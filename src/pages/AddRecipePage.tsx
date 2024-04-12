@@ -1,52 +1,65 @@
 import { Box, Button, Stack, Text } from '@mantine/core'
-import { useDB, useQuery } from '@vlcn.io/react'
-import { Recipe } from 'src/db/models/Recipe'
+import { useDB } from '@vlcn.io/react'
+import { Item, Recipe, RecipeItem } from 'src/db/entities'
+import { resolver } from 'src/db/resolvers/resolver'
 import { nanoid } from 'src/utils/nanoid'
 
-const pirkkaTomato = nanoid(10)
-const pirkkaPasta = nanoid(10)
-
-export function AddRecipePage() {
+export async function AddRecipePage() {
   const ctx = useDB('biteplanner')
-  const recipes = useQuery<Recipe>(
-    ctx,
-    `
-      SELECT
-        recipes.id AS id,
-        recipes.name AS name,
-        json_group_array(json_object('id', items.id, 'name', items.name)) AS items
-      FROM recipes
-      LEFT JOIN recipe_items ON recipes.id = recipe_items.recipe_id
-      JOIN items ON recipe_items.item_id = items.id
-      GROUP BY recipes.id, recipes.name;
-      ORDER BY recipes.created_at DESC;
 
-    `
-  ).data
-  console.log(recipes)
+  const recipes = await Promise.all((await Recipe.findMany({})).map(resolver))
 
   async function addData() {
-    await ctx.db.exec('INSERT INTO items (id, name) VALUES (?, ?);', [
-      pirkkaTomato,
-      'Pirkka Parhaat Tomato',
-    ])
-    await ctx.db.exec('INSERT INTO items (id, name) VALUES (?, ?);', [
-      pirkkaPasta,
-      'Pirkka Parhaat Pasta',
-    ])
-    const recipeId = nanoid(10)
-    await ctx.db.exec('INSERT INTO recipes (id, name) VALUES (?, ?);', [
-      recipeId,
-      'Mun resepti',
-    ])
-    await ctx.db.exec(
-      'INSERT INTO recipe_items (recipe_id, item_id) VALUES (?, ?);',
-      [recipeId, pirkkaTomato]
-    )
-    await ctx.db.exec(
-      'INSERT INTO recipe_items (recipe_id, item_id) VALUES (?, ?);',
-      [recipeId, pirkkaPasta]
-    )
+    const { id: pirkkaTomatoId } = await Item.upsert({
+      object: {
+        id: nanoid(),
+        name: 'Pirkka Parhaat Tomato',
+        kcal: 10,
+        fatTotal: 0,
+        fatSaturated: 0,
+        carbsTotal: 0,
+        carbsSugar: 0,
+        salt: 0,
+        protein: 0,
+      },
+      onConflict: ['name'],
+    })
+    const { id: pirkkaPastaId } = await Item.upsert({
+      object: {
+        id: nanoid(),
+        name: 'Pirkka Parhaat Pasta',
+        kcal: 10,
+        fatTotal: 0,
+        fatSaturated: 0,
+        carbsTotal: 0,
+        carbsSugar: 0,
+        salt: 0,
+        protein: 0,
+      },
+      onConflict: ['name'],
+    })
+
+    const { id: recipeId } = await Recipe.insert({
+      object: {
+        id: nanoid(),
+        name: 'Mun resepti',
+      },
+    })
+
+    await RecipeItem.upsert({
+      object: {
+        recipeId,
+        itemId: pirkkaTomatoId,
+      },
+      onConflict: ['itemId', 'recipeId'],
+    })
+    await RecipeItem.upsert({
+      object: {
+        recipeId,
+        itemId: pirkkaPastaId,
+      },
+      onConflict: ['itemId', 'recipeId'],
+    })
   }
 
   return (

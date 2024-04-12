@@ -1,0 +1,3 @@
+#!/bin/sh
+
+"$(dirname $0)/../node_modules/.bin/ts-node" -T -r tsconfig-paths/register --project "$(dirname $0)/../tsconfig.cli.json" "$@"

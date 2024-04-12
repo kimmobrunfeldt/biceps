@@ -8,7 +8,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { createBrowserRouter } from 'react-router-dom'
 import { App } from 'src/App'
-import schemaContent from 'src/db/schemas/schema.sql?raw'
+import schemaContent from 'src/db/schema.sql?raw'
 import { AddRecipePage } from 'src/pages/AddRecipePage'
 
 const myColor: MantineColorsTuple = [

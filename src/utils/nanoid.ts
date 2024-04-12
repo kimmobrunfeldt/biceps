@@ -1,6 +1,6 @@
-export const nanoid = (t = 21) =>
-  crypto
-    .getRandomValues(new Uint8Array(t))
+export function nanoid(seedLength = 10) {
+  return crypto
+    .getRandomValues(new Uint8Array(seedLength))
     .reduce(
       (t, e) =>
         (t +=
@@ -13,3 +13,4 @@ export const nanoid = (t = 21) =>
                 : '_'),
       ''
     )
+}

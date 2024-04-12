@@ -1,6 +1,12 @@
 {
+  "ts-node": {
+    "compilerOptions": {
+      "module": "commonjs",
+      "target": "es2022"
+    }
+  },
   "compilerOptions": {
-    "target": "esnext",
+    "target": "es2022",
     "lib": [
       "dom",
       "dom.iterable",
@@ -26,13 +32,20 @@
         "./*",
         "src/types/libTypes/*"
       ],
-    }
+    },
+    "plugins": [
+      {
+        "transform": "@zerollup/ts-transform-paths",
+        "exclude": [
+          "*"
+        ]
+      }
+    ]
   },
   "include": [
-    "src/**/*",
-    "shared/schemas/**/*",
-    "shared/*.ts",
-    "*"
+    "**/*.ts",
+    "**/*.tsx",
+    "bin/**/*.ts"
   ],
   "exclude": [
     "node_modules/**/*"
