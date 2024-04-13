@@ -3,13 +3,17 @@
 import '@mantine/core/styles.css'
 
 import { MantineColorsTuple, MantineProvider, createTheme } from '@mantine/core'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { DBProvider } from '@vlcn.io/react'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { createBrowserRouter } from 'react-router-dom'
 import { App } from 'src/App'
+import { DATABASE_NAME } from 'src/constants'
 import schemaContent from 'src/db/schema.sql?raw'
 import { AddRecipePage } from 'src/pages/AddRecipePage'
+
+const queryClient = new QueryClient()
 
 const myColor: MantineColorsTuple = [
   '#f6eeff',
@@ -49,14 +53,16 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <DBProvider
-      dbname="biteplanner"
+      dbname={DATABASE_NAME}
       schema={{
         name: 'schema.sql',
         content: schemaContent,
       }}
       Render={() => (
         <MantineProvider theme={theme}>
-          <AddRecipePage />
+          <QueryClientProvider client={queryClient}>
+            <AddRecipePage />
+          </QueryClientProvider>
         </MantineProvider>
       )}
     />

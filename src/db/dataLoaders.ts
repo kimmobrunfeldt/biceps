@@ -1,12 +1,23 @@
+import { CtxAsync } from '@vlcn.io/react'
 import DataLoader from 'dataloader'
 import _ from 'lodash'
-import { AnyDatabaseEntity, Recipe } from 'src/db/entities'
+import { AnyDatabaseEntity, Item, Recipe, RecipeItem } from 'src/db/entities'
+import { is } from 'src/db/interface/entityMethods'
 
 export type Loaders = ReturnType<typeof createLoaders>
 
-export function createLoaders() {
+export function createLoaders(ctx: CtxAsync) {
   return {
-    recipesById: createSimpleLoader(Recipe),
+    recipesById: createSimpleLoader({ ctx, entity: Recipe }),
+    itemsById: createSimpleLoader({ ctx, entity: Item }),
+    itemsByRecipeIds: new DataLoader(async (recipeIds: readonly string[]) => {
+      const items = await Item.findManyByRecipeIds({
+        ctx,
+        recipeIds,
+      })
+      return groupAndSortByReference(items, recipeIds, (item) => item.recipeId)
+    }),
+    recipeItemsById: createSimpleLoader({ ctx, entity: RecipeItem }),
   }
 }
 
@@ -23,11 +34,18 @@ export function getLoaders() {
 }
 */
 
-function createSimpleLoader<T extends AnyDatabaseEntity>(
-  Entity: T
-): DataLoader<string, Awaited<ReturnType<T['find']>>, string> {
+function createSimpleLoader<T extends AnyDatabaseEntity>({
+  entity: Entity,
+  ctx,
+}: {
+  entity: T
+  ctx: CtxAsync
+}): DataLoader<string, Awaited<ReturnType<T['find']>>, string> {
   const loaderFn = async (ids: readonly string[]) => {
-    const entities = await Entity.findMany({ where: { id: is('in', ids) } })
+    const entities = await Entity.findMany({
+      ctx,
+      where: { id: is('IN', ids) },
+    })
     // @ts-expect-error Wasn't able to make TS happy
     const sorted = sortByReference(entities, ids, (entity) => entity.id)
     return sorted

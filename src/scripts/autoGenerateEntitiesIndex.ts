@@ -23,7 +23,7 @@ function generate() {
     ``,
     `/* eslint-disable no-restricted-imports */`,
     ``,
-    `import { createEntity } from 'src/db/utils/entityInterface'`,
+    `import { createEntity } from 'src/db/interface/entityInterface'`,
     ``,
   ]
   const entityNames: string[] = []

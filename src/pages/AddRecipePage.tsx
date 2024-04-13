@@ -1,16 +1,18 @@
 import { Box, Button, Stack, Text } from '@mantine/core'
 import { useDB } from '@vlcn.io/react'
+import { DATABASE_NAME } from 'src/constants'
 import { Item, Recipe, RecipeItem } from 'src/db/entities'
-import { resolver } from 'src/db/resolvers/resolver'
+import { useGetAllRecipes } from 'src/hooks/useData'
 import { nanoid } from 'src/utils/nanoid'
 
-export async function AddRecipePage() {
-  const ctx = useDB('biteplanner')
-
-  const recipes = await Promise.all((await Recipe.findMany({})).map(resolver))
+export function AddRecipePage() {
+  const ctx = useDB(DATABASE_NAME)
+  const { data: recipes } = useGetAllRecipes()
+  console.log('getAllRecipes', recipes)
 
   async function addData() {
-    const { id: pirkkaTomatoId } = await Item.upsert({
+    const { id: pirkkaTomatoId } = await Item.clientUpsert({
+      ctx,
       object: {
         id: nanoid(),
         name: 'Pirkka Parhaat Tomato',
@@ -24,7 +26,8 @@ export async function AddRecipePage() {
       },
       onConflict: ['name'],
     })
-    const { id: pirkkaPastaId } = await Item.upsert({
+    const { id: pirkkaPastaId } = await Item.clientUpsert({
+      ctx,
       object: {
         id: nanoid(),
         name: 'Pirkka Parhaat Pasta',
@@ -39,21 +42,25 @@ export async function AddRecipePage() {
       onConflict: ['name'],
     })
 
-    const { id: recipeId } = await Recipe.insert({
+    const { id: recipeId } = await Recipe.clientUpsert({
+      ctx,
+      onConflict: ['name'],
       object: {
         id: nanoid(),
         name: 'Mun resepti',
       },
     })
 
-    await RecipeItem.upsert({
+    await RecipeItem.clientUpsert({
+      ctx,
       object: {
         recipeId,
         itemId: pirkkaTomatoId,
       },
       onConflict: ['itemId', 'recipeId'],
     })
-    await RecipeItem.upsert({
+    await RecipeItem.clientUpsert({
+      ctx,
       object: {
         recipeId,
         itemId: pirkkaPastaId,
@@ -65,11 +72,11 @@ export async function AddRecipePage() {
   return (
     <Box>
       <h1>Recipes</h1>
-      {recipes.map((row) => (
-        <Box key={row.id}>
-          <Text>{row.name}</Text>
+      {recipes?.map((recipe) => (
+        <Box key={recipe.id}>
+          <Text>{recipe.name}</Text>
           <Stack>
-            {JSON.parse(row.items).map((item) => {
+            {recipe.items.map((item) => {
               return <Box key={item.id}>{item.name}</Box>
             })}
           </Stack>

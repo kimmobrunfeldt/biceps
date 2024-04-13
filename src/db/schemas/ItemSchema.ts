@@ -1,4 +1,9 @@
-import { DateFieldSchema, NameSchema, addTypeName } from 'src/db/schemas/common'
+import {
+  DateFieldSchema,
+  NameSchema,
+  addTypeName,
+  preprocessors,
+} from 'src/db/schemas/common'
 import { z } from 'zod'
 
 export const ItemRowSchema = z
@@ -6,14 +11,17 @@ export const ItemRowSchema = z
     __type: addTypeName('Item'),
     id: z.string(),
     name: NameSchema,
-    kcal: z.number().int().positive(),
-    fatTotal: z.number().positive(),
-    fatSaturated: z.number().positive(),
-    carbsTotal: z.number().positive(),
-    carbsSugar: z.number().positive(),
-    protein: z.number().positive(),
-    salt: z.number().positive(),
-    imageUrl: z.string().url().optional(),
+    kcal: z.number().int().nonnegative(),
+    fatTotal: z.number().nonnegative(),
+    fatSaturated: z.number().nonnegative(),
+    carbsTotal: z.number().nonnegative(),
+    carbsSugar: z.number().nonnegative(),
+    protein: z.number().nonnegative(),
+    salt: z.number().nonnegative(),
+    imageUrl: z.preprocess(
+      preprocessors.nullToUndefined,
+      z.string().url().optional()
+    ),
     createdAt: DateFieldSchema,
   })
   .strict()

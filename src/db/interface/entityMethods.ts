@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import sql, { Sql, join, raw } from 'sql-template-tag'
-import { Options } from 'src/db/utils/entityInterface'
-import { SqlError } from 'src/db/utils/errors'
+import { createDatabaseMethods } from 'src/db/interface/databaseMethods'
+import { Options } from 'src/db/interface/entityInterface'
 import { isNotUndefined } from 'src/utils/typeUtils'
 import { deepOmitBy } from 'src/utils/utils'
 import { ZodSchema, z } from 'zod'
@@ -20,8 +20,11 @@ export type SubConditions<FullObjT extends Record<string, any>> = Partial<
   OR?: SubConditions<FullObjT>
 }
 
+type ComparisonToken = '=' | '!=' | '>' | '>=' | '<' | '<=' | 'IN'
+type Comparison<T> = { comparison: ComparisonToken; value: T | readonly T[] }
+
 type WhereObject<FullObjT extends Record<string, any>> = {
-  [K in keyof FullObjT]: FullObjT[K] | readonly FullObjT[K][]
+  [K in keyof FullObjT]: FullObjT[K] | Comparison<FullObjT[K]>
 }
 
 export type FindOptions<T extends Record<string, any>> = {
@@ -45,6 +48,12 @@ export function makeUtils<
   beforeDatabaseSchema: BeforeDatabaseSchemaT
   schema: SchemaT
 }) {
+  const createDatabaseMethodsWithTransform: typeof createDatabaseMethods = (
+    opts
+  ) => {
+    return createDatabaseMethods({ ...opts, transformRow: camelCaseObject })
+  }
+
   const table = identifier([inputTableName])
 
   function baseInsertAsSql(object: z.infer<BeforeDatabaseSchemaT>) {
@@ -115,25 +124,44 @@ export function makeUtils<
     ctx,
     where,
     orderBy,
-    limit,
+    // Default limit to 2 to prevent accidental large queries but still allow to throw
+    // when the where criteria returns more than one row.
+    limit = 2,
   }: Options & FindOptions<z.infer<SchemaT>>): Promise<z.infer<SchemaT>> {
     const { limitSql, orderBySql, whereSql } = findOptionsAsSql({
       where,
       orderBy,
       limit,
     })
-    const query = sql`
+    const sqlQuery = sql`
       SELECT * FROM ${table}
       ${whereSql}
       ${orderBySql}
       ${limitSql}
     `
+    const { one } = createDatabaseMethodsWithTransform({ ctx, schema })
+    return await one(sqlQuery)
+  }
 
-    const rows = await ctx.db.execO(query.sql, query.values)
-    if (rows.length !== 1) {
-      throw new SqlError('Unexpected amount of rows returned')
-    }
-    return schema.parse(rows[0])
+  async function maybeFind({
+    ctx,
+    where,
+    orderBy,
+    limit = 2,
+  }: Options & FindOptions<z.infer<SchemaT>>): Promise<z.infer<SchemaT>> {
+    const { limitSql, orderBySql, whereSql } = findOptionsAsSql({
+      where,
+      orderBy,
+      limit,
+    })
+    const sqlQuery = sql`
+      SELECT * FROM ${table}
+      ${whereSql}
+      ${orderBySql}
+      ${limitSql}
+    `
+    const { maybeOne } = createDatabaseMethodsWithTransform({ ctx, schema })
+    return await maybeOne(sqlQuery)
   }
 
   async function findMany({
@@ -149,14 +177,14 @@ export function makeUtils<
       orderBy,
       limit,
     })
-    const query = sql`
+    const sqlQuery = sql`
       SELECT * FROM ${table}
       ${whereSql}
       ${orderBySql}
       ${limitSql}
     `
-    const rows = await ctx.db.execO(query.sql, query.values)
-    return rows.map((r) => schema.parse(r))
+    const { many } = createDatabaseMethodsWithTransform({ ctx, schema })
+    return await many(sqlQuery)
   }
 
   async function insert({
@@ -165,12 +193,9 @@ export function makeUtils<
   }: Options & { object: z.infer<BeforeDatabaseSchemaT> }): Promise<
     z.infer<SchemaT>
   > {
-    const query = insertAsSql(object)
-    const rows = await ctx.db.execO(query.sql, query.values)
-    if (rows.length !== 1) {
-      throw new SqlError('Unexpected amount of rows returned')
-    }
-    return schema.parse(rows[0])
+    const sqlQuery = insertAsSql(object)
+    const { one } = createDatabaseMethodsWithTransform({ ctx, schema })
+    return await one(sqlQuery)
   }
 
   async function upsert({
@@ -188,12 +213,43 @@ export function makeUtils<
      */
     onConflict: Sql | (keyof z.infer<SchemaT> & string)[]
   }): Promise<z.infer<SchemaT>> {
-    const query = upsertAsSql({ object, onConflict })
-    const rows = await ctx.db.execO(query.sql, query.values)
-    if (rows.length !== 1) {
-      throw new SqlError('Unexpected amount of rows returned')
+    const sqlQuery = upsertAsSql({ object, onConflict })
+    const { one } = createDatabaseMethodsWithTransform({ ctx, schema })
+    return await one(sqlQuery)
+  }
+
+  /**
+   * Upsert but implemented on the client side. Not safe for environments
+   * with concurrent writes to the database.
+   */
+  async function clientUpsert({
+    object,
+    onConflict,
+    ctx,
+  }: Options & {
+    /**
+     * Object to insert or update.
+     */
+    object: z.infer<BeforeDatabaseSchemaT> &
+      Partial<Omit<z.infer<SchemaT>, keyof z.infer<BeforeDatabaseSchemaT>>>
+    /**
+     * Either a list of column keys to use in the ON CONFLICT clause or a custom sql fragment for constraints.
+     */
+    onConflict: Sql | (keyof z.infer<SchemaT> & string)[]
+  }): Promise<z.infer<SchemaT>> {
+    if (!_.isArray(onConflict)) {
+      throw new Error('clientUpsert requires onConflict to be an array')
     }
-    return schema.parse(rows[0])
+
+    const onConflictWhere = _.pick(object, onConflict) as WhereConditions<
+      z.infer<SchemaT>
+    >
+    const found = await maybeFind({ ctx, where: onConflictWhere })
+    if (found) {
+      return await update({ ctx, where: onConflictWhere, set: object })
+    }
+
+    return await insert({ ctx, object })
   }
 
   async function update({
@@ -226,17 +282,14 @@ export function makeUtils<
       })
     }
 
-    const query = sql`
+    const sqlQuery = sql`
       UPDATE ${table}
       SET ${join(updates, ', ')}
       WHERE ${whereAsSql(where)}
       RETURNING *
     `
-    const rows = await ctx.db.execO(query.sql, query.values)
-    if (rows.length !== 1) {
-      throw new SqlError('Unexpected amount of rows returned')
-    }
-    return rows[0]
+    const { one } = createDatabaseMethodsWithTransform({ ctx, schema })
+    return await one(sqlQuery)
   }
 
   async function remove({
@@ -253,15 +306,18 @@ export function makeUtils<
 
   return {
     find,
+    maybeFind,
     findMany,
     insert,
     upsert,
+    clientUpsert,
     update,
     remove,
+    createDatabaseMethodsWithTransform,
   }
 }
 
-function findOptionsAsSql<T extends Record<string, any>>({
+export function findOptionsAsSql<T extends Record<string, any>>({
   where = {},
   orderBy,
   limit,
@@ -306,6 +362,35 @@ export function whereConditionsAsSql(
   return sql`${baseConditions}${andConditions}${orConditions}`
 }
 
+export function is<T>(comparison: ComparisonToken, value: T) {
+  return { comparison, value }
+}
+
+function comparisonAsSql<T>(comparison: Comparison<T>): Sql {
+  switch (comparison.comparison) {
+    case '=':
+      return sql`= ${valueToSqlSuitable(comparison.value)}`
+    case '!=':
+      return sql`!= ${valueToSqlSuitable(comparison.value)}`
+    case '>':
+      return sql`> ${valueToSqlSuitable(comparison.value)}`
+    case '>=':
+      return sql`>= ${valueToSqlSuitable(comparison.value)}`
+    case '<':
+      return sql`< ${valueToSqlSuitable(comparison.value)}`
+    case '<=':
+      return sql`<= ${valueToSqlSuitable(comparison.value)}`
+    case 'IN': {
+      const arr = _.isArray(comparison.value)
+        ? comparison.value
+        : [comparison.value]
+      return sql` IN (${join(arr.map(valueToSqlSuitable), ', ')})`
+    }
+    default:
+      throw new Error(`Unknown comparison: ${comparison.comparison}`)
+  }
+}
+
 function entityConditionsAsSql(
   type: 'OR' | 'AND',
   entityConditions: Record<string, any>
@@ -317,17 +402,18 @@ function entityConditionsAsSql(
 
   const conditions = keys.map((key) => {
     const value = entityConditions[key]
-    if (_.isArray(value)) {
-      return sql`${entityKeyToColumn(key)} IN (${join(
-        value.map(valueToSqlSuitable),
-        ', '
-      )})`
+    if (isComparison(value)) {
+      return sql`${entityKeyToColumn(key)} ${comparisonAsSql(value)}`
     }
 
     return sql`${entityKeyToColumn(key)} = ${valueToSqlSuitable(value)}`
   })
   const joiner = type === 'OR' ? ' OR ' : ' AND '
   return sql`(${join(conditions, joiner)})`
+}
+
+function isComparison<T>(val: unknown): val is Comparison<T> {
+  return _.isPlainObject(val) && _.has(val, 'comparison') && _.has(val, 'value')
 }
 
 type OrderByTuple<T extends string> = [T, 'asc' | 'desc']
@@ -364,6 +450,14 @@ function dirAsSql(dir: 'asc' | 'desc') {
 
 function entityKeyToColumn(key: string) {
   return identifier([_.snakeCase(key)])
+}
+
+function snakeCaseObject(obj: Record<string, any>) {
+  return _.mapKeys(obj, (_value, key) => _.snakeCase(key))
+}
+
+function camelCaseObject(obj: Record<string, any>) {
+  return _.mapKeys(obj, (value, key) => _.camelCase(key))
 }
 
 function identifier(names: string[]) {

@@ -1,4 +1,4 @@
-import { CtxAsync, useDB } from '@vlcn.io/react'
+import { CtxAsync } from '@vlcn.io/react'
 import _ from 'lodash'
 import { Sql } from 'sql-template-tag'
 
@@ -49,7 +49,20 @@ export type DatabaseEntity<
   ) => Promise<T>
   upsertMany?: (
     params: {
-      objects: Array<Partial<Omit<T, 'id'>> & Pick<T, 'id'>>
+      objects: Array<BeforeDatabaseT & Partial<Omit<T, keyof BeforeDatabaseT>>>
+      onConflict: Sql | any[]
+    } & Options
+  ) => Promise<readonly T[]>
+  clientUpsert?: (
+    params: {
+      object: BeforeDatabaseT & Partial<Omit<T, keyof BeforeDatabaseT>>
+      onConflict: Sql | any[]
+    } & Options
+  ) => Promise<T>
+  clientUpsertMany?: (
+    params: {
+      objects: Array<BeforeDatabaseT & Partial<Omit<T, keyof BeforeDatabaseT>>>
+      onConflict: Sql | any[]
     } & Options
   ) => Promise<readonly T[]>
   remove?: (params: { where: Partial<T> } & Options) => Promise<void>
@@ -59,19 +72,14 @@ export type DatabaseEntity<
 }
 
 type AnyFunction = (...args: any[]) => any
-type PartialMethodOptions<T extends Record<string, any>> = Omit<
-  T,
-  keyof Options
-> &
-  Partial<Options>
 
-type MethodsWithOptionalParams = 'findAll'
+type MethodsWithOptionalParams = 'findAll' | 'findMany'
 
 type EntityForCaller<T extends DatabaseEntity<any, any>> = {
   [K in keyof T]: T[K] extends AnyFunction
     ? K extends MethodsWithOptionalParams
-      ? (params?: PartialMethodOptions<Parameters<T[K]>[0]>) => ReturnType<T[K]>
-      : (params: PartialMethodOptions<Parameters<T[K]>[0]>) => ReturnType<T[K]>
+      ? (params?: Parameters<T[K]>[0]) => ReturnType<T[K]>
+      : (params: Parameters<T[K]>[0]) => ReturnType<T[K]>
     : T[K]
 }
 
@@ -83,13 +91,9 @@ export function createEntity<T extends DatabaseEntity<any, any>>(
       return val
     }
 
+    // This is a place to do centralized actions before any method is called
     return async (params: Record<string, any> = {}) => {
-      if ('ctx' in params) {
-        return await val(params)
-      }
-
-      const ctx = useDB('biteplanner')
-      return await val({ ...params, ctx })
+      return await val(params)
     }
   }) as EntityForCaller<T>
 }
