@@ -31,11 +31,9 @@ jobs:
       - run: npm ci --include=dev
       - run: npm run build
       - name: Publish to Cloudflare Pages
-        uses: cloudflare/pages-action@v1
+        uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_DEPLOY_API_TOKEN }}
-          accountId: 91372db2b1033c677634cb901eb12ae6
-          projectName: biceps
-          directory: dist
-          # For GitHub Deployments
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=biceps --commit-dirty=true
+
