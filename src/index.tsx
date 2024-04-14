@@ -15,23 +15,24 @@ import { DataLoaderContext } from 'src/hooks/useDataLoaders'
 
 const queryClient = new QueryClient()
 
-const myColor: MantineColorsTuple = [
-  '#f6eeff',
-  '#e7daf7',
-  '#cab1ea',
-  '#ad86dd',
-  '#9562d2',
-  '#854bcb',
-  '#7d3ec9',
-  '#6b31b2',
-  '#5f2aa0',
-  '#52228d',
+const brandColor: MantineColorsTuple = [
+  '#f5ecff',
+  '#e5d4fa',
+  '#c8a6f3',
+  '#aa75ed',
+  '#904ce7',
+  '#8032e4',
+  '#7825e3',
+  '#6619ca',
+  '#5b14b5',
+  '#4e0da0',
 ]
 
 const theme = createTheme({
   colors: {
-    myColor,
+    purple: brandColor,
   },
+  primaryColor: 'purple',
 })
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -47,7 +48,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         const dataLoaders = createLoaders(ctx.db)
         return (
           <DataLoaderContext.Provider value={dataLoaders}>
-            <MantineProvider theme={theme}>
+            <MantineProvider theme={theme} defaultColorScheme='dark'>
               <QueryClientProvider client={queryClient}>
                 <Router />
               </QueryClientProvider>

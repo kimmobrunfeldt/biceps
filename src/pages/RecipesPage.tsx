@@ -1,10 +1,10 @@
-import { Box, Button, Stack, Text } from '@mantine/core'
+import { Box, Button, Stack, Text, Title } from '@mantine/core'
+import { Query } from 'src/components/Query'
 import { useCreateRecipe, useGetAllRecipes } from 'src/hooks/useDatabase'
 
 export function AddRecipePage() {
-  const { data: recipes } = useGetAllRecipes()
+  const recipesResult = useGetAllRecipes()
   const { createRecipe } = useCreateRecipe()
-  console.log('getAllRecipes', recipes)
 
   async function onAddRecipeClick() {
     await createRecipe({
@@ -36,17 +36,21 @@ export function AddRecipePage() {
 
   return (
     <Box>
-      <h1>Recipes</h1>
-      {recipes?.map((recipe) => (
-        <Box key={recipe.id}>
-          <Text>{recipe.name}</Text>
-          <Stack>
-            {recipe.items.map((item) => {
-              return <Box key={item.id}>{item.name}</Box>
-            })}
-          </Stack>
-        </Box>
-      ))}
+      <Title>Recipes</Title>
+      <Box py={"lg"}>
+      <Query result={recipesResult}>
+        {recipes => recipes.map((recipe) => (
+          <Box key={recipe.id}>
+            <Text>{recipe.name}</Text>
+            <Stack>
+              {recipe.items.map((item) => {
+                return <Box key={item.id}>{item.name}</Box>
+              })}
+            </Stack>
+          </Box>
+        ))}
+      </Query>
+      </Box>
       <Button onClick={onAddRecipeClick}>Add recipe</Button>
     </Box>
   )

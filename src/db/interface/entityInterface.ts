@@ -11,9 +11,7 @@ type BaseEntity = AnyFields & {
   id: string
 }
 
-// This is the minimum API contract that all entities must fulfill. Normally
-// most methods are defaults via `slonikUtils.makeUtils()`, but db entities
-// can also choose to implement their own if required.
+// This is the minimum API contract that all entities must fulfill
 export type DatabaseEntity<
   BeforeDatabaseT extends AnyFields,
   T extends BaseEntity,

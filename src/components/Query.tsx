@@ -23,7 +23,7 @@ export function Query<T>({
   isLoading = (result) => result.isLoading || result.isFetching,
   pickData = (result) => result.data,
   whenEmpty = () => <Text>No results found</Text>,
-  whenLoading = <Loader speed="0.8s" />,
+  whenLoading = <Loader size="sm" />,
 }: Props<T>): JSX.Element {
   const showSpinner = useSpinDelay(isLoading(result), {
     delay: loaderDelayMs,

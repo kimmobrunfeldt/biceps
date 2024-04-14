@@ -15,9 +15,6 @@
     "generate:watch": "chokidar 'src/db/**/*.ts' -i /index.ts/ --initial -c 'npm run generate'"
   },
   "dependencies": {
-    "@automerge/automerge-repo": "^1.1.5",
-    "@automerge/automerge-repo-react-hooks": "^1.1.5",
-    "@automerge/automerge-repo-storage-indexeddb": "^1.1.5",
     "@mantine/core": "^7.7.1",
     "@mantine/hooks": "^7.7.1",
     "@tabler/icons-react": "^3.1.0",
@@ -25,7 +22,6 @@
     "@vlcn.io/crsqlite-wasm": "^0.16.0",
     "@vlcn.io/react": "^3.1.0",
     "dataloader": "^2.2.2",
-    "effect": "^2.4.18",
     "lodash": "^4.17.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -52,7 +48,7 @@
     "eslint-plugin-react-refresh": "^0.4.6",
     "jsdom": "^24.0.0",
     "postcss": "^8.4.38",
-    "postcss-preset-mantine": "^1.13.0",
+    "postcss-preset-mantine": "^1.14.4",
     "postcss-simple-vars": "^7.0.1",
     "prettier": "^3.2.5",
     "ts-morph": "^22.0.0",

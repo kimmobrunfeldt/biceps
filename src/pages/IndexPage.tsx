@@ -1,3 +1,3 @@
 export function IndexPage() {
-  return <></>
+  return <>Home</>
 }

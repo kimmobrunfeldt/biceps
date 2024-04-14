@@ -17,4 +17,8 @@ export const routes = {
       title: makeTitle('Add recipe'),
     },
   },
+  settings: {
+    path: '/settings',
+    title: makeTitle('Settings'),
+  },
 }

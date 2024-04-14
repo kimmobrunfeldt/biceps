@@ -1,0 +1,51 @@
+.root {
+  padding-top: 80px;
+  padding-bottom: 80px;
+}
+
+.inner {
+  position: relative;
+}
+
+.background {
+  position: absolute;
+  inset: 0;
+  color: light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-6));
+  font-size: 200px;
+  font-weight: bold;
+  text-align: center;
+  top: -100px;
+
+  @media (min-width: $mantine-breakpoint-sm) {
+    font-size: 400px;
+    top: -130px;
+  }
+}
+
+.content {
+  padding-top: 120px;
+  position: relative;
+  z-index: 1;
+
+  @media (min-width: $mantine-breakpoint-sm) {
+    padding-top: 220px;
+  }
+}
+
+.title {
+  font-family: var(--mantine-font-family);
+  text-align: center;
+  font-weight: 900;
+  font-size: 32px;
+
+  @media (min-width: $mantine-breakpoint-sm) {
+    font-size: 38px;
+  }
+}
+
+.description {
+  max-width: 540px;
+  margin: auto;
+  margin-top: var(--mantine-spacing-xl);
+  margin-bottom: calc(var(--mantine-spacing-xl) * 1.5);
+}

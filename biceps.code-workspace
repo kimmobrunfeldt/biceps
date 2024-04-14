@@ -43,6 +43,9 @@
       "source.fixAll.eslint": "explicit"
     },
     "typescript.preferences.importModuleSpecifier": "non-relative",
-    "eslint.trace.server": "verbose"
+    "eslint.trace.server": "verbose",
+    "files.associations": {
+      "*.css": "postcss"
+    }
   }
 }
