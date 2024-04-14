@@ -1,6 +1,5 @@
-import { CtxAsync } from '@vlcn.io/react'
-import { createLoaders } from 'src/db/dataLoaders'
-import { Recipe, RecipeRow } from 'src/db/schemas/RecipeSchema'
+import { CommonResolverOptions } from 'src/db/resolvers/types'
+import { RecipeResolved, RecipeRow } from 'src/db/schemas/RecipeSchema'
 
 export const resolvers = {
   Recipe: recipeResolver,
@@ -8,12 +7,10 @@ export const resolvers = {
 
 export async function recipeResolver({
   row,
-  ctx,
+  loaders,
 }: {
   row: RecipeRow
-  ctx: CtxAsync
-}): Promise<Recipe> {
-  const loaders = createLoaders(ctx)
+} & CommonResolverOptions): Promise<RecipeResolved> {
   const recipe = {
     ...row,
     items: await loaders.itemsByRecipeIds.load(row.id),

@@ -1,5 +1,7 @@
 import {
-  DateFieldSchema,
+  AddIdSchema,
+  DateSchema,
+  IdSchema,
   NameSchema,
   addTypeName,
   preprocessors,
@@ -9,7 +11,7 @@ import { z } from 'zod'
 export const ItemRowSchema = z
   .object({
     __type: addTypeName('Item'),
-    id: z.string(),
+    id: IdSchema,
     name: NameSchema,
     kcal: z.number().int().nonnegative(),
     fatTotal: z.number().nonnegative(),
@@ -22,22 +24,29 @@ export const ItemRowSchema = z
       preprocessors.nullToUndefined,
       z.string().url().optional()
     ),
-    createdAt: DateFieldSchema,
+    createdAt: DateSchema,
   })
   .strict()
 export type ItemRow = z.infer<typeof ItemRowSchema>
 
 export const ItemBeforeDatabaseSchema = ItemRowSchema.omit({
   __type: true,
+  id: true,
   createdAt: true,
 })
   .merge(
     z.object({
+      id: AddIdSchema,
       createdAt: ItemRowSchema.shape.createdAt.optional(),
     })
   )
   .strict()
 export type ItemBeforeDatabase = z.infer<typeof ItemBeforeDatabaseSchema>
 
-export const ItemSchema = ItemRowSchema
-export type Item = z.infer<typeof ItemSchema>
+export const ItemResolvedSchema = ItemRowSchema
+export type ItemResolved = z.infer<typeof ItemResolvedSchema>
+
+export const ItemResolvedBeforeSavingSchema = ItemBeforeDatabaseSchema
+export type ItemResolvedBeforeSaving = z.infer<
+  typeof ItemResolvedBeforeSavingSchema
+>

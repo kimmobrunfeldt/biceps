@@ -1,71 +1,36 @@
 import { Box, Button, Stack, Text } from '@mantine/core'
-import { useDB } from '@vlcn.io/react'
-import { DATABASE_NAME } from 'src/constants'
-import { Item, Recipe, RecipeItem } from 'src/db/entities'
-import { useGetAllRecipes } from 'src/hooks/useData'
-import { nanoid } from 'src/utils/nanoid'
+import { useCreateRecipe, useGetAllRecipes } from 'src/hooks/useDatabase'
 
 export function AddRecipePage() {
-  const ctx = useDB(DATABASE_NAME)
   const { data: recipes } = useGetAllRecipes()
+  const { createRecipe } = useCreateRecipe()
   console.log('getAllRecipes', recipes)
 
-  async function addData() {
-    const { id: pirkkaTomatoId } = await Item.clientUpsert({
-      ctx,
-      object: {
-        id: nanoid(),
-        name: 'Pirkka Parhaat Tomato',
-        kcal: 10,
-        fatTotal: 0,
-        fatSaturated: 0,
-        carbsTotal: 0,
-        carbsSugar: 0,
-        salt: 0,
-        protein: 0,
-      },
-      onConflict: ['name'],
-    })
-    const { id: pirkkaPastaId } = await Item.clientUpsert({
-      ctx,
-      object: {
-        id: nanoid(),
-        name: 'Pirkka Parhaat Pasta',
-        kcal: 10,
-        fatTotal: 0,
-        fatSaturated: 0,
-        carbsTotal: 0,
-        carbsSugar: 0,
-        salt: 0,
-        protein: 0,
-      },
-      onConflict: ['name'],
-    })
-
-    const { id: recipeId } = await Recipe.clientUpsert({
-      ctx,
-      onConflict: ['name'],
-      object: {
-        id: nanoid(),
-        name: 'Mun resepti',
-      },
-    })
-
-    await RecipeItem.clientUpsert({
-      ctx,
-      object: {
-        recipeId,
-        itemId: pirkkaTomatoId,
-      },
-      onConflict: ['itemId', 'recipeId'],
-    })
-    await RecipeItem.clientUpsert({
-      ctx,
-      object: {
-        recipeId,
-        itemId: pirkkaPastaId,
-      },
-      onConflict: ['itemId', 'recipeId'],
+  async function onAddRecipeClick() {
+    await createRecipe({
+      name: 'My recipe',
+      items: [
+        {
+          name: 'Pirkka Parhaat Tomato',
+          kcal: 10,
+          fatTotal: 0,
+          fatSaturated: 0,
+          carbsTotal: 0,
+          carbsSugar: 0,
+          salt: 0,
+          protein: 0,
+        },
+        {
+          name: 'Pirkka Parhaat Pasta',
+          kcal: 10,
+          fatTotal: 0,
+          fatSaturated: 0,
+          carbsTotal: 0,
+          carbsSugar: 0,
+          salt: 0,
+          protein: 0,
+        },
+      ],
     })
   }
 
@@ -82,7 +47,7 @@ export function AddRecipePage() {
           </Stack>
         </Box>
       ))}
-      <Button onClick={addData}>Add data</Button>
+      <Button onClick={onAddRecipeClick}>Add recipe</Button>
     </Box>
   )
 }

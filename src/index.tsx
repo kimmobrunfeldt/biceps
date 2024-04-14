@@ -4,14 +4,14 @@ import '@mantine/core/styles.css'
 
 import { MantineColorsTuple, MantineProvider, createTheme } from '@mantine/core'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { DBProvider } from '@vlcn.io/react'
+import { DBProvider, useDB } from '@vlcn.io/react'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { createBrowserRouter } from 'react-router-dom'
-import { App } from 'src/App'
+import { Router } from 'src/Router'
 import { DATABASE_NAME } from 'src/constants'
+import { createLoaders } from 'src/db/dataLoaders'
 import schemaContent from 'src/db/schema.sql?raw'
-import { AddRecipePage } from 'src/pages/AddRecipePage'
+import { DataLoaderContext } from 'src/hooks/useDataLoaders'
 
 const queryClient = new QueryClient()
 
@@ -34,22 +34,6 @@ const theme = createTheme({
   },
 })
 
-const router = createBrowserRouter([
-  {
-    element: <App />,
-    children: [
-      {
-        path: '/',
-        element: <AddRecipePage />,
-      },
-      {
-        path: '/recipes/add',
-        element: <AddRecipePage />,
-      },
-    ],
-  },
-])
-
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <DBProvider
@@ -58,13 +42,19 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         name: 'schema.sql',
         content: schemaContent,
       }}
-      Render={() => (
-        <MantineProvider theme={theme}>
-          <QueryClientProvider client={queryClient}>
-            <AddRecipePage />
-          </QueryClientProvider>
-        </MantineProvider>
-      )}
+      Render={() => {
+        const ctx = useDB(DATABASE_NAME)
+        const dataLoaders = createLoaders(ctx.db)
+        return (
+          <DataLoaderContext.Provider value={dataLoaders}>
+            <MantineProvider theme={theme}>
+              <QueryClientProvider client={queryClient}>
+                <Router />
+              </QueryClientProvider>
+            </MantineProvider>
+          </DataLoaderContext.Provider>
+        )
+      }}
     />
   </React.StrictMode>
 )

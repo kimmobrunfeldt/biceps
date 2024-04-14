@@ -1,49 +1,36 @@
-import { CtxAsync } from '@vlcn.io/react'
+import { TXAsync } from '@vlcn.io/xplat-api'
 import DataLoader from 'dataloader'
 import _ from 'lodash'
 import { AnyDatabaseEntity, Item, Recipe, RecipeItem } from 'src/db/entities'
 import { is } from 'src/db/interface/entityMethods'
 
-export type Loaders = ReturnType<typeof createLoaders>
+export type DataLoaders = ReturnType<typeof createLoaders>
 
-export function createLoaders(ctx: CtxAsync) {
+export function createLoaders(connection: TXAsync) {
   return {
-    recipesById: createSimpleLoader({ ctx, entity: Recipe }),
-    itemsById: createSimpleLoader({ ctx, entity: Item }),
+    recipesById: createSimpleLoader({ connection, entity: Recipe }),
+    itemsById: createSimpleLoader({ connection, entity: Item }),
     itemsByRecipeIds: new DataLoader(async (recipeIds: readonly string[]) => {
       const items = await Item.findManyByRecipeIds({
-        ctx,
+        connection,
         recipeIds,
       })
       return groupAndSortByReference(items, recipeIds, (item) => item.recipeId)
     }),
-    recipeItemsById: createSimpleLoader({ ctx, entity: RecipeItem }),
+    recipeItemsById: createSimpleLoader({ connection, entity: RecipeItem }),
   }
 }
-
-// TODO: Convert to react hook
-/*
-export function getLoaders() {
-  // Return from request context if request available
-  const loadersFromContext = requestContext.maybeGet('loaders')
-  if (loadersFromContext) {
-    return loadersFromContext
-  }
-  // This should happen only on background workers
-  return createLoaders()
-}
-*/
 
 function createSimpleLoader<T extends AnyDatabaseEntity>({
   entity: Entity,
-  ctx,
+  connection,
 }: {
   entity: T
-  ctx: CtxAsync
+  connection: TXAsync
 }): DataLoader<string, Awaited<ReturnType<T['find']>>, string> {
   const loaderFn = async (ids: readonly string[]) => {
     const entities = await Entity.findMany({
-      ctx,
+      connection,
       where: { id: is('IN', ids) },
     })
     // @ts-expect-error Wasn't able to make TS happy

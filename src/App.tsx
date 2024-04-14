@@ -1,14 +1,6 @@
-import {
-  AppShell,
-  Box,
-  Burger,
-  Group,
-  Stack,
-  UnstyledButton,
-} from '@mantine/core'
+import { AppShell, Box, Burger, Group, Stack } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { NavLink } from 'react-router-dom'
-import classes from 'src/App.module.css'
+import { NavLink } from 'src/components/NavLink'
 import { appName, routes } from 'src/routes'
 
 export function App({ children }: { children?: React.ReactNode }) {
@@ -29,11 +21,7 @@ export function App({ children }: { children?: React.ReactNode }) {
       <AppShell.Navbar p="md">
         <Stack gap="xl">
           <Stack>
-            <NavLink to={routes.recipes.index.path} className={classes.control}>
-              {({ isActive, isPending, isTransitioning }) => (
-                <UnstyledButton>Recipes</UnstyledButton>
-              )}
-            </NavLink>
+            <NavLink to={routes.index.path}>Recipes</NavLink>
           </Stack>
         </Stack>
       </AppShell.Navbar>

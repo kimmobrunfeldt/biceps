@@ -1,4 +1,4 @@
-export function nanoid(seedLength = 10) {
+export function nanoId(seedLength = 10) {
   return crypto
     .getRandomValues(new Uint8Array(seedLength))
     .reduce(

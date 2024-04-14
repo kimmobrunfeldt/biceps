@@ -17,5 +17,11 @@ export type RecipeItemBeforeDatabase = z.infer<
   typeof RecipeItemBeforeDatabaseSchema
 >
 
-export const RecipeItemSchema = RecipeItemRowSchema
-export type RecipeItem = z.infer<typeof RecipeItemSchema>
+export const RecipeItemResolvedSchema = RecipeItemRowSchema
+export type RecipeItemResolved = z.infer<typeof RecipeItemResolvedSchema>
+
+export const RecipeItemResolvedBeforeSavingSchema =
+  RecipeItemBeforeDatabaseSchema
+export type RecipeItemResolvedBeforeSaving = z.infer<
+  typeof RecipeItemResolvedBeforeSavingSchema
+>

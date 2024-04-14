@@ -31,7 +31,7 @@ const ItemRowWithRecipeIdSchema = ItemRowSchema.merge(
 type ItemRowWithRecipeId = z.infer<typeof ItemRowWithRecipeIdSchema>
 
 export async function findManyByRecipeIds({
-  ctx,
+  connection,
   recipeIds,
 }: Options & {
   recipeIds: readonly string[]
@@ -42,7 +42,7 @@ export async function findManyByRecipeIds({
     where: { recipeId: is('IN', recipeIds) },
   })
   const { many } = createDatabaseMethodsWithTransform({
-    ctx,
+    connection,
     schema: ItemRowWithRecipeIdSchema,
   })
   const sqlQuery = sql`

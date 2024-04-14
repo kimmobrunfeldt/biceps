@@ -1,9 +1,9 @@
-import { CtxAsync } from '@vlcn.io/react'
+import { TXAsync } from '@vlcn.io/xplat-api'
 import _ from 'lodash'
 import { Sql } from 'sql-template-tag'
 
 export type Options = {
-  ctx: CtxAsync
+  connection: TXAsync
 }
 
 type AnyFields = Record<string, any>

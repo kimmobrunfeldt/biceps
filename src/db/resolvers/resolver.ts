@@ -1,6 +1,9 @@
-import { CtxAsync } from '@vlcn.io/react'
 import { resolvers } from 'src/db/resolvers/resolversPerEntity'
-import { EntityRow, TypeToEntityRowMapping } from 'src/db/resolvers/types'
+import {
+  CommonResolverOptions,
+  EntityRow,
+  TypeToEntityRowMapping,
+} from 'src/db/resolvers/types'
 
 export type ResolverMapping = {
   [K in keyof TypeToEntityRowMapping]: K extends keyof typeof resolvers
@@ -13,15 +16,15 @@ export type ResolvedEntity = ResolverMapping[keyof ResolverMapping]
 // Resolves entity foreign key references
 export async function resolver<T extends EntityRow>({
   row,
-  ctx,
+  connection,
+  loaders,
 }: {
   row: T
-  ctx: CtxAsync
-}): Promise<ResolverMapping[T['__type']]> {
+} & CommonResolverOptions): Promise<ResolverMapping[T['__type']]> {
   // We have a fallback later in case the resolver has not been implemented
   const maybeResolver = (resolvers as any)[row.__type]
   const resolverForEntity = maybeResolver ?? identityResolver
-  return await resolverForEntity({ row, ctx })
+  return await resolverForEntity({ row, connection, loaders })
 }
 
 export async function identityResolver<T>(row: T): Promise<T> {

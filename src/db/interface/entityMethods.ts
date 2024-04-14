@@ -57,9 +57,9 @@ export function makeUtils<
   const table = identifier([inputTableName])
 
   function baseInsertAsSql(object: z.infer<BeforeDatabaseSchemaT>) {
-    const keys = Object.keys(object)
-    const filteredKeys = keys.filter((key) => !_.isUndefined(object[key]))
     const validObject = beforeDatabaseSchema.parse(object)
+    const keys = Object.keys(validObject)
+    const filteredKeys = keys.filter((key) => !_.isUndefined(validObject[key]))
 
     return sql`
       INSERT INTO ${table} (
@@ -121,7 +121,7 @@ export function makeUtils<
   }
 
   async function find({
-    ctx,
+    connection,
     where,
     orderBy,
     // Default limit to 2 to prevent accidental large queries but still allow to throw
@@ -139,12 +139,12 @@ export function makeUtils<
       ${orderBySql}
       ${limitSql}
     `
-    const { one } = createDatabaseMethodsWithTransform({ ctx, schema })
+    const { one } = createDatabaseMethodsWithTransform({ connection, schema })
     return await one(sqlQuery)
   }
 
   async function maybeFind({
-    ctx,
+    connection,
     where,
     orderBy,
     limit = 2,
@@ -160,12 +160,15 @@ export function makeUtils<
       ${orderBySql}
       ${limitSql}
     `
-    const { maybeOne } = createDatabaseMethodsWithTransform({ ctx, schema })
+    const { maybeOne } = createDatabaseMethodsWithTransform({
+      connection,
+      schema,
+    })
     return await maybeOne(sqlQuery)
   }
 
   async function findMany({
-    ctx,
+    connection,
     where,
     limit,
     orderBy,
@@ -183,25 +186,25 @@ export function makeUtils<
       ${orderBySql}
       ${limitSql}
     `
-    const { many } = createDatabaseMethodsWithTransform({ ctx, schema })
+    const { many } = createDatabaseMethodsWithTransform({ connection, schema })
     return await many(sqlQuery)
   }
 
   async function insert({
     object,
-    ctx,
+    connection,
   }: Options & { object: z.infer<BeforeDatabaseSchemaT> }): Promise<
     z.infer<SchemaT>
   > {
     const sqlQuery = insertAsSql(object)
-    const { one } = createDatabaseMethodsWithTransform({ ctx, schema })
+    const { one } = createDatabaseMethodsWithTransform({ connection, schema })
     return await one(sqlQuery)
   }
 
   async function upsert({
     object,
     onConflict,
-    ctx,
+    connection,
   }: Options & {
     /**
      * Object to insert or update.
@@ -214,7 +217,7 @@ export function makeUtils<
     onConflict: Sql | (keyof z.infer<SchemaT> & string)[]
   }): Promise<z.infer<SchemaT>> {
     const sqlQuery = upsertAsSql({ object, onConflict })
-    const { one } = createDatabaseMethodsWithTransform({ ctx, schema })
+    const { one } = createDatabaseMethodsWithTransform({ connection, schema })
     return await one(sqlQuery)
   }
 
@@ -225,7 +228,7 @@ export function makeUtils<
   async function clientUpsert({
     object,
     onConflict,
-    ctx,
+    connection,
   }: Options & {
     /**
      * Object to insert or update.
@@ -244,17 +247,17 @@ export function makeUtils<
     const onConflictWhere = _.pick(object, onConflict) as WhereConditions<
       z.infer<SchemaT>
     >
-    const found = await maybeFind({ ctx, where: onConflictWhere })
+    const found = await maybeFind({ connection, where: onConflictWhere })
     if (found) {
-      return await update({ ctx, where: onConflictWhere, set: object })
+      return await update({ connection, where: onConflictWhere, set: object })
     }
 
-    return await insert({ ctx, object })
+    return await insert({ connection, object })
   }
 
   async function update({
     set,
-    ctx,
+    connection,
     where,
   }: Options & {
     set: Partial<z.infer<BeforeDatabaseSchemaT>>
@@ -277,7 +280,7 @@ export function makeUtils<
 
     if (updates.length === 0) {
       return await find({
-        ctx,
+        connection,
         where,
       })
     }
@@ -288,12 +291,12 @@ export function makeUtils<
       WHERE ${whereAsSql(where)}
       RETURNING *
     `
-    const { one } = createDatabaseMethodsWithTransform({ ctx, schema })
+    const { one } = createDatabaseMethodsWithTransform({ connection, schema })
     return await one(sqlQuery)
   }
 
   async function remove({
-    ctx,
+    connection,
     where,
   }: Options & {
     where: WhereConditions<z.infer<SchemaT>>
@@ -301,7 +304,7 @@ export function makeUtils<
     const query = sql`
       DELETE FROM ${table} WHERE ${whereAsSql(where)}
     `
-    await ctx.db.exec(query.sql, query.values)
+    await connection.exec(query.sql, query.values)
   }
 
   return {
@@ -448,12 +451,9 @@ function dirAsSql(dir: 'asc' | 'desc') {
   return dir === 'desc' ? sql`DESC` : sql`ASC`
 }
 
+// TODO: Have an input transformer that would do this at a higher level in the DB "framework", then each method would not need to care about this separately.
 function entityKeyToColumn(key: string) {
   return identifier([_.snakeCase(key)])
-}
-
-function snakeCaseObject(obj: Record<string, any>) {
-  return _.mapKeys(obj, (_value, key) => _.snakeCase(key))
 }
 
 function camelCaseObject(obj: Record<string, any>) {
@@ -471,6 +471,9 @@ function doubleQuote(value: string) {
 
 const VALID_NAME_REGEX = /^[a-zA-Z_][a-zA-Z0-9_]*$/
 
+// XXX: Is this enough to keep it safe? Naively one would think that if you cannot use any other
+// characters than identifier token characters, no possible input that's valid according to the regex can derail the
+// parser to interpret the input as something else (i.e. SQL injection).
 function validateIdentifier(name: string): string {
   if (!VALID_NAME_REGEX.test(name)) {
     throw new Error(`Invalid identifier: '${name}'`)
