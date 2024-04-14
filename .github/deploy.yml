@@ -1,0 +1,41 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy to CloudFlare
+    permissions:
+      contents: read
+      deployments: write
+
+    concurrency:
+      group: deploy
+      cancel-in-progress: true
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Read .node-version
+        run: echo "version=$(cat .node-version)" >> $GITHUB_OUTPUT
+        id: node-version
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ steps.node-version.outputs.version }}
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+      - run: npm ci --include=dev
+      - run: npm run build
+      - name: Publish to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_DEPLOY_API_TOKEN }}
+          accountId: 91372db2b1033c677634cb901eb12ae6
+          projectName: biceps
+          directory: dist
+          # For GitHub Deployments
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}

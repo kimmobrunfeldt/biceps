@@ -1,1 +1,1 @@
-export const DATABASE_NAME = 'biteplanner'
+export const DATABASE_NAME = 'biceps'

@@ -1,7 +1,8 @@
 {
-  "name": "biteplanner",
+  "name": "biceps",
   "private": true,
   "version": "0.0.0",
+  "licence": "UNLICENSED",
   "scripts": {
     "start": "vite",
     "dev": "vite",

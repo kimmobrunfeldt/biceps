@@ -1,4 +1,4 @@
-export const appName = 'Bite Planner'
+export const appName = 'Biceps'
 
 const makeTitle = (title: string) => `${title} | ${appName}`
 
