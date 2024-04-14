@@ -1,5 +1,5 @@
 import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
+import { configDefaults, defineConfig } from 'vitest/config'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -26,5 +26,14 @@ export default defineConfig({
     fs: {
       strict: false,
     },
+  },
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    exclude: [
+      ...configDefaults.exclude,
+      '**/*.playwright.test.ts',
+      '**/*.playwright.test.tsx',
+    ],
   },
 })

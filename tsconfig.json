@@ -40,6 +40,9 @@
           "*"
         ]
       }
+    ],
+    "types": [
+      "vitest/globals"
     ]
   },
   "include": [
