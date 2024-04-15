@@ -38,6 +38,18 @@
         "source.fixAll.eslint"
       ]
     },
+    "[postcss]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+      "editor.formatOnSave": true
+    },
+    "[html]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+      "editor.formatOnSave": true
+    },
+    "[json]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+      "editor.formatOnSave": true
+    },
     "files.trimTrailingWhitespace": true,
     "editor.codeActionsOnSave": {
       "source.fixAll.eslint": "explicit"

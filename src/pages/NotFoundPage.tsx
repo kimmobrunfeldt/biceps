@@ -8,11 +8,7 @@ export function NotFoundPage() {
     <Container className={classes.root}>
       <div className={classes.inner}>
         <Box>
-          <Text
-            className={classes.background}
-          >
-            404
-          </Text>
+          <Text className={classes.background}>404</Text>
         </Box>
 
         <div className={classes.content}>
@@ -27,7 +23,9 @@ export function NotFoundPage() {
             the address, or the page has been moved to another URL.
           </Text>
           <Group justify="center">
-            <Link to={routes.index.path}><Button size="md">Take me back to home page</Button></Link>
+            <Link to={routes.index.path}>
+              <Button size="md">Take me back to home page</Button>
+            </Link>
           </Group>
         </div>
       </div>

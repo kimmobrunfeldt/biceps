@@ -37,19 +37,21 @@ export function AddRecipePage() {
   return (
     <Box>
       <Title>Recipes</Title>
-      <Box py={"lg"}>
-      <Query result={recipesResult}>
-        {recipes => recipes.map((recipe) => (
-          <Box key={recipe.id}>
-            <Text>{recipe.name}</Text>
-            <Stack>
-              {recipe.items.map((item) => {
-                return <Box key={item.id}>{item.name}</Box>
-              })}
-            </Stack>
-          </Box>
-        ))}
-      </Query>
+      <Box py="lg">
+        <Query result={recipesResult}>
+          {(recipes) =>
+            recipes.map((recipe) => (
+              <Box key={recipe.id}>
+                <Text>{recipe.name}</Text>
+                <Stack>
+                  {recipe.items.map((item) => {
+                    return <Box key={item.id}>{item.name}</Box>
+                  })}
+                </Stack>
+              </Box>
+            ))
+          }
+        </Query>
       </Box>
       <Button onClick={onAddRecipeClick}>Add recipe</Button>
     </Box>

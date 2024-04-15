@@ -48,7 +48,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         const dataLoaders = createLoaders(ctx.db)
         return (
           <DataLoaderContext.Provider value={dataLoaders}>
-            <MantineProvider theme={theme} defaultColorScheme='dark'>
+            <MantineProvider theme={theme} defaultColorScheme="dark">
               <QueryClientProvider client={queryClient}>
                 <Router />
               </QueryClientProvider>
