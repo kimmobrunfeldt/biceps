@@ -18,3 +18,13 @@ export function deepApply<T extends Record<string, any>>(
     _.isPlainObject(val) ? deepApply(val, toApply) : val
   )
 }
+
+export function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+export function ensureError(err: unknown): Error {
+  return err instanceof Error
+    ? err
+    : new Error(`${String(err)} (invalid error class)`, { cause: err })
+}

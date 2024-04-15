@@ -307,6 +307,11 @@ export function makeUtils<
     await connection.exec(query.sql, query.values)
   }
 
+  async function removeAll({ connection }: Options): Promise<void> {
+    const query = sql`DELETE FROM ${table}`
+    await connection.exec(query.sql, query.values)
+  }
+
   return {
     find,
     maybeFind,
@@ -316,6 +321,7 @@ export function makeUtils<
     clientUpsert,
     update,
     remove,
+    removeAll,
     createDatabaseMethodsWithTransform,
   }
 }

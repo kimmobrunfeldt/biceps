@@ -11,6 +11,7 @@ import {
   findMany as findManyItem,
   insert as insertItem,
   remove as removeItem,
+  removeAll as removeAllItem,
   update as updateItem,
   upsert as upsertItem,
 } from 'src/db/entities/Item'
@@ -21,6 +22,7 @@ const ItemEntity = createEntity({
   findMany: findManyItem,
   insert: insertItem,
   remove: removeItem,
+  removeAll: removeAllItem,
   update: updateItem,
   upsert: upsertItem,
 })
@@ -32,6 +34,7 @@ import {
   findMany as findManyRecipe,
   insert as insertRecipe,
   remove as removeRecipe,
+  removeAll as removeAllRecipe,
   update as updateRecipe,
   upsert as upsertRecipe,
 } from 'src/db/entities/Recipe'
@@ -41,6 +44,7 @@ const RecipeEntity = createEntity({
   findMany: findManyRecipe,
   insert: insertRecipe,
   remove: removeRecipe,
+  removeAll: removeAllRecipe,
   update: updateRecipe,
   upsert: upsertRecipe,
 })
@@ -51,6 +55,7 @@ import {
   find as findRecipeItem,
   findMany as findManyRecipeItem,
   insert as insertRecipeItem,
+  removeAll as removeAllRecipeItem,
   upsert as upsertRecipeItem,
 } from 'src/db/entities/RecipeItem'
 const RecipeItemEntity = createEntity({
@@ -58,6 +63,7 @@ const RecipeItemEntity = createEntity({
   find: findRecipeItem,
   findMany: findManyRecipeItem,
   insert: insertRecipeItem,
+  removeAll: removeAllRecipeItem,
   upsert: upsertRecipeItem,
 })
 export { RecipeItemEntity as RecipeItem }

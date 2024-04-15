@@ -16,13 +16,23 @@ const {
   upsert,
   clientUpsert,
   createDatabaseMethodsWithTransform,
+  removeAll,
 } = makeUtils({
   tableName: 'items',
   beforeDatabaseSchema: ItemBeforeDatabaseSchema,
   schema: ItemRowSchema,
 })
 
-export { clientUpsert, find, findMany, insert, remove, update, upsert }
+export {
+  clientUpsert,
+  find,
+  findMany,
+  insert,
+  remove,
+  removeAll,
+  update,
+  upsert,
+}
 
 // Ad-hoc schema for custom the custom method
 const ItemRowWithRecipeIdSchema = ItemRowSchema.merge(

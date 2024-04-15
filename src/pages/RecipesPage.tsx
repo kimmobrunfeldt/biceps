@@ -2,7 +2,7 @@ import { Box, Button, Stack, Text, Title } from '@mantine/core'
 import { Query } from 'src/components/Query'
 import { useCreateRecipe, useGetAllRecipes } from 'src/hooks/useDatabase'
 
-export function AddRecipePage() {
+export function RecipesPage() {
   const recipesResult = useGetAllRecipes()
   const { createRecipe } = useCreateRecipe()
 

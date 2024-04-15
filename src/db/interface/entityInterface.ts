@@ -64,6 +64,7 @@ export type DatabaseEntity<
     } & Options
   ) => Promise<readonly T[]>
   remove?: (params: { where: Partial<T> } & Options) => Promise<void>
+  removeAll?: (params: Options) => Promise<void>
   removeMany?: (
     params: { where: { id: string | readonly string[] } } & Options
   ) => Promise<void>

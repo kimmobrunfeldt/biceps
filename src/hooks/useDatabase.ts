@@ -95,3 +95,27 @@ async function createRecipe(ctx: CtxAsync, recipe: RecipeResolvedBeforeSaving) {
     )
   })
 }
+
+export function useDeleteAllData() {
+  const ctx = useDB(DATABASE_NAME)
+  const queryClient = useQueryClient()
+
+  return {
+    deleteAllData: async () => {
+      await deleteAllData(ctx)
+      queryClient.invalidateQueries()
+    },
+  }
+}
+
+/**
+ * Note: this only marks the items as deleted, it does not actually delete them.
+ * This is done because CRDT.
+ */
+async function deleteAllData(ctx: CtxAsync) {
+  await ctx.db.tx(async (tx) => {
+    await RecipeItem.removeAll({ connection: tx })
+    await Item.removeAll({ connection: tx })
+    await Recipe.removeAll({ connection: tx })
+  })
+}

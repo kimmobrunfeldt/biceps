@@ -4,10 +4,10 @@ import {
   RecipeItemRowSchema,
 } from 'src/db/schemas/RecipeItemSchema'
 
-const { find, findMany, insert, upsert, clientUpsert } = makeUtils({
+const { find, findMany, insert, upsert, clientUpsert, removeAll } = makeUtils({
   tableName: 'recipe_items',
   beforeDatabaseSchema: RecipeItemBeforeDatabaseSchema,
   schema: RecipeItemRowSchema,
 })
 
-export { clientUpsert, find, findMany, insert, upsert }
+export { clientUpsert, find, findMany, insert, removeAll, upsert }
