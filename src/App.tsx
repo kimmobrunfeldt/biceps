@@ -1,6 +1,7 @@
 import { Box, Flex } from '@mantine/core'
-import 'src/App.module.css'
 import { NavBar } from 'src/components/NavBar'
+
+import 'src/App.css'
 
 export function App({ children }: { children?: React.ReactNode }) {
   return (
