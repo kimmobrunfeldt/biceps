@@ -11,6 +11,7 @@ const {
   update,
   remove,
   upsert,
+  maybeFind,
   clientUpsert,
   removeAll,
 } = makeUtils({
@@ -24,6 +25,7 @@ export {
   find,
   findMany,
   insert,
+  maybeFind,
   remove,
   removeAll,
   update,

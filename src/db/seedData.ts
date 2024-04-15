@@ -44,7 +44,7 @@ export async function upsertSeedData(connection: TXAsync) {
     },
     onConflict: ['personId', 'recipeId'],
   })
-  const appState = await AppState.find({
+  const appState = await AppState.maybeFind({
     connection,
     where: { key: APP_STATE_KEY },
   })
