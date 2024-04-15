@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Box,
   Center,
   Image,
@@ -7,29 +8,49 @@ import {
   UnstyledButton,
   rem,
 } from '@mantine/core'
-import { IconHome2, IconSalad, IconSettings } from '@tabler/icons-react'
+import { IconHome2, IconSalad } from '@tabler/icons-react'
 import logo from 'src/assets/biceps-logo.svg'
+import { Query } from 'src/components/Query'
+import { useGetAppState } from 'src/hooks/useDatabase'
 import { routes } from 'src/routes'
 import { Link, useRoute } from 'wouter'
 import classes from './NavBar.module.css'
 
 interface NavBarLinkProps {
-  icon: typeof IconHome2
   label: string
   to: string
+  icon?: typeof IconHome2
+  children?: React.ReactNode
 }
 
-function NavBarLink({ to, icon: Icon, label }: NavBarLinkProps) {
+function NavBarLink({ to, icon: Icon, label, children }: NavBarLinkProps) {
   const [active] = useRoute(to)
-  return (
-    <Tooltip label={label} position="right" transitionProps={{ duration: 0 }}>
-      <Link to={to}>
+
+  const getContent = () => {
+    if (children) {
+      return (
+        <Box className={classes.linkAvatar} data-active={Boolean(active)}>
+          {children}
+        </Box>
+      )
+    } else if (Icon) {
+      return (
         <UnstyledButton
-          className={classes.link}
-          data-active={active || undefined}
+          className={classes.linkButton}
+          data-active={Boolean(active)}
         >
           <Icon style={{ width: rem(20), height: rem(20) }} stroke={1.5} />
         </UnstyledButton>
+      )
+    } else {
+      throw new Error('Either icon or children must be provided')
+    }
+  }
+
+  return (
+    <Tooltip label={label} position="right" transitionProps={{ duration: 0 }}>
+      <Link to={to} className={classes.link}>
+        {getContent()}
       </Link>
     </Tooltip>
   )
@@ -38,13 +59,15 @@ function NavBarLink({ to, icon: Icon, label }: NavBarLinkProps) {
 const menuItems = [
   { icon: IconHome2, label: 'Home', to: routes.index.path },
   { icon: IconSalad, label: 'Recipes', to: routes.recipes.index.path },
-  { icon: IconSettings, label: 'Settings', to: routes.settings.path },
 ]
 
 export function NavBar() {
+  const appStateResult = useGetAppState()
   const links = menuItems.map((link) => (
     <NavBarLink {...link} key={link.label} to={link.to} />
   ))
+
+  const [settingsRouteActive] = useRoute(routes.settings.path)
 
   return (
     <nav className={classes.navbar}>
@@ -58,10 +81,28 @@ export function NavBar() {
         </Stack>
       </Box>
 
-      <Stack justify="center" gap={0}>
-        {/*
-        <NavBarLink icon={IconLogout} label="Logout" />
-        */}
+      <Stack justify="center" align="center" gap={0}>
+        <NavBarLink to={routes.settings.path} label="Profile & Settings">
+          <Query
+            result={appStateResult}
+            whenEmpty={() => null}
+            whenLoading={
+              <Avatar alt="Placeholder avatar" color="gray">
+                {' '}
+              </Avatar>
+            }
+          >
+            {(data) => (
+              <Avatar
+                color={settingsRouteActive ? 'purple' : 'gray'}
+                radius="xl"
+                alt={data.selectedPerson.name}
+              >
+                {data.selectedPerson.initials}
+              </Avatar>
+            )}
+          </Query>
+        </NavBarLink>
       </Stack>
     </nav>
   )

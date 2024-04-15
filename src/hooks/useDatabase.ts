@@ -1,8 +1,11 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { CtxAsync, useDB } from '@vlcn.io/react'
-import { DATABASE_NAME } from 'src/constants'
-import { Item, Recipe, RecipeItem } from 'src/db/entities'
+import { APP_STATE_KEY, DATABASE_NAME } from 'src/constants'
+import { deleteAllData } from 'src/core/dataCore'
+import { upsertRecipe } from 'src/core/recipeCore'
+import { AppState, Person, Recipe } from 'src/db/entities'
 import { resolver } from 'src/db/resolvers/resolver'
+import { PersonBeforeDatabase } from 'src/db/schemas/PersonSchema'
 import { RecipeResolvedBeforeSaving } from 'src/db/schemas/RecipeSchema'
 import { useDataLoaders } from 'src/hooks/useDataLoaders'
 
@@ -51,49 +54,18 @@ export function useGetAllRecipes() {
   })
 }
 
-export function useCreateRecipe() {
+export function useUpsertRecipe() {
   const ctx = useDB(DATABASE_NAME)
   const queryClient = useQueryClient()
 
   return {
-    createRecipe: async (recipe: RecipeResolvedBeforeSaving) => {
-      await createRecipe(ctx, recipe)
+    upsertRecipe: async (recipe: RecipeResolvedBeforeSaving) => {
+      await upsertRecipe(ctx.db, recipe)
       queryClient.invalidateQueries({
         queryKey: getCacheKeyToInvalidate('getAllRecipes'),
       })
     },
   }
-}
-
-async function createRecipe(ctx: CtxAsync, recipe: RecipeResolvedBeforeSaving) {
-  const { items: itemsToUpsert, ...baseRecipe } = recipe
-
-  await ctx.db.tx(async (tx) => {
-    const { id: recipeId } = await Recipe.clientUpsert({
-      connection: tx,
-      onConflict: ['name'],
-      object: baseRecipe,
-    })
-    const items = await Promise.all(
-      itemsToUpsert.map((item) =>
-        Item.clientUpsert({
-          connection: tx,
-          object: item,
-          onConflict: ['name'],
-        })
-      )
-    )
-    // Link items to receipe
-    await Promise.all(
-      items.map((item) =>
-        RecipeItem.clientUpsert({
-          connection: tx,
-          object: { recipeId, itemId: item.id },
-          onConflict: ['itemId', 'recipeId'],
-        })
-      )
-    )
-  })
 }
 
 export function useDeleteAllData() {
@@ -102,20 +74,46 @@ export function useDeleteAllData() {
 
   return {
     deleteAllData: async () => {
-      await deleteAllData(ctx)
+      await deleteAllData(ctx.db)
       queryClient.invalidateQueries()
     },
   }
 }
 
-/**
- * Note: this only marks the items as deleted, it does not actually delete them.
- * This is done because CRDT.
- */
-async function deleteAllData(ctx: CtxAsync) {
-  await ctx.db.tx(async (tx) => {
-    await RecipeItem.removeAll({ connection: tx })
-    await Item.removeAll({ connection: tx })
-    await Recipe.removeAll({ connection: tx })
+export function useGetAppState() {
+  const ctx = useDB(DATABASE_NAME)
+  const loaders = useDataLoaders()
+
+  const name = 'getAppState'
+  return useQuery({
+    queryKey: getCacheKey(ctx, name),
+    queryFn: withQueryErrorHandling(name, async () => {
+      const appState = await AppState.find({
+        connection: ctx.db,
+        where: { key: APP_STATE_KEY },
+      })
+      return await resolver({ row: appState, connection: ctx.db, loaders })
+    }),
   })
+}
+
+export function useUpdatePerson() {
+  const ctx = useDB(DATABASE_NAME)
+  const queryClient = useQueryClient()
+
+  return {
+    updatePerson: async (
+      personId: string,
+      newValues: Partial<PersonBeforeDatabase>
+    ) => {
+      await Person.update({
+        connection: ctx.db,
+        where: { id: personId },
+        set: newValues,
+      })
+      queryClient.invalidateQueries({
+        queryKey: getCacheKeyToInvalidate('getAppState'),
+      })
+    },
+  }
 }

@@ -1,7 +1,13 @@
 import { TXAsync } from '@vlcn.io/xplat-api'
 import DataLoader from 'dataloader'
 import _ from 'lodash'
-import { AnyDatabaseEntity, Item, Recipe, RecipeItem } from 'src/db/entities'
+import {
+  AnyDatabaseEntity,
+  Item,
+  Person,
+  Recipe,
+  RecipeItem,
+} from 'src/db/entities'
 import { is } from 'src/db/interface/entityMethods'
 
 export type DataLoaders = ReturnType<typeof createLoaders>
@@ -10,6 +16,7 @@ export function createLoaders(connection: TXAsync) {
   return {
     recipesById: createSimpleLoader({ connection, entity: Recipe }),
     itemsById: createSimpleLoader({ connection, entity: Item }),
+    personById: createSimpleLoader({ connection, entity: Person }),
     itemsByRecipeIds: new DataLoader(async (recipeIds: readonly string[]) => {
       const items = await Item.findManyByRecipeIds({
         connection,

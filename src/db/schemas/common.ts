@@ -7,6 +7,10 @@ export const preprocessors = {
   nullToUndefined: (val: unknown) => (!_.isNull(val) ? val : undefined),
   dateToIsoString: (val: unknown) => (!_.isDate(val) ? val : val.toISOString()),
   isoStringToDate: (val: unknown) => (!_.isString(val) ? val : new Date(val)),
+  jsonStringToObject: (val: unknown) =>
+    !_.isString(val) ? val : JSON.parse(val),
+  objectToJsonString: (val: unknown) =>
+    !_.isPlainObject(val) ? val : JSON.stringify(val),
 }
 
 export const IdSchema = z

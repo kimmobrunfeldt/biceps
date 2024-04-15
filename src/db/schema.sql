@@ -11,7 +11,6 @@ CREATE TABLE items (
   image_url TEXT,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-
 SELECT crsql_as_crr('items');
 
 CREATE TABLE recipes (
@@ -27,3 +26,25 @@ CREATE TABLE recipe_items (
   PRIMARY KEY (recipe_id, item_id)
 );
 SELECT crsql_as_crr('recipe_items');
+
+CREATE TABLE persons (
+  id TEXT PRIMARY KEY NOT NULL,
+  name TEXT,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+SELECT crsql_as_crr('persons');
+
+CREATE TABLE person_recipes (
+  person_id TEXT NOT NULL,
+  recipe_id TEXT NOT NULL,
+  PRIMARY KEY (person_id, recipe_id)
+);
+SELECT crsql_as_crr('person_recipes');
+
+
+CREATE TABLE app_state (
+  key TEXT PRIMARY KEY NOT NULL,
+  selected_person_id TEXT,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+SELECT crsql_as_crr('app_state');

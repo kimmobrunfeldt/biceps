@@ -22,21 +22,21 @@ export function useNotifications() {
     })
   }
 
-  function withNotifications<T>({
+  async function withNotifications<T>({
     fn,
     minLoadingNotificationMs = 1000,
     loading,
     success,
     error,
   }: WithLoadingNotificationsOptions<T>) {
-    return async (...args: any) => {
+    const wrapped = async () => {
       const loadingId = nanoId()
       if (loading) {
         notification({ ...loading, id: loadingId })
       }
       try {
         const [result] = await Promise.all([
-          fn(...args),
+          fn(),
           sleep(minLoadingNotificationMs),
         ])
         if (loading) {
@@ -61,6 +61,7 @@ export function useNotifications() {
         throw err
       }
     }
+    await wrapped()
   }
 
   return {

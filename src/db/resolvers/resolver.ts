@@ -27,6 +27,6 @@ export async function resolver<T extends EntityRow>({
   return await resolverForEntity({ row, connection, loaders })
 }
 
-export async function identityResolver<T>(row: T): Promise<T> {
+export async function identityResolver<T>({ row }: { row: T }): Promise<T> {
   return row
 }

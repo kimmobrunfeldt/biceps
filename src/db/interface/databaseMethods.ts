@@ -39,3 +39,17 @@ export function createDatabaseMethods<SchemaT extends ZodSchema>({
     },
   }
 }
+
+/**
+ * Like connection.transaction but provides return value.
+ */
+export async function withTransaction<T>(
+  connection: TXAsync,
+  cb: (tx: TXAsync) => Promise<T>
+): Promise<T> {
+  let result: T
+  await connection.tx(async (tx) => {
+    result = await cb(tx)
+  })
+  return result!
+}

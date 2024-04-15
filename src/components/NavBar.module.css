@@ -3,7 +3,8 @@
   padding: var(--mantine-spacing-md);
   display: flex;
   flex-direction: column;
-  border-right: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+  border-right: 1px solid
+    light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
 }
 
 .navbarMain {
@@ -11,7 +12,7 @@
   margin-top: 50px;
 }
 
-.link {
+.linkButton {
   width: 50px;
   height: 50px;
   border-radius: var(--mantine-radius-md);
@@ -21,11 +22,36 @@
   color: light-dark(var(--mantine-color-gray-7), var(--mantine-color-dark-0));
 
   &:hover {
-    background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-5));
+    background-color: light-dark(
+      var(--mantine-color-gray-0),
+      var(--mantine-color-dark-5)
+    );
   }
 
-  &[data-active] {
+  &[data-active='true'] {
+    &,
+    &:hover {
+      background-color: var(--mantine-color-purple-light);
+      color: var(--mantine-color-purple-light-color);
+    }
+  }
+}
 
+.link {
+  text-decoration: none;
+}
+
+.linkAvatar {
+  border-radius: 99999px;
+
+  &:hover {
+    background-color: light-dark(
+      var(--mantine-color-gray-0),
+      var(--mantine-color-dark-5)
+    );
+  }
+
+  &[data-active='true'] {
     &,
     &:hover {
       background-color: var(--mantine-color-purple-light);

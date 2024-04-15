@@ -1,13 +1,13 @@
 import { Box, Button, Stack, Text, Title } from '@mantine/core'
 import { Query } from 'src/components/Query'
-import { useCreateRecipe, useGetAllRecipes } from 'src/hooks/useDatabase'
+import { useGetAllRecipes, useUpsertRecipe } from 'src/hooks/useDatabase'
 
 export function RecipesPage() {
   const recipesResult = useGetAllRecipes()
-  const { createRecipe } = useCreateRecipe()
+  const { upsertRecipe } = useUpsertRecipe()
 
   async function onAddRecipeClick() {
-    await createRecipe({
+    await upsertRecipe({
       name: 'My recipe',
       items: [
         {

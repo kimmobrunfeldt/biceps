@@ -55,5 +55,5 @@ function defaultIsEmpty(data: any) {
     return data.length === 0
   }
 
-  return Boolean(data)
+  return !data
 }

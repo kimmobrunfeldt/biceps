@@ -1,6 +1,6 @@
 import {
   ItemResolvedBeforeSavingSchema,
-  ItemRowSchema as ItemSchema,
+  ItemResolvedSchema,
 } from 'src/db/schemas/ItemSchema'
 import {
   AddIdSchema,
@@ -36,7 +36,7 @@ export const RecipeResolvedSchema = RecipeRowSchema.merge(
     id: RecipeRowSchema.shape.id,
     name: NameSchema,
     createdAt: DateSchema,
-    items: z.array(ItemSchema),
+    items: z.array(ItemResolvedSchema),
   })
 ).strict()
 export type RecipeResolved = z.infer<typeof RecipeResolvedSchema>

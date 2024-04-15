@@ -14,6 +14,7 @@ import { Router } from 'src/Router'
 import { DATABASE_NAME } from 'src/constants'
 import { createLoaders } from 'src/db/dataLoaders'
 import schemaContent from 'src/db/schema.sql?raw'
+import { upsertSeedData } from 'src/db/seedData'
 import { DataLoaderContext } from 'src/hooks/useDataLoaders'
 
 const queryClient = new QueryClient()
@@ -46,16 +47,19 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         name: 'schema.sql',
         content: schemaContent,
       }}
+      manualSetup={async (ctx) => {
+        await upsertSeedData(ctx.db)
+      }}
       Render={() => {
         const ctx = useDB(DATABASE_NAME)
-        const dataLoaders = createLoaders(ctx.db)
+        const dataLoaders = ctx ? createLoaders(ctx.db) : undefined
         return (
           <DataLoaderContext.Provider value={dataLoaders}>
             <MantineProvider theme={theme} defaultColorScheme="dark">
               <Notifications position="top-center" />
               <ModalsProvider>
                 <QueryClientProvider client={queryClient}>
-                  <Router />
+                  {ctx ? <Router /> : null}
                 </QueryClientProvider>
               </ModalsProvider>
             </MantineProvider>
