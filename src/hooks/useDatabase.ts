@@ -9,6 +9,11 @@ import { PersonBeforeDatabase } from 'src/db/schemas/PersonSchema'
 import { RecipeResolvedBeforeSaving } from 'src/db/schemas/RecipeSchema'
 import { useDataLoaders } from 'src/hooks/useDataLoaders'
 
+const queryNames = {
+  getAppState: 'getAppState',
+  getAllRecipes: 'getAllRecipes',
+}
+
 /**
  * Cache key prefix to use for all SQL related queries.
  */
@@ -41,10 +46,9 @@ export function useGetAllRecipes() {
   const ctx = useDB(DATABASE_NAME)
   const loaders = useDataLoaders()
 
-  const name = 'getAllRecipes'
   return useQuery({
-    queryKey: getCacheKey(ctx, name),
-    queryFn: withQueryErrorHandling(name, async () => {
+    queryKey: getCacheKey(ctx, queryNames.getAllRecipes),
+    queryFn: withQueryErrorHandling(queryNames.getAllRecipes, async () => {
       const recipeRows = await Recipe.findMany({ connection: ctx.db })
       const recipes = await Promise.all(
         recipeRows.map((row) => resolver({ row, connection: ctx.db, loaders }))
@@ -62,7 +66,7 @@ export function useUpsertRecipe() {
     upsertRecipe: async (recipe: RecipeResolvedBeforeSaving) => {
       await upsertRecipe(ctx.db, recipe)
       queryClient.invalidateQueries({
-        queryKey: getCacheKeyToInvalidate('getAllRecipes'),
+        queryKey: getCacheKeyToInvalidate(queryNames.getAllRecipes),
       })
     },
   }
@@ -84,15 +88,19 @@ export function useGetAppState() {
   const ctx = useDB(DATABASE_NAME)
   const loaders = useDataLoaders()
 
-  const name = 'getAppState'
   return useQuery({
-    queryKey: getCacheKey(ctx, name),
-    queryFn: withQueryErrorHandling(name, async () => {
+    queryKey: getCacheKey(ctx, queryNames.getAppState),
+    queryFn: withQueryErrorHandling(queryNames.getAppState, async () => {
       const appState = await AppState.find({
         connection: ctx.db,
         where: { key: APP_STATE_KEY },
       })
-      return await resolver({ row: appState, connection: ctx.db, loaders })
+      const resolved = await resolver({
+        row: appState,
+        connection: ctx.db,
+        loaders,
+      })
+      return resolved
     }),
   })
 }
@@ -112,7 +120,7 @@ export function useUpdatePerson() {
         set: newValues,
       })
       queryClient.invalidateQueries({
-        queryKey: getCacheKeyToInvalidate('getAppState'),
+        queryKey: getCacheKeyToInvalidate(queryNames.getAppState),
       })
     },
   }

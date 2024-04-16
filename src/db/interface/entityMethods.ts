@@ -291,6 +291,7 @@ export function makeUtils<
       WHERE ${whereAsSql(where)}
       RETURNING *
     `
+    console.log('executing', sqlQuery.sql)
     const { one } = createDatabaseMethodsWithTransform({ connection, schema })
     return await one(sqlQuery)
   }

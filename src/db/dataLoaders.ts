@@ -12,6 +12,10 @@ import { is } from 'src/db/interface/entityMethods'
 
 export type DataLoaders = ReturnType<typeof createLoaders>
 
+const DEFAULT_DATALOADER_OPTIONS = Object.freeze({
+  cache: false,
+}) satisfies DataLoader.Options<unknown, unknown>
+
 export function createLoaders(connection: TXAsync) {
   return {
     recipesById: createSimpleLoader({ connection, entity: Recipe }),
@@ -23,7 +27,7 @@ export function createLoaders(connection: TXAsync) {
         recipeIds,
       })
       return groupAndSortByReference(items, recipeIds, (item) => item.recipeId)
-    }),
+    }, DEFAULT_DATALOADER_OPTIONS),
     recipeItemsById: createSimpleLoader({ connection, entity: RecipeItem }),
   }
 }
@@ -40,12 +44,15 @@ function createSimpleLoader<T extends AnyDatabaseEntity>({
       connection,
       where: { id: is('IN', ids) },
     })
+    if (ids.length !== entities.length) {
+      throw new Error('Not all entities were found in the database')
+    }
     // @ts-expect-error Wasn't able to make TS happy
     const sorted = sortByReference(entities, ids, (entity) => entity.id)
     return sorted
   }
   // Cast to any because https://github.com/graphql/dataloader/pull/248/
-  return new DataLoader(loaderFn as any)
+  return new DataLoader(loaderFn as any, DEFAULT_DATALOADER_OPTIONS)
 }
 
 export function sortByReference<T extends { [key: string]: any }>(

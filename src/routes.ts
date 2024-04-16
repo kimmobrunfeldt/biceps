@@ -1,24 +1,28 @@
 export const appName = 'Biceps'
 
-const makeTitle = (title: string) => `${title} | ${appName}`
-
 export const routes = {
   index: {
     path: '/',
-    title: appName,
+    title: 'Home',
   },
   recipes: {
     index: {
       path: '/recipes',
-      title: makeTitle('Recipes'),
+      title: 'Recipes',
     },
     add: {
-      path: '/add',
-      title: makeTitle('Add recipe'),
+      path: '/recipes/add',
+      title: 'Add recipe',
+    },
+  },
+  weeklySchedule: {
+    index: {
+      path: '/weekly-schedule',
+      title: 'Weekly Schedule',
     },
   },
   settings: {
     path: '/settings',
-    title: makeTitle('Settings'),
+    title: 'Profile & Settings',
   },
 }

@@ -8,7 +8,7 @@ import {
   UnstyledButton,
   rem,
 } from '@mantine/core'
-import { IconHome2, IconSalad } from '@tabler/icons-react'
+import { IconCalendarWeek, IconHome2, IconSalad } from '@tabler/icons-react'
 import logo from 'src/assets/biceps-logo.svg'
 import { Query } from 'src/components/Query'
 import { useGetAppState } from 'src/hooks/useDatabase'
@@ -57,8 +57,17 @@ function NavBarLink({ to, icon: Icon, label, children }: NavBarLinkProps) {
 }
 
 const menuItems = [
-  { icon: IconHome2, label: 'Home', to: routes.index.path },
-  { icon: IconSalad, label: 'Recipes', to: routes.recipes.index.path },
+  { icon: IconHome2, label: routes.index.title, to: routes.index.path },
+  {
+    icon: IconSalad,
+    label: routes.recipes.index.title,
+    to: routes.recipes.index.path,
+  },
+  {
+    icon: IconCalendarWeek,
+    label: routes.weeklySchedule.index.title,
+    to: routes.weeklySchedule.index.path,
+  },
 ]
 
 export function NavBar() {
@@ -92,15 +101,18 @@ export function NavBar() {
               </Avatar>
             }
           >
-            {(data) => (
-              <Avatar
-                color={settingsRouteActive ? 'purple' : 'gray'}
-                radius="xl"
-                alt={data.selectedPerson.name}
-              >
-                {data.selectedPerson.initials}
-              </Avatar>
-            )}
+            {(data) => {
+              console.log('navbar data', data.selectedPerson)
+              return (
+                <Avatar
+                  color={settingsRouteActive ? 'purple' : 'gray'}
+                  radius="xl"
+                  alt={data.selectedPerson.name}
+                >
+                  {data.selectedPerson.initials}
+                </Avatar>
+              )
+            }}
           </Query>
         </NavBarLink>
       </Stack>

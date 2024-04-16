@@ -1,4 +1,5 @@
-import { Loader, Text } from '@mantine/core'
+import { Loader, Text, Tooltip } from '@mantine/core'
+import { IconAlertTriangle, IconBoxOff } from '@tabler/icons-react'
 import { UseQueryResult } from '@tanstack/react-query'
 import _ from 'lodash'
 import { ReactNode } from 'react'
@@ -31,7 +32,11 @@ export function Query<T>({
   })
 
   if (result.error) {
-    return <Text>Something went wrong when fetching data</Text>
+    return (
+      <Tooltip label="Error fetching data">
+        <IconAlertTriangle color="red" />
+      </Tooltip>
+    )
   }
 
   if (showSpinner) {
@@ -40,7 +45,11 @@ export function Query<T>({
 
   const data = pickData(result)
   if (!data) {
-    return <Text>Something went wrong</Text>
+    return (
+      <Tooltip label="Something went wrong">
+        <IconBoxOff color="red" />
+      </Tooltip>
+    )
   }
 
   if (isEmpty(data)) {
