@@ -7,7 +7,7 @@ export async function upsertRecipe(
   connection: TXAsync,
   recipe: RecipeResolvedBeforeSaving
 ) {
-  const { items: itemsToUpsert, ...baseRecipe } = recipe
+  const { recipeItems: recipeItemsToUpsert, ...baseRecipe } = recipe
 
   return await transaction(connection, async (tx) => {
     const { id: recipeId } = await Recipe.clientUpsert({
@@ -16,20 +16,24 @@ export async function upsertRecipe(
       object: baseRecipe,
     })
     const items = await Promise.all(
-      itemsToUpsert.map((item) =>
+      recipeItemsToUpsert.map((recipeItem) =>
         Item.clientUpsert({
           connection: tx,
-          object: item,
+          object: recipeItem.item,
           onConflict: ['name'],
         })
       )
     )
     // Link items to receipe
     await Promise.all(
-      items.map((item) =>
+      recipeItemsToUpsert.map((recipeItem, i) =>
         RecipeItem.clientUpsert({
           connection: tx,
-          object: { recipeId, itemId: item.id },
+          object: {
+            recipeId,
+            itemId: items[i].id,
+            weightGrams: recipeItem.weightGrams,
+          },
           onConflict: ['itemId', 'recipeId'],
         })
       )

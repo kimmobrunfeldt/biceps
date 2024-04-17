@@ -3,6 +3,7 @@ import { IndexPage } from 'src/pages/IndexPage'
 import { NotFoundPage } from 'src/pages/NotFoundPage'
 import { RecipesPage } from 'src/pages/RecipesPage'
 import { SettingsPage } from 'src/pages/SettingsPage/SettingsPage'
+import { WeeklySchedulePage } from 'src/pages/WeeklySchedulePage/WeeklySchedulePage'
 import { Route, Switch } from 'wouter'
 
 export function Router() {
@@ -11,6 +12,7 @@ export function Router() {
       <Switch>
         <Route path="/" component={IndexPage} />
         <Route path="/recipes" component={RecipesPage} />
+        <Route path="/weekly-schedule" component={WeeklySchedulePage} />
         <Route path="/settings" component={SettingsPage} />
 
         {/* Default route in a switch */}

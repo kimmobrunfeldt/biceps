@@ -59,7 +59,7 @@ export function ProfileSettings() {
 
   return (
     <>
-      <Title>Profile</Title>
+      <Title order={2}>Profile</Title>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Controller
           name="name"

@@ -1,7 +1,7 @@
 import {
-  ItemResolvedBeforeSavingSchema,
-  ItemResolvedSchema,
-} from 'src/db/schemas/ItemSchema'
+  RecipeItemResolvedBeforeSavingSchema,
+  RecipeItemResolvedSchema,
+} from 'src/db/schemas/RecipeItemSchema'
 import {
   AddIdSchema,
   DateSchema,
@@ -36,7 +36,7 @@ export const RecipeResolvedSchema = RecipeRowSchema.merge(
     id: RecipeRowSchema.shape.id,
     name: NameSchema,
     createdAt: DateSchema,
-    items: z.array(ItemResolvedSchema),
+    recipeItems: z.array(RecipeItemResolvedSchema),
   })
 ).strict()
 export type RecipeResolved = z.infer<typeof RecipeResolvedSchema>
@@ -44,7 +44,7 @@ export type RecipeResolved = z.infer<typeof RecipeResolvedSchema>
 export const RecipeResolvedBeforeSavingSchema =
   RecipeBeforeDatabaseSchema.merge(
     z.object({
-      items: z.array(ItemResolvedBeforeSavingSchema),
+      recipeItems: z.array(RecipeItemResolvedBeforeSavingSchema),
     })
   ).strict()
 export type RecipeResolvedBeforeSaving = z.infer<

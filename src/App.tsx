@@ -10,7 +10,7 @@ export function App({ children }: { children?: React.ReactNode }) {
 
       <Box flex={1}>
         <ScrollArea w="100%" h="100%" scrollbars="y">
-          <Box p="xl">{children}</Box>
+          <Box>{children}</Box>
         </ScrollArea>
       </Box>
     </Flex>

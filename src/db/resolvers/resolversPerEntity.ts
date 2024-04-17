@@ -2,6 +2,10 @@ import { CommonResolverOptions } from 'src/db/resolvers/types'
 import { AppStateResolved, AppStateRow } from 'src/db/schemas/AppState'
 import { ItemResolved, ItemRow } from 'src/db/schemas/ItemSchema'
 import { PersonResolved, PersonRow } from 'src/db/schemas/PersonSchema'
+import {
+  RecipeItemResolved,
+  RecipeItemRow,
+} from 'src/db/schemas/RecipeItemSchema'
 import { RecipeResolved, RecipeRow } from 'src/db/schemas/RecipeSchema'
 
 export const resolvers = {
@@ -9,6 +13,7 @@ export const resolvers = {
   AppState: appStateResolver,
   Person: personResolver,
   Item: itemResolver,
+  RecipeItem: recipeItemResolver,
 }
 
 export async function recipeResolver({
@@ -18,14 +23,32 @@ export async function recipeResolver({
 }: {
   row: RecipeRow
 } & CommonResolverOptions): Promise<RecipeResolved> {
-  const itemRows = await loaders.itemsByRecipeIds.load(row.id)
+  const itemRows = await loaders.recipeItemsByRecipeIds.load(row.id)
   const recipe = {
     ...row,
-    items: await Promise.all(
-      itemRows.map((row) => itemResolver({ row, loaders, connection }))
+    recipeItems: await Promise.all(
+      itemRows.map((row) => recipeItemResolver({ row, loaders, connection }))
     ),
   }
   return recipe
+}
+
+export async function recipeItemResolver({
+  row,
+  loaders,
+  connection,
+}: {
+  row: RecipeItemRow
+} & CommonResolverOptions): Promise<RecipeItemResolved> {
+  const itemRow = await loaders.itemsById.load(row.itemId)
+  return {
+    ...row,
+    item: await itemResolver({
+      row: itemRow,
+      loaders,
+      connection,
+    }),
+  }
 }
 
 export async function itemResolver({

@@ -21,13 +21,21 @@ export function createLoaders(connection: TXAsync) {
     recipesById: createSimpleLoader({ connection, entity: Recipe }),
     itemsById: createSimpleLoader({ connection, entity: Item }),
     personById: createSimpleLoader({ connection, entity: Person }),
-    itemsByRecipeIds: new DataLoader(async (recipeIds: readonly string[]) => {
-      const items = await Item.findManyByRecipeIds({
-        connection,
-        recipeIds,
-      })
-      return groupAndSortByReference(items, recipeIds, (item) => item.recipeId)
-    }, DEFAULT_DATALOADER_OPTIONS),
+    recipeItemsByRecipeIds: new DataLoader(
+      async (recipeIds: readonly string[]) => {
+        const recipeItems = await RecipeItem.findManyByRecipeIds({
+          connection,
+          recipeIds,
+        })
+        return groupAndSortByReference(
+          recipeItems,
+          recipeIds,
+          (item) => item.recipeId
+        )
+      },
+      DEFAULT_DATALOADER_OPTIONS
+    ),
+
     recipeItemsById: createSimpleLoader({ connection, entity: RecipeItem }),
   }
 }

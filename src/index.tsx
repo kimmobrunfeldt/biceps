@@ -55,7 +55,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         const dataLoaders = ctx ? createLoaders(ctx.db) : undefined
         return (
           <DataLoaderContext.Provider value={dataLoaders}>
-            <MantineProvider theme={theme} defaultColorScheme="dark">
+            <MantineProvider theme={theme} defaultColorScheme="auto">
               <Notifications position="top-center" />
               <ModalsProvider>
                 <QueryClientProvider client={queryClient}>

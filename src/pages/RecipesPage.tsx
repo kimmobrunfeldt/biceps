@@ -1,42 +1,25 @@
-import { Box, Button, Stack, Text, Title } from '@mantine/core'
+import { Box, Button, Stack, Text } from '@mantine/core'
+import { IconPlus } from '@tabler/icons-react'
+import { PageTemplate } from 'src/components/PageTemplate'
 import { Query } from 'src/components/Query'
-import { useGetAllRecipes, useUpsertRecipe } from 'src/hooks/useDatabase'
+import { useGetAllRecipes } from 'src/hooks/useDatabase'
 
 export function RecipesPage() {
   const recipesResult = useGetAllRecipes()
-  const { upsertRecipe } = useUpsertRecipe()
 
   async function onAddRecipeClick() {
-    await upsertRecipe({
-      name: 'My recipe',
-      items: [
-        {
-          name: 'Pirkka Parhaat Tomato',
-          kcal: 10,
-          fatTotal: 0,
-          fatSaturated: 0,
-          carbsTotal: 0,
-          carbsSugar: 0,
-          salt: 0,
-          protein: 0,
-        },
-        {
-          name: 'Pirkka Parhaat Pasta',
-          kcal: 10,
-          fatTotal: 0,
-          fatSaturated: 0,
-          carbsTotal: 0,
-          carbsSugar: 0,
-          salt: 0,
-          protein: 0,
-        },
-      ],
-    })
+    console.log('Add recipe')
   }
 
   return (
-    <Box>
-      <Title>Recipes</Title>
+    <PageTemplate
+      title="Recipes"
+      titleRightSection={
+        <Button leftSection={<IconPlus size={14} />} onClick={onAddRecipeClick}>
+          Add recipe
+        </Button>
+      }
+    >
       <Box py="lg">
         <Query result={recipesResult}>
           {(recipes) =>
@@ -44,8 +27,12 @@ export function RecipesPage() {
               <Box key={recipe.id}>
                 <Text>{recipe.name}</Text>
                 <Stack>
-                  {recipe.items.map((item) => {
-                    return <Box key={item.id}>{item.name}</Box>
+                  {recipe.recipeItems.map((recipeItem) => {
+                    return (
+                      <Box key={recipeItem.item.id}>
+                        {recipeItem.weightGrams}g {recipeItem.item.name}
+                      </Box>
+                    )
                   })}
                 </Stack>
               </Box>
@@ -53,7 +40,6 @@ export function RecipesPage() {
           }
         </Query>
       </Box>
-      <Button onClick={onAddRecipeClick}>Add recipe</Button>
-    </Box>
+    </PageTemplate>
   )
 }

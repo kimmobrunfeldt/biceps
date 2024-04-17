@@ -1,13 +1,46 @@
-import { makeUtils } from 'src/db/interface/entityMethods'
+import sql from 'sql-template-tag'
+import { Options } from 'src/db/interface/entityInterface'
+import { findOptionsAsSql, is, makeUtils } from 'src/db/interface/entityMethods'
 import {
   RecipeItemBeforeDatabaseSchema,
+  RecipeItemRow,
   RecipeItemRowSchema,
 } from 'src/db/schemas/RecipeItemSchema'
 
-const { find, findMany, insert, upsert, clientUpsert, removeAll } = makeUtils({
+const {
+  find,
+  findMany,
+  insert,
+  upsert,
+  clientUpsert,
+  removeAll,
+  createDatabaseMethodsWithTransform,
+} = makeUtils({
   tableName: 'recipe_items',
   beforeDatabaseSchema: RecipeItemBeforeDatabaseSchema,
   schema: RecipeItemRowSchema,
 })
 
 export { clientUpsert, find, findMany, insert, removeAll, upsert }
+
+export async function findManyByRecipeIds({
+  connection,
+  recipeIds,
+}: Options & {
+  recipeIds: readonly string[]
+}): Promise<RecipeItemRow[]> {
+  if (recipeIds.length === 0) return []
+
+  const { whereSql } = findOptionsAsSql<RecipeItemRow>({
+    where: { recipeId: is('IN', recipeIds) },
+  })
+  const { many } = createDatabaseMethodsWithTransform({
+    connection,
+    schema: RecipeItemRowSchema,
+  })
+  const sqlQuery = sql`
+    SELECT * FROM recipe_items
+    ${whereSql}
+  `
+  return await many(sqlQuery)
+}

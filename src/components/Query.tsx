@@ -21,14 +21,14 @@ export function Query<T>({
   children,
   loaderDelayMs = 0,
   isEmpty = defaultIsEmpty,
-  isLoading = (result) => result.isLoading || result.isFetching,
+  isLoading = (result) => result.isLoading,
   pickData = (result) => result.data,
   whenEmpty = () => <Text>No results found</Text>,
   whenLoading = <Loader size="sm" />,
 }: Props<T>): JSX.Element {
   const showSpinner = useSpinDelay(isLoading(result), {
     delay: loaderDelayMs,
-    minDuration: 300,
+    minDuration: 500,
   })
 
   if (result.error) {
