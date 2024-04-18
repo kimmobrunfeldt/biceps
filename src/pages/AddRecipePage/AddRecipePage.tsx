@@ -1,52 +1,49 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Button, TextInput, Title } from '@mantine/core'
-import { useCallback, useEffect, useState } from 'react'
+import { Button, TextInput } from '@mantine/core'
+import { useCallback, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { PersonResolvedSchema } from 'src/db/schemas/PersonSchema'
-import { useGetAppState, useUpdatePerson } from 'src/hooks/useDatabase'
+import { PageTemplate } from 'src/components/PageTemplate'
+import { RecipeItemResolvedBeforeSaving } from 'src/db/schemas/RecipeItemSchema'
+import { RecipeResolvedSchema } from 'src/db/schemas/RecipeSchema'
+import { useGetAppState, useUpsertRecipe } from 'src/hooks/useDatabase'
 import { useNotifications } from 'src/hooks/useNotification'
-import * as z from 'zod'
+import { RecipeItems } from 'src/pages/AddRecipePage/components/RecipeItems'
+import { z } from 'zod'
 
 const FormSchema = z.object({
-  name: PersonResolvedSchema.shape.name,
+  name: RecipeResolvedSchema.shape.name,
 })
 type FormData = z.infer<typeof FormSchema>
 
-export function ProfileSettings() {
+export function AddRecipePage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { withNotifications } = useNotifications()
-  const { updatePerson } = useUpdatePerson()
   const appStateResult = useGetAppState()
+  const { upsertRecipe } = useUpsertRecipe()
+  const [recipeItems, setRecipeItems] = useState<
+    RecipeItemResolvedBeforeSaving[]
+  >([])
 
   const {
     control,
     handleSubmit,
-    setValue,
-    resetField,
     formState: { isDirty, errors },
   } = useForm<FormData>({
     defaultValues: { name: '' },
     resolver: zodResolver(FormSchema),
   })
 
-  useEffect(() => {
-    if (!appStateResult.data?.selectedPerson.name) return
-    // Use reset to clear dirty status
-    resetField('name', {
-      defaultValue: appStateResult.data.selectedPerson.name,
-    })
-  }, [setValue, resetField, appStateResult.data?.selectedPerson.name])
-
   const onSubmit = useCallback(
     async (data: FormData) => {
-      if (!appStateResult.data || isSubmitting) return
+      if (isSubmitting) return
 
       setIsSubmitting(true)
       try {
         await withNotifications({
           fn: async () => {
-            await updatePerson(appStateResult.data.selectedPerson.id, {
-              name: data.name,
+            await upsertRecipe({
+              ...data,
+              recipeItems,
             })
           },
         })
@@ -54,14 +51,11 @@ export function ProfileSettings() {
         setIsSubmitting(false)
       }
     },
-    [updatePerson, appStateResult.data, withNotifications, isSubmitting]
+    [withNotifications, isSubmitting, recipeItems, upsertRecipe]
   )
 
   return (
-    <>
-      <Title order={2} fz="xl" mb="md">
-        Profile
-      </Title>
+    <PageTemplate title="Add recipe">
       <form onSubmit={handleSubmit(onSubmit)}>
         <Controller
           name="name"
@@ -69,12 +63,18 @@ export function ProfileSettings() {
           render={({ field }) => (
             <TextInput
               {...field}
-              label="Your name"
+              label="Recipe name"
               placeholder="Name"
               error={errors.name?.message}
               disabled={appStateResult.isLoading || isSubmitting}
+              maw={400}
             />
           )}
+        />
+
+        <RecipeItems
+          recipeItems={recipeItems}
+          onChange={(recipeItems) => setRecipeItems(recipeItems)}
         />
 
         <Button
@@ -83,9 +83,9 @@ export function ProfileSettings() {
           disabled={!isDirty || isSubmitting || appStateResult.isLoading}
           loading={isSubmitting}
         >
-          Save
+          Add recipe
         </Button>
       </form>
-    </>
+    </PageTemplate>
   )
 }

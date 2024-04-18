@@ -20,6 +20,10 @@ export const ItemRowSchema = z
     carbsSugar: z.number().nonnegative(),
     protein: z.number().nonnegative(),
     salt: z.number().nonnegative(),
+    imageThumbUrl: z.preprocess(
+      preprocessors.nullToUndefined,
+      z.string().url().optional()
+    ),
     imageUrl: z.preprocess(
       preprocessors.nullToUndefined,
       z.string().url().optional()

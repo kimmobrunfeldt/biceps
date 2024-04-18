@@ -105,7 +105,7 @@ export function NavBar() {
               console.log('navbar data', data.selectedPerson)
               return (
                 <Avatar
-                  color={settingsRouteActive ? 'purple' : 'gray'}
+                  color={settingsRouteActive ? 'brand' : 'gray'}
                   radius="xl"
                   alt={data.selectedPerson.name}
                 >

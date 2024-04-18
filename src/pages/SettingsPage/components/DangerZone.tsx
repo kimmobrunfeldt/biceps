@@ -35,7 +35,7 @@ export function DangerZone() {
 
   return (
     <>
-      <Title mb="xl" order={2}>
+      <Title mb="lg" order={2} fz="xl">
         Danger zone
       </Title>
 

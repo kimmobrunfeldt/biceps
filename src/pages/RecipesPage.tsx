@@ -3,21 +3,19 @@ import { IconPlus } from '@tabler/icons-react'
 import { PageTemplate } from 'src/components/PageTemplate'
 import { Query } from 'src/components/Query'
 import { useGetAllRecipes } from 'src/hooks/useDatabase'
+import { routes } from 'src/routes'
+import { Link } from 'wouter'
 
 export function RecipesPage() {
   const recipesResult = useGetAllRecipes()
-
-  async function onAddRecipeClick() {
-    console.log('Add recipe')
-  }
 
   return (
     <PageTemplate
       title="Recipes"
       titleRightSection={
-        <Button leftSection={<IconPlus size={14} />} onClick={onAddRecipeClick}>
-          Add recipe
-        </Button>
+        <Link to={routes.recipes.add.path}>
+          <Button leftSection={<IconPlus size={14} />}>Add recipe</Button>
+        </Link>
       }
     >
       <Box py="lg">

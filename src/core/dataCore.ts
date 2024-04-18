@@ -1,5 +1,12 @@
 import { TXAsync } from '@vlcn.io/xplat-api'
-import { Item, Person, PersonRecipe, Recipe, RecipeItem } from 'src/db/entities'
+import {
+  AppState,
+  Item,
+  Person,
+  PersonRecipe,
+  Recipe,
+  RecipeItem,
+} from 'src/db/entities'
 import { upsertSeedData } from 'src/db/seedData'
 
 /**
@@ -13,6 +20,7 @@ export async function deleteAllData(connection: TXAsync) {
     await Recipe.removeAll({ connection: tx })
     await PersonRecipe.removeAll({ connection: tx })
     await Person.removeAll({ connection: tx })
+    await AppState.removeAll({ connection: tx })
     await upsertSeedData(tx)
   })
 }

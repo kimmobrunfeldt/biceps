@@ -9,6 +9,7 @@ CREATE TABLE items (
   protein REAL,
   salt REAL,
   image_url TEXT,
+  image_thumb_url TEXT,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 SELECT crsql_as_crr('items');

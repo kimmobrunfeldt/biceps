@@ -31,8 +31,8 @@
   &[data-active='true'] {
     &,
     &:hover {
-      background-color: var(--mantine-color-purple-light);
-      color: var(--mantine-color-purple-light-color);
+      background-color: var(--mantine-color-brand-light);
+      color: var(--mantine-color-brand-light-color);
     }
   }
 }
@@ -54,8 +54,8 @@
   &[data-active='true'] {
     &,
     &:hover {
-      background-color: var(--mantine-color-purple-light);
-      color: var(--mantine-color-purple-light-color);
+      background-color: var(--mantine-color-brand-light);
+      color: var(--mantine-color-brand-light-color);
     }
   }
 }

@@ -17,7 +17,15 @@ import schemaContent from 'src/db/schema.sql?raw'
 import { upsertSeedData } from 'src/db/seedData'
 import { DataLoaderContext } from 'src/hooks/useDataLoaders'
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false, // Disables automatic retries on failed queries.
+      staleTime: 1000 * 60 * 60, // 1 hour in ms
+      refetchOnWindowFocus: false, // Disables automatic refetching when browser window is focused.
+    },
+  },
+})
 
 const brandColor: MantineColorsTuple = [
   '#f5ecff',
@@ -36,7 +44,7 @@ const theme = createTheme({
   colors: {
     purple: brandColor,
   },
-  primaryColor: 'purple',
+  primaryColor: 'blue',
 })
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

@@ -6,7 +6,7 @@ import { ProfileSettings } from 'src/pages/SettingsPage/components/ProfileSettin
 export function SettingsPage() {
   return (
     <PageTemplate title="Settings">
-      <Stack gap="xl">
+      <Stack gap="xl" mt="md">
         <Box>
           <ProfileSettings />
         </Box>
