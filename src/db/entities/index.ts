@@ -30,6 +30,8 @@ export { AppStateEntity as AppState }
 
 import {
   findManyByRecipeIds as findManyByRecipeIdsItem,
+  findManyCustom as findManyCustomItem,
+  findManyExternal as findManyExternalItem,
   clientUpsert as clientUpsertItem,
   find as findItem,
   findMany as findManyItem,
@@ -41,6 +43,8 @@ import {
 } from 'src/db/entities/Item'
 const ItemEntity = createEntity({
   findManyByRecipeIds: findManyByRecipeIdsItem,
+  findManyCustom: findManyCustomItem,
+  findManyExternal: findManyExternalItem,
   clientUpsert: clientUpsertItem,
   find: findItem,
   findMany: findManyItem,

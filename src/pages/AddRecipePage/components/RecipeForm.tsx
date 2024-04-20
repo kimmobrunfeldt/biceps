@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Box, Button, Code, TextInput } from '@mantine/core'
 import { useCallback, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
+import { RecipeItemResolvedBeforeSavingSchema } from 'src/db/schemas/RecipeItemSchema'
 import { RecipeResolvedBeforeSavingSchema } from 'src/db/schemas/RecipeSchema'
 import { RecipeItemsForm } from 'src/pages/AddRecipePage/components/RecipeItemsForm'
 import { z } from 'zod'
@@ -9,7 +10,13 @@ import { z } from 'zod'
 const RecipeFormSchema = z.object({
   id: RecipeResolvedBeforeSavingSchema.shape.id,
   name: RecipeResolvedBeforeSavingSchema.shape.name,
-  recipeItems: RecipeResolvedBeforeSavingSchema.shape.recipeItems,
+  recipeItems: z.array(
+    RecipeItemResolvedBeforeSavingSchema.merge(
+      z.object({
+        __reactHookFormId: z.string().optional(),
+      })
+    )
+  ),
 })
 export type RecipeFormFields = z.infer<typeof RecipeFormSchema>
 
@@ -43,7 +50,12 @@ export function RecipeForm({ initialData, onSubmit: inputOnSubmit }: Props) {
 
       setIsSubmitting(true)
       try {
-        await inputOnSubmit({ ...data, id: initialData?.id })
+        const recipeItems = data.recipeItems.map((recipeItem) => {
+          // Remove react-hook-form's internal ID before passing to parent
+          const { __reactHookFormId, ...rest } = recipeItem
+          return rest
+        })
+        await inputOnSubmit({ ...data, recipeItems, id: initialData?.id })
       } finally {
         setIsSubmitting(false)
       }

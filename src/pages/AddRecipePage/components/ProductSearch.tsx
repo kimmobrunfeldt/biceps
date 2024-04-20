@@ -10,6 +10,7 @@ import { IconSearch } from '@tabler/icons-react'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useCallback, useEffect, useState } from 'react'
 import { ItemImage } from 'src/components/ItemImage'
+import { useCustomProductSearch } from 'src/hooks/useDatabase'
 import { useSearch } from 'src/hooks/useFoodApi'
 import { useNotifications } from 'src/hooks/useNotification'
 import { Product } from 'src/utils/foodApi'
@@ -26,6 +27,9 @@ export function ProductSearch({ onProductSelect }: Props) {
   const [value, setValue] = useState('')
   const debouncedValue = useDebounce(value, 300)
   const searchResult = useSearch({ searchTerms: debouncedValue })
+  const customSearchResult = useCustomProductSearch({
+    searchTerms: debouncedValue,
+  })
   const products = searchResult.data?.products ?? []
 
   useEffect(() => {
@@ -94,7 +98,7 @@ export function ProductSearch({ onProductSelect }: Props) {
           }}
           onBlur={() => combobox.closeDropdown()}
           rightSection={
-            searchResult.isLoading ? (
+            searchResult.isLoading || customSearchResult.isLoading ? (
               <Loader size={18} />
             ) : (
               <IconSearch width={18} />
@@ -104,7 +108,10 @@ export function ProductSearch({ onProductSelect }: Props) {
       </Combobox.Target>
 
       <Combobox.Dropdown
-        hidden={searchResult.isLoading || searchResult.isPending}
+        hidden={
+          (searchResult.isLoading || searchResult.isPending) &&
+          (customSearchResult.isLoading || customSearchResult.isPending)
+        }
       >
         <Combobox.Options mah={280} style={{ overflowY: 'auto' }}>
           {options}

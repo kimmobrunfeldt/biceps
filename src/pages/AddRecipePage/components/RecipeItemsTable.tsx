@@ -123,7 +123,10 @@ export function RecipeItemsTable({
   )
 }
 
-function calculateNutrition(weightGrams: number, valuePer100Grams: number) {
+export function calculateNutrition(
+  weightGrams: number,
+  valuePer100Grams: number
+) {
   return valuePer100Grams * (weightGrams / 100)
 }
 
@@ -155,7 +158,9 @@ export function calculateTotals(recipeItems: RecipeItemResolvedBeforeSaving[]) {
   )
 }
 
-function calculateValuesForItem(recipeItem: RecipeItemResolvedBeforeSaving) {
+export function calculateValuesForItem(
+  recipeItem: RecipeItemResolvedBeforeSaving
+) {
   const { weightGrams, item } = recipeItem
   return {
     weightGrams,

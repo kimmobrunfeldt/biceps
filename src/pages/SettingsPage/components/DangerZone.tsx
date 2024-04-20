@@ -3,6 +3,7 @@ import { modals } from '@mantine/modals'
 import { IconAlertCircle, IconAlertTriangle } from '@tabler/icons-react'
 import { useDeleteAllData } from 'src/hooks/useDatabase'
 import { useNotifications } from 'src/hooks/useNotification'
+import { sleep } from 'src/utils/utils'
 
 export function DangerZone() {
   const { deleteAllData } = useDeleteAllData()
@@ -20,6 +21,7 @@ export function DangerZone() {
           fn: async () => {
             await deleteAllData()
           },
+          minLoadingNotificationMs: 600,
           loading: { message: 'Deleting data ...', color: 'blue' },
           success: { message: 'All data deleted', color: 'green' },
           error: {
@@ -29,6 +31,8 @@ export function DangerZone() {
             icon: <IconAlertCircle />,
           },
         })
+        await sleep(1000)
+        window.location.pathname = '/'
       },
     })
   }

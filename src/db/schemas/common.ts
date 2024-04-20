@@ -3,7 +3,7 @@ import { nanoId } from 'src/utils/nanoid'
 import { z } from 'zod'
 
 export const preprocessors = {
-  addNanoId: (val: unknown) => (!_.isNil(val) ? val : nanoId()),
+  addNanoId: (val: unknown) => (!_.isNil(val) ? val : `c-${nanoId()}`),
   nullToUndefined: (val: unknown) => (!_.isNull(val) ? val : undefined),
   dateToIsoString: (val: unknown) => (!_.isDate(val) ? val : val.toISOString()),
   isoStringToDate: (val: unknown) => (!_.isString(val) ? val : new Date(val)),

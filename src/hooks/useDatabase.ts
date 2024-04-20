@@ -1,10 +1,10 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { CtxAsync, useDB } from '@vlcn.io/react'
 import _ from 'lodash'
-import { APP_STATE_KEY, DATABASE_NAME } from 'src/constants'
-import { deleteAllData } from 'src/core/dataCore'
+import { APP_STATE_KEY, DATABASE_NAME, INDEXEDDB_NAME } from 'src/constants'
 import { createRecipe, upsertRecipe } from 'src/core/recipeCore'
-import { AppState, Person, Recipe } from 'src/db/entities'
+import { AppState, Item, Person, Recipe } from 'src/db/entities'
+import { is } from 'src/db/interface/entityMethods'
 import { resolver } from 'src/db/resolvers/resolver'
 import { PersonBeforeDatabase } from 'src/db/schemas/PersonSchema'
 import { RecipeResolvedBeforeSaving } from 'src/db/schemas/RecipeSchema'
@@ -14,6 +14,9 @@ const queryNames = {
   getAppState: 'getAppState',
   getAllRecipes: 'getAllRecipes',
   getRecipe: (id: string) => `getRecipe-${id}`,
+  getAllCustomProducts: 'getAllCustomProducts',
+  useCustomProductSearch: 'useCustomProductSearch',
+  getAllExternalProducts: 'getAllExternalProducts',
 }
 
 /**
@@ -110,13 +113,81 @@ export function useCreateRecipe() {
   }
 }
 
+export function useGetAllCustomProducts() {
+  const ctx = useDB(DATABASE_NAME)
+  const loaders = useDataLoaders()
+
+  return useQuery({
+    queryKey: getCacheKey(ctx, queryNames.getAllCustomProducts),
+    queryFn: withQueryErrorHandling(
+      queryNames.getAllCustomProducts,
+      async () => {
+        const itemRow = await Item.findManyCustom({ connection: ctx.db })
+        const items = await Promise.all(
+          itemRow.map((row) => resolver({ row, connection: ctx.db, loaders }))
+        )
+        return items
+      }
+    ),
+  })
+}
+
+export function useCustomProductSearch({
+  searchTerms,
+}: {
+  searchTerms: string
+}) {
+  const ctx = useDB(DATABASE_NAME)
+  const loaders = useDataLoaders()
+
+  return useQuery({
+    queryKey: [
+      ...getCacheKey(ctx, queryNames.getAllCustomProducts),
+      searchTerms,
+    ],
+    queryFn: withQueryErrorHandling(
+      queryNames.getAllCustomProducts,
+      async () => {
+        const itemRow = await Item.findManyCustom({
+          connection: ctx.db,
+          where: { name: is('LIKE', `%${searchTerms}%`) },
+        })
+        const items = await Promise.all(
+          itemRow.map((row) => resolver({ row, connection: ctx.db, loaders }))
+        )
+        return items
+      }
+    ),
+  })
+}
+
+export function useGetAllExternalProducts() {
+  const ctx = useDB(DATABASE_NAME)
+  const loaders = useDataLoaders()
+
+  return useQuery({
+    queryKey: getCacheKey(ctx, queryNames.getAllExternalProducts),
+    queryFn: withQueryErrorHandling(
+      queryNames.getAllExternalProducts,
+      async () => {
+        const itemRow = await Item.findManyExternal({ connection: ctx.db })
+        const items = await Promise.all(
+          itemRow.map((row) => resolver({ row, connection: ctx.db, loaders }))
+        )
+        return items
+      }
+    ),
+  })
+}
+
 export function useDeleteAllData() {
   const ctx = useDB(DATABASE_NAME)
   const queryClient = useQueryClient()
 
   return {
     deleteAllData: async () => {
-      await deleteAllData(ctx.db)
+      await ctx.db.close()
+      await indexedDB.deleteDatabase(INDEXEDDB_NAME)
       queryClient.invalidateQueries()
     },
   }

@@ -28,6 +28,12 @@ export const routes = {
       title: 'Edit recipe',
     },
   },
+  products: {
+    index: {
+      path: '/products',
+      title: 'Products',
+    },
+  },
   weeklySchedule: {
     index: {
       path: '/weekly-schedule',

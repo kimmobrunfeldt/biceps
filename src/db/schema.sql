@@ -1,3 +1,8 @@
+CREATE TABLE migrations (
+  version INTEGER,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE items (
   id TEXT PRIMARY KEY NOT NULL,
   name TEXT,

@@ -20,7 +20,7 @@ export type SubConditions<FullObjT extends Record<string, any>> = Partial<
   OR?: SubConditions<FullObjT>
 }
 
-type ComparisonToken = '=' | '!=' | '>' | '>=' | '<' | '<=' | 'IN'
+type ComparisonToken = '=' | '!=' | '>' | '>=' | '<' | '<=' | 'IN' | 'LIKE'
 type Comparison<T> = { comparison: ComparisonToken; value: T | readonly T[] }
 
 type WhereObject<FullObjT extends Record<string, any>> = {
@@ -396,6 +396,8 @@ function comparisonAsSql<T>(comparison: Comparison<T>): Sql {
       return sql`< ${valueToSqlSuitable(comparison.value)}`
     case '<=':
       return sql`<= ${valueToSqlSuitable(comparison.value)}`
+    case 'LIKE':
+      return sql`LIKE ${valueToSqlSuitable(comparison.value)}`
     case 'IN': {
       const arr = _.isArray(comparison.value)
         ? comparison.value

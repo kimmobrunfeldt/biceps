@@ -16,6 +16,8 @@ import { createLoaders } from 'src/db/dataLoaders'
 import schemaContent from 'src/db/schema.sql?raw'
 import { upsertSeedData } from 'src/db/seedData'
 import { DataLoaderContext } from 'src/hooks/useDataLoaders'
+import { runMigrations } from 'src/migrations'
+import { EmergencyFallbackPage } from 'src/pages/EmergencyFallbackPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -47,33 +49,54 @@ const theme = createTheme({
   primaryColor: 'blue',
 })
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <DBProvider
-      dbname={DATABASE_NAME}
-      schema={{
-        name: 'schema.sql',
-        content: schemaContent,
-      }}
-      manualSetup={async (ctx) => {
-        await upsertSeedData(ctx.db)
-      }}
-      Render={() => {
-        const ctx = useDB(DATABASE_NAME)
-        const dataLoaders = ctx ? createLoaders(ctx.db) : undefined
-        return (
-          <DataLoaderContext.Provider value={dataLoaders}>
-            <MantineProvider theme={theme} defaultColorScheme="auto">
-              <Notifications position="top-center" />
-              <ModalsProvider>
-                <QueryClientProvider client={queryClient}>
-                  {ctx ? <Router /> : null}
-                </QueryClientProvider>
-              </ModalsProvider>
-            </MantineProvider>
-          </DataLoaderContext.Provider>
-        )
-      }}
-    />
-  </React.StrictMode>
-)
+const UiProviders = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <MantineProvider theme={theme} defaultColorScheme="auto">
+      <Notifications position="top-center" />
+      <ModalsProvider>
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      </ModalsProvider>
+    </MantineProvider>
+  )
+}
+
+async function main() {
+  try {
+    await runMigrations()
+  } catch (err) {
+    console.error('Error running migrations:', err)
+  }
+
+  await ReactDOM.createRoot(document.getElementById('root')!).render(
+    <React.StrictMode>
+      <DBProvider
+        dbname={DATABASE_NAME}
+        schema={{
+          name: 'schema.sql',
+          content: schemaContent,
+        }}
+        manualSetup={async (ctx) => {
+          await upsertSeedData(ctx.db)
+        }}
+        fallback={
+          <UiProviders>
+            <EmergencyFallbackPage />
+          </UiProviders>
+        }
+        Render={() => {
+          const ctx = useDB(DATABASE_NAME)
+          const dataLoaders = ctx ? createLoaders(ctx.db) : undefined
+          return (
+            <DataLoaderContext.Provider value={dataLoaders}>
+              <UiProviders>{ctx ? <Router /> : null}</UiProviders>
+            </DataLoaderContext.Provider>
+          )
+        }}
+      />
+    </React.StrictMode>
+  )
+}
+
+void main()

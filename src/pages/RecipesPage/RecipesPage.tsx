@@ -1,4 +1,4 @@
-import { Box, Button } from '@mantine/core'
+import { Blockquote, Box, Button, Text } from '@mantine/core'
 import { IconPlus } from '@tabler/icons-react'
 import { PageTemplate } from 'src/components/PageTemplate'
 import { Query } from 'src/components/Query'
@@ -19,7 +19,22 @@ export function RecipesPage() {
         </Link>
       }
     >
-      <Box py="lg">
+      <Blockquote my="lg" maw={900}>
+        <Text c="gray">
+          Recipes can be a single meal or food prepping batch that serves
+          multiple meals. Product search is powered by{' '}
+          <a
+            href="https://world.openfoodfacts.org/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Open Food Facts
+          </a>{' '}
+          project. In addition, you can add your own products in Products page.
+        </Text>
+      </Blockquote>
+
+      <Box>
         <Query result={recipesResult}>
           {(recipes) => {
             return <RecipesTable recipes={recipes} onRemove={() => undefined} />

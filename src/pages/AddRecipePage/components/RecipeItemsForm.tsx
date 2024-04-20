@@ -23,6 +23,7 @@ export function RecipeItemsForm({ control, setValue }: Props) {
   const { append, remove, fields } = useFieldArray({
     control,
     name: 'recipeItems',
+    keyName: '__reactHookFormId',
   })
 
   const recipeItems = useWatch({ control, name: 'recipeItems' })

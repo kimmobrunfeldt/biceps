@@ -3,6 +3,7 @@ import { AddRecipePage } from 'src/pages/AddRecipePage/AddRecipePage'
 import { EditRecipePage } from 'src/pages/EditRecipePage/EditRecipePage'
 import { IndexPage } from 'src/pages/IndexPage/IndexPage'
 import { NotFoundPage } from 'src/pages/NotFoundPage'
+import { ProductsPage } from 'src/pages/ProductsPage/ProductsPage'
 import { RecipesPage } from 'src/pages/RecipesPage/RecipesPage'
 import { SettingsPage } from 'src/pages/SettingsPage/SettingsPage'
 import { WeeklySchedulePage } from 'src/pages/WeeklySchedulePage/WeeklySchedulePage'
@@ -19,6 +20,8 @@ export function Router() {
         <Route<{ id: string }> path={routes.recipes.edit.path}>
           {(params) => <EditRecipePage id={params.id} />}
         </Route>
+
+        <Route path={routes.products.index.path} component={ProductsPage} />
 
         <Route
           path={routes.weeklySchedule.index.path}

@@ -8,7 +8,12 @@ import {
   UnstyledButton,
   rem,
 } from '@mantine/core'
-import { IconCalendarWeek, IconHome2, IconSalad } from '@tabler/icons-react'
+import {
+  IconCalendarWeek,
+  IconHome2,
+  IconSalad,
+  IconShoppingBag,
+} from '@tabler/icons-react'
 import logo from 'src/assets/biceps-logo.svg'
 import { Query } from 'src/components/Query'
 import { useGetAppState } from 'src/hooks/useDatabase'
@@ -59,14 +64,19 @@ function NavBarLink({ to, icon: Icon, label, children }: NavBarLinkProps) {
 const menuItems = [
   { icon: IconHome2, label: routes.index.title, to: routes.index.path },
   {
+    icon: IconCalendarWeek,
+    label: routes.weeklySchedule.index.title,
+    to: routes.weeklySchedule.index.path,
+  },
+  {
     icon: IconSalad,
     label: routes.recipes.index.title,
     to: routes.recipes.index.path,
   },
   {
-    icon: IconCalendarWeek,
-    label: routes.weeklySchedule.index.title,
-    to: routes.weeklySchedule.index.path,
+    icon: IconShoppingBag,
+    label: routes.products.index.title,
+    to: routes.products.index.path,
   },
 ]
 

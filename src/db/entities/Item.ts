@@ -1,8 +1,14 @@
 import sql from 'sql-template-tag'
 import { Options } from 'src/db/interface/entityInterface'
-import { findOptionsAsSql, is, makeUtils } from 'src/db/interface/entityMethods'
+import {
+  FindOptions,
+  findOptionsAsSql,
+  is,
+  makeUtils,
+} from 'src/db/interface/entityMethods'
 import {
   ItemBeforeDatabaseSchema,
+  ItemRow,
   ItemRowSchema,
 } from 'src/db/schemas/ItemSchema'
 import { z } from 'zod'
@@ -62,6 +68,60 @@ export async function findManyByRecipeIds({
     FROM items
     LEFT JOIN recipe_items ON items.id = recipe_items.item_id
     ${whereSql}
+  `
+  return await many(sqlQuery)
+}
+
+export async function findManyCustom({
+  connection,
+  where,
+  limit,
+  orderBy,
+}: Options & FindOptions<ItemRow>): Promise<ItemRow[]> {
+  const { whereSql, limitSql, orderBySql } =
+    findOptionsAsSql<ItemRowWithRecipeId>({
+      where: { ...where, id: is('LIKE', 'c-%') },
+      limit,
+      orderBy,
+    })
+  const { many } = createDatabaseMethodsWithTransform({
+    connection,
+    schema: ItemRowSchema,
+  })
+  const sqlQuery = sql`
+    SELECT
+      *
+    FROM items
+    ${whereSql}
+    ${orderBySql}
+    ${limitSql}
+  `
+  return await many(sqlQuery)
+}
+
+export async function findManyExternal({
+  connection,
+  where = {},
+  limit,
+  orderBy,
+}: Options & FindOptions<ItemRow>): Promise<ItemRow[]> {
+  const { whereSql, limitSql, orderBySql } =
+    findOptionsAsSql<ItemRowWithRecipeId>({
+      where,
+      limit,
+      orderBy,
+    })
+  const { many } = createDatabaseMethodsWithTransform({
+    connection,
+    schema: ItemRowSchema,
+  })
+  const sqlQuery = sql`
+    SELECT
+      *
+    FROM items
+    ${Object.keys(where).length > 0 ? sql`${whereSql} AND id NOT LIKE 'c-%'` : sql`WHERE id NOT LIKE 'c-%'`}
+    ${orderBySql}
+    ${limitSql}
   `
   return await many(sqlQuery)
 }
