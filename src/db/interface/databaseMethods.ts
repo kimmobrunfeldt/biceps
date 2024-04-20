@@ -28,6 +28,7 @@ export function createDatabaseMethods<SchemaT extends ZodSchema>({
     async maybeOne(sqlQuery: Sql): Promise<z.infer<SchemaT> | null> {
       const rows = await connection.execO(sqlQuery.sql, sqlQuery.values)
       if (rows.length > 1) {
+        console.log(rows)
         throw new SqlError('Unexpected amount of rows returned')
       }
       return rows[0] ? schema.parse(transformRow(rows[0])) : null

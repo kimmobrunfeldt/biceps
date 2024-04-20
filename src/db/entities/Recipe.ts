@@ -7,6 +7,7 @@ import {
 const {
   find,
   findMany,
+  maybeFind,
   insert,
   update,
   remove,
@@ -24,6 +25,7 @@ export {
   find,
   findMany,
   insert,
+  maybeFind,
   remove,
   removeAll,
   update,

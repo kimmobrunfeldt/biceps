@@ -22,15 +22,7 @@ export function useSearch(options: Options) {
       queryNames.search,
       options.searchTerms,
     ],
-    throwOnError: true,
     queryFn: async () => {
-      /*
-      await sleep(500)
-      console.log('return!')
-      return {
-        products: [{ id: '1', product_name: 'test' } as Product],
-      }*/
-
       return await api('GET /cgi/search.pl', {
         query: { search_terms: options.searchTerms },
       })

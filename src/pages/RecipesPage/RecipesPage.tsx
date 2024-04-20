@@ -1,8 +1,9 @@
-import { Box, Button, Stack, Text } from '@mantine/core'
+import { Box, Button } from '@mantine/core'
 import { IconPlus } from '@tabler/icons-react'
 import { PageTemplate } from 'src/components/PageTemplate'
 import { Query } from 'src/components/Query'
 import { useGetAllRecipes } from 'src/hooks/useDatabase'
+import { RecipesTable } from 'src/pages/RecipesPage/components/RecipesTable'
 import { routes } from 'src/routes'
 import { Link } from 'wouter'
 
@@ -20,22 +21,9 @@ export function RecipesPage() {
     >
       <Box py="lg">
         <Query result={recipesResult}>
-          {(recipes) =>
-            recipes.map((recipe) => (
-              <Box key={recipe.id}>
-                <Text>{recipe.name}</Text>
-                <Stack>
-                  {recipe.recipeItems.map((recipeItem) => {
-                    return (
-                      <Box key={recipeItem.item.id}>
-                        {recipeItem.weightGrams}g {recipeItem.item.name}
-                      </Box>
-                    )
-                  })}
-                </Stack>
-              </Box>
-            ))
-          }
+          {(recipes) => {
+            return <RecipesTable recipes={recipes} onRemove={() => undefined} />
+          }}
         </Query>
       </Box>
     </PageTemplate>

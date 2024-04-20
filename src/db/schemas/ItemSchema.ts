@@ -34,7 +34,6 @@ export const ItemRowSchema = z
 export type ItemRow = z.infer<typeof ItemRowSchema>
 
 export const ItemBeforeDatabaseSchema = ItemRowSchema.omit({
-  __type: true,
   id: true,
   createdAt: true,
 })

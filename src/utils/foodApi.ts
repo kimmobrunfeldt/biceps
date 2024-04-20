@@ -29,10 +29,6 @@ export type Product = z.infer<typeof ProductSchema>
 
 const SearchResponseSchema = z
   .object({
-    count: z.number(),
-    page: z.number(),
-    page_count: z.number(),
-    page_size: z.number(),
     products: z.array(ProductSchema),
   })
   .passthrough()
@@ -120,7 +116,7 @@ export async function api<ReqT extends keyof ApiResponseMapping>(
     ...restOpts,
     method,
     headers: {
-      'User-Agent': 'Biceps Nutrition Web App v0.1 - https://biceps.app',
+      //'X-User-Agent': 'Biceps Nutrition Web App v0.1 - https://biceps.app',
       ...(opts.headers ? opts.headers : {}),
     },
     body: body ? JSON.stringify(body) : undefined,

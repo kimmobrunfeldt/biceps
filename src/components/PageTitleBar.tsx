@@ -1,4 +1,4 @@
-import { Box, BoxProps, Flex, Title } from '@mantine/core'
+import { BoxProps, Flex, Title } from '@mantine/core'
 
 type Props = {
   title: string
@@ -20,7 +20,7 @@ export function PageTitleBar({ title, rightSection, ...rest }: Props) {
       >
         {title}
       </Title>
-      <Box>{rightSection ? rightSection : null}</Box>
+      {rightSection ? rightSection : null}
     </Flex>
   )
 }

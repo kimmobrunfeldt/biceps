@@ -13,6 +13,7 @@ const {
   insert,
   upsert,
   clientUpsert,
+  remove,
   removeAll,
   createDatabaseMethodsWithTransform,
 } = makeUtils({
@@ -21,7 +22,7 @@ const {
   schema: RecipeItemRowSchema,
 })
 
-export { clientUpsert, find, findMany, insert, removeAll, upsert }
+export { clientUpsert, find, findMany, insert, remove, removeAll, upsert }
 
 export async function findManyByRecipeIds({
   connection,
@@ -33,6 +34,7 @@ export async function findManyByRecipeIds({
 
   const { whereSql } = findOptionsAsSql<RecipeItemRow>({
     where: { recipeId: is('IN', recipeIds) },
+    orderBy: ['createdAt', 'asc'],
   })
   const { many } = createDatabaseMethodsWithTransform({
     connection,

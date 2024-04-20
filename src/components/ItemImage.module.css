@@ -1,0 +1,5 @@
+.itemImage {
+  & img {
+    object-fit: contain;
+  }
+}

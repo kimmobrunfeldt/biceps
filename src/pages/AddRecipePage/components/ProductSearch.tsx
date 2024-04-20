@@ -1,5 +1,4 @@
 import {
-  Avatar,
   Combobox,
   Flex,
   Loader,
@@ -9,8 +8,10 @@ import {
 } from '@mantine/core'
 import { IconSearch } from '@tabler/icons-react'
 import { useDebounce } from '@uidotdev/usehooks'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { ItemImage } from 'src/components/ItemImage'
 import { useSearch } from 'src/hooks/useFoodApi'
+import { useNotifications } from 'src/hooks/useNotification'
 import { Product } from 'src/utils/foodApi'
 
 type Props = {
@@ -21,10 +22,20 @@ export function ProductSearch({ onProductSelect }: Props) {
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
   })
+  const { notification } = useNotifications()
   const [value, setValue] = useState('')
   const debouncedValue = useDebounce(value, 300)
   const searchResult = useSearch({ searchTerms: debouncedValue })
   const products = searchResult.data?.products ?? []
+
+  useEffect(() => {
+    if (!searchResult.error) return
+
+    notification({
+      message: `Search failed: ${searchResult.error?.message ?? 'unknown error'}`,
+      color: 'red',
+    })
+  }, [searchResult.error, notification])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValue(e.currentTarget.value)
@@ -47,12 +58,14 @@ export function ProductSearch({ onProductSelect }: Props) {
       onClick={onProductClick.bind(null, product)}
     >
       <Flex align="center" gap="sm">
-        <Avatar
-          src={product.image_thumb_url}
+        <ItemImage
+          item={{
+            imageUrl: product.image_url,
+            imageThumbUrl: product.image_thumb_url,
+          }}
           alt={product.product_name}
-          size="md"
-          radius="sm"
         />
+
         <Text>
           {product.product_name} {product.quantity}
         </Text>
@@ -93,7 +106,7 @@ export function ProductSearch({ onProductSelect }: Props) {
       <Combobox.Dropdown
         hidden={searchResult.isLoading || searchResult.isPending}
       >
-        <Combobox.Options>
+        <Combobox.Options mah={280} style={{ overflowY: 'auto' }}>
           {options}
           {products.length === 0 ? (
             <Combobox.Empty>No products found</Combobox.Empty>

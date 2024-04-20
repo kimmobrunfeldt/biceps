@@ -21,7 +21,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: false, // Disables automatic retries on failed queries.
-      staleTime: 1000 * 60 * 60, // 1 hour in ms
+      staleTime: Infinity,
       refetchOnWindowFocus: false, // Disables automatic refetching when browser window is focused.
     },
   },

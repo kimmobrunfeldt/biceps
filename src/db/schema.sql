@@ -25,6 +25,7 @@ CREATE TABLE recipe_items (
   recipe_id TEXT NOT NULL,
   item_id TEXT NOT NULL,
   weight_grams REAL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (recipe_id, item_id)
 );
 SELECT crsql_as_crr('recipe_items');

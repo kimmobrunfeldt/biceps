@@ -1,20 +1,23 @@
+import { Box } from '@mantine/core'
 import { IconAlertCircle } from '@tabler/icons-react'
 import { useCallback, useState } from 'react'
 import { PageTemplate } from 'src/components/PageTemplate'
-import { useCreateRecipe } from 'src/hooks/useDatabase'
+import { Query } from 'src/components/Query'
+import { useGetRecipe, useUpsertRecipe } from 'src/hooks/useDatabase'
 import { useNotifications } from 'src/hooks/useNotification'
 import {
   RecipeForm,
   RecipeFormFields,
 } from 'src/pages/AddRecipePage/components/RecipeForm'
-import { routes } from 'src/routes'
-import { useLocation } from 'wouter'
 
-export function AddRecipePage() {
+type Props = {
+  id: string
+}
+export function EditRecipePage({ id }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { withNotifications } = useNotifications()
-  const { createRecipe } = useCreateRecipe()
-  const [_location, setLocation] = useLocation()
+  const { upsertRecipe } = useUpsertRecipe()
+  const recipeResult = useGetRecipe(id)
 
   const onSubmit = useCallback(
     async (data: RecipeFormFields) => {
@@ -24,14 +27,12 @@ export function AddRecipePage() {
       try {
         await withNotifications({
           fn: async () => {
-            await createRecipe(data)
-            setLocation(routes.recipes.index.path)
+            await upsertRecipe(data)
           },
-          success: { message: `'${data.name}' added`, color: 'green' },
+          success: { message: `'${data.name}' saved`, color: 'green' },
           error: (err) => ({
-            message: `Adding failed: ${err.message}`,
+            message: `Saving failed: ${err.message}`,
             color: 'red',
-            autoClose: 5000,
             icon: <IconAlertCircle />,
           }),
         })
@@ -39,12 +40,20 @@ export function AddRecipePage() {
         setIsSubmitting(false)
       }
     },
-    [withNotifications, isSubmitting, createRecipe, setLocation]
+    [withNotifications, isSubmitting, upsertRecipe]
   )
 
   return (
-    <PageTemplate title="Add recipe">
-      <RecipeForm onSubmit={onSubmit} />
+    <PageTemplate title="Edit recipe">
+      <Query result={recipeResult} isEmpty={() => false}>
+        {(recipe) => {
+          if (!recipe) {
+            return <Box>Recipe not found</Box>
+          }
+
+          return <RecipeForm onSubmit={onSubmit} initialData={recipe} />
+        }}
+      </Query>
     </PageTemplate>
   )
 }

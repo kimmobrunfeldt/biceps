@@ -44,7 +44,7 @@ export function Query<T>({
   }
 
   const data = pickData(result)
-  if (!data) {
+  if (_.isUndefined(data)) {
     return (
       <Tooltip label="Something went wrong">
         <IconBoxOff color="red" />

@@ -40,4 +40,4 @@ export const DateIsoStringSchema = z.preprocess(
 export const NameSchema = z
   .string()
   .min(2, { message: 'Minimum length is 2 characters' })
-  .max(64, { message: 'Minimum length is 64 characters' })
+  .max(100, { message: 'Maximum length is 100 characters' })

@@ -12,7 +12,7 @@ export async function upsertRecipe(
   return await transaction(connection, async (tx) => {
     const { id: recipeId } = await Recipe.clientUpsert({
       connection: tx,
-      onConflict: ['name'],
+      onConflict: ['id'],
       object: baseRecipe,
     })
     const items = await Promise.all(
@@ -20,10 +20,13 @@ export async function upsertRecipe(
         Item.clientUpsert({
           connection: tx,
           object: recipeItem.item,
-          onConflict: ['name'],
+          onConflict: ['id'],
         })
       )
     )
+
+    // Remove existing recipe items
+    await RecipeItem.remove({ where: { recipeId: recipeId }, connection: tx })
     // Link items to receipe
     await Promise.all(
       recipeItemsToUpsert.map((recipeItem, i) =>
@@ -35,6 +38,44 @@ export async function upsertRecipe(
             weightGrams: recipeItem.weightGrams,
           },
           onConflict: ['itemId', 'recipeId'],
+        })
+      )
+    )
+
+    return { recipeId }
+  })
+}
+
+export async function createRecipe(
+  connection: TXAsync,
+  recipe: RecipeResolvedBeforeSaving
+) {
+  const { recipeItems: recipeItemsToUpsert, ...baseRecipe } = recipe
+
+  return await transaction(connection, async (tx) => {
+    const { id: recipeId } = await Recipe.insert({
+      connection: tx,
+      object: baseRecipe,
+    })
+    const items = await Promise.all(
+      recipeItemsToUpsert.map((recipeItem) =>
+        Item.clientUpsert({
+          connection: tx,
+          object: recipeItem.item,
+          onConflict: ['id'],
+        })
+      )
+    )
+    // Link items to receipe
+    await Promise.all(
+      recipeItemsToUpsert.map((recipeItem, i) =>
+        RecipeItem.insert({
+          connection: tx,
+          object: {
+            recipeId,
+            itemId: items[i].id,
+            weightGrams: recipeItem.weightGrams,
+          },
         })
       )
     )

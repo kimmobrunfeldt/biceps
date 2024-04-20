@@ -102,7 +102,6 @@ export function NavBar() {
             }
           >
             {(data) => {
-              console.log('navbar data', data.selectedPerson)
               return (
                 <Avatar
                   color={settingsRouteActive ? 'brand' : 'gray'}

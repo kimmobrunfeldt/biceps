@@ -1,8 +1,9 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { CtxAsync, useDB } from '@vlcn.io/react'
+import _ from 'lodash'
 import { APP_STATE_KEY, DATABASE_NAME } from 'src/constants'
 import { deleteAllData } from 'src/core/dataCore'
-import { upsertRecipe } from 'src/core/recipeCore'
+import { createRecipe, upsertRecipe } from 'src/core/recipeCore'
 import { AppState, Person, Recipe } from 'src/db/entities'
 import { resolver } from 'src/db/resolvers/resolver'
 import { PersonBeforeDatabase } from 'src/db/schemas/PersonSchema'
@@ -12,6 +13,7 @@ import { useDataLoaders } from 'src/hooks/useDataLoaders'
 const queryNames = {
   getAppState: 'getAppState',
   getAllRecipes: 'getAllRecipes',
+  getRecipe: (id: string) => `getRecipe-${id}`,
 }
 
 /**
@@ -58,6 +60,23 @@ export function useGetAllRecipes() {
   })
 }
 
+export function useGetRecipe(id: string) {
+  const ctx = useDB(DATABASE_NAME)
+  const loaders = useDataLoaders()
+
+  return useQuery({
+    queryKey: getCacheKey(ctx, queryNames.getRecipe(id)),
+    queryFn: withQueryErrorHandling(queryNames.getRecipe(id), async () => {
+      const recipe = await Recipe.maybeFind({
+        where: { id },
+        connection: ctx.db,
+      })
+      if (!recipe) return null
+      return await resolver({ row: recipe, connection: ctx.db, loaders })
+    }),
+  })
+}
+
 export function useUpsertRecipe() {
   const ctx = useDB(DATABASE_NAME)
   const queryClient = useQueryClient()
@@ -65,6 +84,25 @@ export function useUpsertRecipe() {
   return {
     upsertRecipe: async (recipe: RecipeResolvedBeforeSaving) => {
       await upsertRecipe(ctx.db, recipe)
+      queryClient.invalidateQueries({
+        queryKey: _.compact([
+          getCacheKeyToInvalidate(queryNames.getAllRecipes),
+          recipe.id
+            ? getCacheKeyToInvalidate(queryNames.getRecipe(recipe.id))
+            : undefined,
+        ]),
+      })
+    },
+  }
+}
+
+export function useCreateRecipe() {
+  const ctx = useDB(DATABASE_NAME)
+  const queryClient = useQueryClient()
+
+  return {
+    createRecipe: async (recipe: RecipeResolvedBeforeSaving) => {
+      await createRecipe(ctx.db, recipe)
       queryClient.invalidateQueries({
         queryKey: getCacheKeyToInvalidate(queryNames.getAllRecipes),
       })

@@ -37,7 +37,7 @@ export function useNotifications() {
       try {
         const [result] = await Promise.all([
           fn(),
-          sleep(minLoadingNotificationMs),
+          sleep(loading ? minLoadingNotificationMs : 0),
         ])
         if (loading) {
           notifications.hide(loadingId)

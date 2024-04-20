@@ -4,6 +4,15 @@ import { upsertRecipe } from 'src/core/recipeCore'
 import { AppState, Person, PersonRecipe } from 'src/db/entities'
 
 export async function upsertSeedData(connection: TXAsync) {
+  const maybePerson = await Person.maybeFind({
+    connection,
+    where: { name: 'John Doe' },
+  })
+  if (maybePerson) {
+    console.log('Seed data already exists')
+    return
+  }
+
   const person = await Person.clientUpsert({
     connection,
     object: {
@@ -15,8 +24,10 @@ export async function upsertSeedData(connection: TXAsync) {
     name: 'My recipe',
     recipeItems: [
       {
+        __type: 'RecipeItem',
         weightGrams: 100,
         item: {
+          __type: 'Item',
           name: 'Pirkka Parhaat Tomato',
           kcal: 10,
           fatTotal: 0,
@@ -28,8 +39,10 @@ export async function upsertSeedData(connection: TXAsync) {
         },
       },
       {
+        __type: 'RecipeItem',
         weightGrams: 100,
         item: {
+          __type: 'Item',
           name: 'Pirkka Parhaat Pasta',
           kcal: 10,
           fatTotal: 0,

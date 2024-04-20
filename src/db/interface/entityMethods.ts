@@ -59,7 +59,9 @@ export function makeUtils<
   function baseInsertAsSql(object: z.infer<BeforeDatabaseSchemaT>) {
     const validObject = beforeDatabaseSchema.parse(object)
     const keys = Object.keys(validObject)
-    const filteredKeys = keys.filter((key) => !_.isUndefined(validObject[key]))
+    const filteredKeys = keys.filter(
+      (key) => !_.isUndefined(validObject[key]) && key !== '__type'
+    )
 
     return sql`
       INSERT INTO ${table} (
@@ -243,16 +245,21 @@ export function makeUtils<
     if (!_.isArray(onConflict)) {
       throw new Error('clientUpsert requires onConflict to be an array')
     }
-
-    const onConflictWhere = _.pick(object, onConflict) as WhereConditions<
+    const validObject = beforeDatabaseSchema.parse(object)
+    console.log('validObject', validObject)
+    const onConflictWhere = _.pick(validObject, onConflict) as WhereConditions<
       z.infer<SchemaT>
     >
     const found = await maybeFind({ connection, where: onConflictWhere })
     if (found) {
-      return await update({ connection, where: onConflictWhere, set: object })
+      return await update({
+        connection,
+        where: onConflictWhere,
+        set: validObject,
+      })
     }
 
-    return await insert({ connection, object })
+    return await insert({ connection, object: validObject })
   }
 
   async function update({
@@ -263,7 +270,7 @@ export function makeUtils<
     set: Partial<z.infer<BeforeDatabaseSchemaT>>
     where: WhereConditions<z.infer<SchemaT>>
   }): Promise<z.infer<SchemaT>> {
-    const keys: string[] = Object.keys(set)
+    const keys: string[] = Object.keys(set).filter((key) => key !== '__type')
     const updates = keys
       .map((key) => {
         const column = entityKeyToColumn(key)
@@ -291,7 +298,6 @@ export function makeUtils<
       WHERE ${whereAsSql(where)}
       RETURNING *
     `
-    console.log('executing', sqlQuery.sql)
     const { one } = createDatabaseMethodsWithTransform({ connection, schema })
     return await one(sqlQuery)
   }
