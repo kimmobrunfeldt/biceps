@@ -1,9 +1,12 @@
 import _ from 'lodash'
+import { DATABASE_ID_PREFIX } from 'src/constants'
 import { nanoId } from 'src/utils/nanoid'
 import { z } from 'zod'
 
 export const preprocessors = {
-  addNanoId: (val: unknown) => (!_.isNil(val) ? val : `c-${nanoId()}`),
+  addNanoId: (val: unknown) => (!_.isNil(val) ? val : nanoId()),
+  addBicepsNanoId: (val: unknown) =>
+    !_.isNil(val) ? val : `${DATABASE_ID_PREFIX}-${nanoId()}`,
   nullToUndefined: (val: unknown) => (!_.isNull(val) ? val : undefined),
   dateToIsoString: (val: unknown) => (!_.isDate(val) ? val : val.toISOString()),
   isoStringToDate: (val: unknown) => (!_.isString(val) ? val : new Date(val)),
@@ -25,6 +28,10 @@ export const IdSchema = z
  */
 export const AddIdSchema = z.preprocess(
   preprocessors.addNanoId,
+  z.string().optional()
+)
+export const AddBicepsIdSchema = z.preprocess(
+  preprocessors.addBicepsNanoId,
   z.string().optional()
 )
 

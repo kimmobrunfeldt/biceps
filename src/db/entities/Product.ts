@@ -1,4 +1,5 @@
 import sql from 'sql-template-tag'
+import { DATABASE_ID_PREFIX } from 'src/constants'
 import { Options } from 'src/db/interface/entityInterface'
 import {
   FindOptions,
@@ -80,7 +81,7 @@ export async function findManyCustom({
 }: Options & FindOptions<ProductRow>): Promise<ProductRow[]> {
   const { whereSql, limitSql, orderBySql } =
     findOptionsAsSql<ProductRowWithRecipeId>({
-      where: { ...where, id: is('LIKE', 'c-%') },
+      where: { ...where, id: is('LIKE', `${DATABASE_ID_PREFIX}-%`) },
       limit,
       orderBy,
     })
@@ -119,7 +120,11 @@ export async function findManyExternal({
     SELECT
       *
     FROM products
-    ${Object.keys(where).length > 0 ? sql`${whereSql} AND id NOT LIKE 'c-%'` : sql`WHERE id NOT LIKE 'c-%'`}
+    ${
+      Object.keys(where).length > 0
+        ? sql`${whereSql} AND id NOT LIKE ${`${DATABASE_ID_PREFIX}-%`}`
+        : sql`WHERE id NOT LIKE ${`${DATABASE_ID_PREFIX}-%`}`
+    }
     ${orderBySql}
     ${limitSql}
   `

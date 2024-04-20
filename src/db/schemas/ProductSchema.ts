@@ -1,5 +1,5 @@
 import {
-  AddIdSchema,
+  AddBicepsIdSchema,
   DateSchema,
   IdSchema,
   NameSchema,
@@ -39,7 +39,7 @@ export const ProductBeforeDatabaseSchema = ProductRowSchema.omit({
 })
   .merge(
     z.object({
-      id: AddIdSchema,
+      id: AddBicepsIdSchema,
       createdAt: ProductRowSchema.shape.createdAt.optional(),
     })
   )
