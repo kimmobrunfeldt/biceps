@@ -43,7 +43,7 @@ export function RecipeItemsTable({
   const totals = calculateTotals(recipeItems)
   const allRows = recipeItems.length > 0 ? [...recipeItems, totals] : []
   const rows = allRows.map((row, index) => {
-    const hasItem = 'item' in row
+    const hasItem = 'product' in row
     const name = hasItem ? row.product.name : 'Total'
     const values = hasItem ? calculateValuesForItem(row) : row
 

@@ -2,10 +2,10 @@ import { Box, Flex, Paper, Text } from '@mantine/core'
 import { IconInfoCircle } from '@tabler/icons-react'
 import convert, { Unit } from 'convert'
 import {
-    Control,
-    UseFormSetValue,
-    useFieldArray,
-    useWatch,
+  Control,
+  UseFormSetValue,
+  useFieldArray,
+  useWatch,
 } from 'react-hook-form'
 import { RecipeItemResolvedBeforeSaving } from 'src/db/schemas/RecipeItemSchema'
 import { ProductSearch } from 'src/pages/recipes/AddRecipePage/components/ProductSearch'

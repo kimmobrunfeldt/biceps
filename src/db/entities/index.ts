@@ -1,7 +1,5 @@
 // Warning! This file was auto-generated with 'npm run generate'. Do not edit manually.
 
-/* eslint-disable no-restricted-imports */
-
 import { createEntity } from 'src/db/interface/entityInterface'
 
 import {
