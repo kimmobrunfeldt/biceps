@@ -2,10 +2,10 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Box, Button, Code, NumberInput, Stack, TextInput } from '@mantine/core'
 import { useCallback, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { ItemResolvedBeforeSavingSchema } from 'src/db/schemas/ItemSchema'
+import { ProductResolvedBeforeSavingSchema } from 'src/db/schemas/ProductSchema'
 import { z } from 'zod'
 
-const ProductFormSchema = ItemResolvedBeforeSavingSchema
+const ProductFormSchema = ProductResolvedBeforeSavingSchema
 export type ProductFormFields = z.infer<typeof ProductFormSchema>
 
 type Props = {

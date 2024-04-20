@@ -8,9 +8,9 @@ import {
 } from 'src/db/schemas/common'
 import { z } from 'zod'
 
-export const ItemRowSchema = z
+export const ProductRowSchema = z
   .object({
-    __type: addTypeName('Item'),
+    __type: addTypeName('Product'),
     id: IdSchema,
     name: NameSchema,
     kcal: z.number().int().nonnegative(),
@@ -31,25 +31,25 @@ export const ItemRowSchema = z
     createdAt: DateSchema,
   })
   .strict()
-export type ItemRow = z.infer<typeof ItemRowSchema>
+export type ProductRow = z.infer<typeof ProductRowSchema>
 
-export const ItemBeforeDatabaseSchema = ItemRowSchema.omit({
+export const ProductBeforeDatabaseSchema = ProductRowSchema.omit({
   id: true,
   createdAt: true,
 })
   .merge(
     z.object({
       id: AddIdSchema,
-      createdAt: ItemRowSchema.shape.createdAt.optional(),
+      createdAt: ProductRowSchema.shape.createdAt.optional(),
     })
   )
   .strict()
-export type ItemBeforeDatabase = z.infer<typeof ItemBeforeDatabaseSchema>
+export type ProductBeforeDatabase = z.infer<typeof ProductBeforeDatabaseSchema>
 
-export const ItemResolvedSchema = ItemRowSchema
-export type ItemResolved = z.infer<typeof ItemResolvedSchema>
+export const ProductResolvedSchema = ProductRowSchema
+export type ProductResolved = z.infer<typeof ProductResolvedSchema>
 
-export const ItemResolvedBeforeSavingSchema = ItemBeforeDatabaseSchema
-export type ItemResolvedBeforeSaving = z.infer<
-  typeof ItemResolvedBeforeSavingSchema
+export const ProductResolvedBeforeSavingSchema = ProductBeforeDatabaseSchema
+export type ProductResolvedBeforeSaving = z.infer<
+  typeof ProductResolvedBeforeSavingSchema
 >

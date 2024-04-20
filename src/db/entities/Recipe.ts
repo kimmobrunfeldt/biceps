@@ -37,30 +37,30 @@ export {
 }
 
 // Ad-hoc schema for the custom method
-const RecipeRowWithItemIdSchema = RecipeRowSchema.merge(
-  z.object({ itemId: z.string() })
+const RecipeRowWithProductIdSchema = RecipeRowSchema.merge(
+  z.object({ productId: z.string() })
 )
-type RecipeRowWithItemId = z.infer<typeof RecipeRowWithItemIdSchema>
+type RecipeRowWithProductId = z.infer<typeof RecipeRowWithProductIdSchema>
 
 export async function findManyByProductIds({
   connection,
   productIds,
 }: Options & {
   productIds: readonly string[]
-}): Promise<RecipeRowWithItemId[]> {
+}): Promise<RecipeRowWithProductId[]> {
   if (productIds.length === 0) return []
 
-  const { whereSql } = findOptionsAsSql<RecipeRowWithItemId>({
-    where: { itemId: is('IN', productIds) },
+  const { whereSql } = findOptionsAsSql<RecipeRowWithProductId>({
+    where: { productId: is('IN', productIds) },
   })
   const { many } = createDatabaseMethodsWithTransform({
     connection,
-    schema: RecipeRowWithItemIdSchema,
+    schema: RecipeRowWithProductIdSchema,
   })
   const sqlQuery = sql`
     SELECT
       recipes.*,
-      recipe_items.item_id
+      recipe_items.product_id
     FROM recipes
     JOIN recipe_items ON recipe_items.recipe_id = recipes.id
     ${whereSql}

@@ -3,8 +3,8 @@ import DataLoader from 'dataloader'
 import _ from 'lodash'
 import {
   AnyDatabaseEntity,
-  Item,
   Person,
+  Product,
   Recipe,
   RecipeItem,
 } from 'src/db/entities'
@@ -19,7 +19,7 @@ const DEFAULT_DATALOADER_OPTIONS = Object.freeze({
 export function createLoaders(connection: TXAsync) {
   return {
     recipesById: createSimpleLoader({ connection, entity: Recipe }),
-    itemsById: createSimpleLoader({ connection, entity: Item }),
+    productsById: createSimpleLoader({ connection, entity: Product }),
     personById: createSimpleLoader({ connection, entity: Person }),
     recipeItemsByRecipeIds: new DataLoader(
       async (recipeIds: readonly string[]) => {

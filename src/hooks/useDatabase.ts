@@ -3,11 +3,11 @@ import { CtxAsync, useDB } from '@vlcn.io/react'
 import _ from 'lodash'
 import { APP_STATE_KEY, DATABASE_NAME, INDEXEDDB_NAME } from 'src/constants'
 import { createRecipe, upsertRecipe } from 'src/core/recipeCore'
-import { AppState, Item, Person, Recipe, RecipeItem } from 'src/db/entities'
+import { AppState, Person, Product, Recipe, RecipeItem } from 'src/db/entities'
 import { is } from 'src/db/interface/entityMethods'
 import { resolver } from 'src/db/resolvers/resolver'
-import { ItemResolvedBeforeSaving } from 'src/db/schemas/ItemSchema'
 import { PersonBeforeDatabase } from 'src/db/schemas/PersonSchema'
+import { ProductResolvedBeforeSaving } from 'src/db/schemas/ProductSchema'
 import { RecipeResolvedBeforeSaving } from 'src/db/schemas/RecipeSchema'
 import { useDataLoaders } from 'src/hooks/useDataLoaders'
 
@@ -123,11 +123,11 @@ export function useGetAllCustomProducts() {
     queryFn: withQueryErrorHandling(
       queryNames.getAllCustomProducts,
       async () => {
-        const itemRow = await Item.findManyCustom({ connection: ctx.db })
-        const items = await Promise.all(
-          itemRow.map((row) => resolver({ row, connection: ctx.db, loaders }))
+        const rows = await Product.findManyCustom({ connection: ctx.db })
+        const products = await Promise.all(
+          rows.map((row) => resolver({ row, connection: ctx.db, loaders }))
         )
-        return items
+        return products
       }
     ),
   })
@@ -149,14 +149,14 @@ export function useCustomProductSearch({
     queryFn: withQueryErrorHandling(
       queryNames.getAllCustomProducts,
       async () => {
-        const itemRow = await Item.findManyCustom({
+        const rows = await Product.findManyCustom({
           connection: ctx.db,
           where: { name: is('LIKE', `%${searchTerms}%`) },
         })
-        const items = await Promise.all(
-          itemRow.map((row) => resolver({ row, connection: ctx.db, loaders }))
+        const products = await Promise.all(
+          rows.map((row) => resolver({ row, connection: ctx.db, loaders }))
         )
-        return items
+        return products
       }
     ),
   })
@@ -171,11 +171,11 @@ export function useGetAllExternalProducts() {
     queryFn: withQueryErrorHandling(
       queryNames.getAllExternalProducts,
       async () => {
-        const itemRow = await Item.findManyExternal({ connection: ctx.db })
-        const items = await Promise.all(
-          itemRow.map((row) => resolver({ row, connection: ctx.db, loaders }))
+        const rows = await Product.findManyExternal({ connection: ctx.db })
+        const products = await Promise.all(
+          rows.map((row) => resolver({ row, connection: ctx.db, loaders }))
         )
-        return items
+        return products
       }
     ),
   })
@@ -203,8 +203,8 @@ export function useUpsertProduct() {
   const queryClient = useQueryClient()
 
   return {
-    upsertProduct: async (recipe: ItemResolvedBeforeSaving) => {
-      await Item.clientUpsert({
+    upsertProduct: async (recipe: ProductResolvedBeforeSaving) => {
+      await Product.clientUpsert({
         connection: ctx.db,
         object: recipe,
         onConflict: ['id'],
@@ -222,13 +222,13 @@ export function useDeleteProduct() {
 
   return {
     deleteProduct: async (productId: string) => {
-      await Item.remove({
+      await Product.remove({
         connection: ctx.db,
         where: { id: productId },
       })
       await RecipeItem.remove({
         connection: ctx.db,
-        where: { itemId: productId },
+        where: { productId },
       })
       queryClient.invalidateQueries({
         queryKey: getCacheKeyToInvalidate(queryNames.getAllCustomProducts),

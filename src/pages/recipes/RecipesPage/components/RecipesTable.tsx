@@ -1,5 +1,5 @@
 import { BoxProps, Flex, Table, Text } from '@mantine/core'
-import { ItemImage } from 'src/components/ItemImage'
+import { ProductImage } from 'src/components/ProductImage'
 import { RecipeResolved } from 'src/db/schemas/RecipeSchema'
 import { calculateTotals } from 'src/pages/recipes/AddRecipePage/components/RecipeItemsTable'
 import { formatRoute, routes } from 'src/routes'
@@ -18,7 +18,7 @@ export function RecipesTable({ recipes }: Props) {
       <Table.Tr key={index}>
         <Table.Td>
           <Flex align="center" gap="sm">
-            <ItemImage item={recipe.recipeItems[0]?.item} />
+            <ProductImage product={recipe.recipeItems[0]?.product} />
             <Link to={formatRoute(routes.recipes.edit.path, { id: recipe.id })}>
               <Text>{recipe.name}</Text>
             </Link>

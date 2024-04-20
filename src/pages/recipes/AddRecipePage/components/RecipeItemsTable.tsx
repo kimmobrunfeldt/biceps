@@ -9,7 +9,7 @@ import {
   Tooltip,
 } from '@mantine/core'
 import { IconX } from '@tabler/icons-react'
-import { ItemImage } from 'src/components/ItemImage'
+import { ProductImage } from 'src/components/ProductImage'
 import { RecipeItemResolvedBeforeSaving } from 'src/db/schemas/RecipeItemSchema'
 import { formatGrams, formatKcal } from 'src/utils/format'
 
@@ -44,15 +44,15 @@ export function RecipeItemsTable({
   const allRows = recipeItems.length > 0 ? [...recipeItems, totals] : []
   const rows = allRows.map((row, index) => {
     const hasItem = 'item' in row
-    const name = hasItem ? row.item.name : 'Total'
+    const name = hasItem ? row.product.name : 'Total'
     const values = hasItem ? calculateValuesForItem(row) : row
 
     return (
       <Table.Tr key={index} opacity={hasItem ? 1 : 0.7}>
         <Table.Td>
           <Flex align="center" gap="sm">
-            <ItemImage
-              item={hasItem ? row.item : undefined}
+            <ProductImage
+              product={hasItem ? row.product : undefined}
               style={{ opacity: hasItem ? 1 : 0 }}
             />
             <Text>{name}</Text>
@@ -161,7 +161,7 @@ export function calculateTotals(recipeItems: RecipeItemResolvedBeforeSaving[]) {
 export function calculateValuesForItem(
   recipeItem: RecipeItemResolvedBeforeSaving
 ) {
-  const { weightGrams, item } = recipeItem
+  const { weightGrams, product: item } = recipeItem
   return {
     weightGrams,
     kcal: calculateNutrition(weightGrams, item.kcal),

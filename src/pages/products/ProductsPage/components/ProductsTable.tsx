@@ -1,13 +1,13 @@
 import { ActionIcon, BoxProps, Flex, Table, Text, Tooltip } from '@mantine/core'
 import { IconX } from '@tabler/icons-react'
-import { ItemImage } from 'src/components/ItemImage'
-import { ItemResolved } from 'src/db/schemas/ItemSchema'
+import { ProductImage } from 'src/components/ProductImage'
+import { ProductResolved } from 'src/db/schemas/ProductSchema'
 import { formatGrams, formatKcal } from 'src/utils/format'
 
 type Props = {
-  products: ItemResolved[]
+  products: ProductResolved[]
   showRemove?: boolean
-  onRemove?: (product: ItemResolved) => void
+  onRemove?: (product: ProductResolved) => void
 }
 
 export function ProductsTable({
@@ -20,7 +20,7 @@ export function ProductsTable({
       <Table.Tr key={index}>
         <Table.Td>
           <Flex align="center" gap="sm">
-            <ItemImage item={product} />
+            <ProductImage product={product} />
             <Text>{product.name}</Text>
           </Flex>
         </Table.Td>

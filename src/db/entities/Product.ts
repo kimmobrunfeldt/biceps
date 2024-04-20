@@ -7,10 +7,10 @@ import {
   makeUtils,
 } from 'src/db/interface/entityMethods'
 import {
-  ItemBeforeDatabaseSchema,
-  ItemRow,
-  ItemRowSchema,
-} from 'src/db/schemas/ItemSchema'
+  ProductBeforeDatabaseSchema,
+  ProductRow,
+  ProductRowSchema,
+} from 'src/db/schemas/ProductSchema'
 import { z } from 'zod'
 
 const {
@@ -24,9 +24,9 @@ const {
   createDatabaseMethodsWithTransform,
   removeAll,
 } = makeUtils({
-  tableName: 'items',
-  beforeDatabaseSchema: ItemBeforeDatabaseSchema,
-  schema: ItemRowSchema,
+  tableName: 'products',
+  beforeDatabaseSchema: ProductBeforeDatabaseSchema,
+  schema: ProductRowSchema,
 })
 
 export {
@@ -41,32 +41,32 @@ export {
 }
 
 // Ad-hoc schema for the custom method
-const ItemRowWithRecipeIdSchema = ItemRowSchema.merge(
+const ProductRowWithRecipeIdSchema = ProductRowSchema.merge(
   z.object({ recipeId: z.string() })
 )
-type ItemRowWithRecipeId = z.infer<typeof ItemRowWithRecipeIdSchema>
+type ProductRowWithRecipeId = z.infer<typeof ProductRowWithRecipeIdSchema>
 
 export async function findManyByRecipeIds({
   connection,
   recipeIds,
 }: Options & {
   recipeIds: readonly string[]
-}): Promise<ItemRowWithRecipeId[]> {
+}): Promise<ProductRowWithRecipeId[]> {
   if (recipeIds.length === 0) return []
 
-  const { whereSql } = findOptionsAsSql<ItemRowWithRecipeId>({
+  const { whereSql } = findOptionsAsSql<ProductRowWithRecipeId>({
     where: { recipeId: is('IN', recipeIds) },
   })
   const { many } = createDatabaseMethodsWithTransform({
     connection,
-    schema: ItemRowWithRecipeIdSchema,
+    schema: ProductRowWithRecipeIdSchema,
   })
   const sqlQuery = sql`
     SELECT
-      items.*,
+      products.*,
       recipe_id
-    FROM items
-    LEFT JOIN recipe_items ON items.id = recipe_items.item_id
+    FROM products
+    LEFT JOIN recipe_items ON products.id = recipe_items.product_id
     ${whereSql}
   `
   return await many(sqlQuery)
@@ -77,21 +77,21 @@ export async function findManyCustom({
   where,
   limit,
   orderBy,
-}: Options & FindOptions<ItemRow>): Promise<ItemRow[]> {
+}: Options & FindOptions<ProductRow>): Promise<ProductRow[]> {
   const { whereSql, limitSql, orderBySql } =
-    findOptionsAsSql<ItemRowWithRecipeId>({
+    findOptionsAsSql<ProductRowWithRecipeId>({
       where: { ...where, id: is('LIKE', 'c-%') },
       limit,
       orderBy,
     })
   const { many } = createDatabaseMethodsWithTransform({
     connection,
-    schema: ItemRowSchema,
+    schema: ProductRowSchema,
   })
   const sqlQuery = sql`
     SELECT
       *
-    FROM items
+    FROM products
     ${whereSql}
     ${orderBySql}
     ${limitSql}
@@ -104,21 +104,21 @@ export async function findManyExternal({
   where = {},
   limit,
   orderBy,
-}: Options & FindOptions<ItemRow>): Promise<ItemRow[]> {
+}: Options & FindOptions<ProductRow>): Promise<ProductRow[]> {
   const { whereSql, limitSql, orderBySql } =
-    findOptionsAsSql<ItemRowWithRecipeId>({
+    findOptionsAsSql<ProductRowWithRecipeId>({
       where,
       limit,
       orderBy,
     })
   const { many } = createDatabaseMethodsWithTransform({
     connection,
-    schema: ItemRowSchema,
+    schema: ProductRowSchema,
   })
   const sqlQuery = sql`
     SELECT
       *
-    FROM items
+    FROM products
     ${Object.keys(where).length > 0 ? sql`${whereSql} AND id NOT LIKE 'c-%'` : sql`WHERE id NOT LIKE 'c-%'`}
     ${orderBySql}
     ${limitSql}

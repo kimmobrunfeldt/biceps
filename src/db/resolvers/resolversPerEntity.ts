@@ -1,7 +1,7 @@
 import { CommonResolverOptions } from 'src/db/resolvers/types'
 import { AppStateResolved, AppStateRow } from 'src/db/schemas/AppState'
-import { ItemResolved, ItemRow } from 'src/db/schemas/ItemSchema'
 import { PersonResolved, PersonRow } from 'src/db/schemas/PersonSchema'
+import { ProductResolved, ProductRow } from 'src/db/schemas/ProductSchema'
 import {
   RecipeItemResolved,
   RecipeItemRow,
@@ -12,7 +12,7 @@ export const resolvers = {
   Recipe: recipeResolver,
   AppState: appStateResolver,
   Person: personResolver,
-  Item: itemResolver,
+  Product: productResolver,
   RecipeItem: recipeItemResolver,
 }
 
@@ -40,22 +40,22 @@ export async function recipeItemResolver({
 }: {
   row: RecipeItemRow
 } & CommonResolverOptions): Promise<RecipeItemResolved> {
-  const itemRow = await loaders.itemsById.load(row.itemId)
+  const productRow = await loaders.productsById.load(row.productId)
   return {
     ...row,
-    item: await itemResolver({
-      row: itemRow,
+    product: await productResolver({
+      row: productRow,
       loaders,
       connection,
     }),
   }
 }
 
-export async function itemResolver({
+export async function productResolver({
   row,
 }: {
-  row: ItemRow
-} & CommonResolverOptions): Promise<ItemResolved> {
+  row: ProductRow
+} & CommonResolverOptions): Promise<ProductResolved> {
   return row
 }
 

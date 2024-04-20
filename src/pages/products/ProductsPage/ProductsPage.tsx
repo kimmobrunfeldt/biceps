@@ -5,7 +5,7 @@ import pluralize from 'pluralize'
 import { useCallback } from 'react'
 import { PageTemplate } from 'src/components/PageTemplate'
 import { Query } from 'src/components/Query'
-import { ItemResolved } from 'src/db/schemas/ItemSchema'
+import { ProductResolved } from 'src/db/schemas/ProductSchema'
 import {
   useDeleteProduct,
   useGetAllCustomProducts,
@@ -25,7 +25,7 @@ export function ProductsPage() {
   const { getRecipesByProductId } = useLazyGetRecipesByProductId()
 
   const onProductRemove = useCallback(
-    async (product: ItemResolved) => {
+    async (product: ProductResolved) => {
       async function executeDelete() {
         await withNotifications({
           fn: async () => {

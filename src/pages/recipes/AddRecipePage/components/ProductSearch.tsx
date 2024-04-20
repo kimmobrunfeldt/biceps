@@ -9,7 +9,7 @@ import {
 import { IconSearch } from '@tabler/icons-react'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useCallback, useEffect, useState } from 'react'
-import { ItemImage } from 'src/components/ItemImage'
+import { ProductImage } from 'src/components/ProductImage'
 import { useCustomProductSearch } from 'src/hooks/useDatabase'
 import { useSearch } from 'src/hooks/useFoodApi'
 import { useNotifications } from 'src/hooks/useNotification'
@@ -62,8 +62,8 @@ export function ProductSearch({ onProductSelect }: Props) {
       onClick={onProductClick.bind(null, product)}
     >
       <Flex align="center" gap="sm">
-        <ItemImage
-          item={{
+        <ProductImage
+          product={{
             imageUrl: product.image_url,
             imageThumbUrl: product.image_thumb_url,
           }}

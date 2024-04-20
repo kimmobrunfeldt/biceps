@@ -29,34 +29,6 @@ const AppStateEntity = createEntity({
 export { AppStateEntity as AppState }
 
 import {
-  findManyByRecipeIds as findManyByRecipeIdsItem,
-  findManyCustom as findManyCustomItem,
-  findManyExternal as findManyExternalItem,
-  clientUpsert as clientUpsertItem,
-  find as findItem,
-  findMany as findManyItem,
-  insert as insertItem,
-  remove as removeItem,
-  removeAll as removeAllItem,
-  update as updateItem,
-  upsert as upsertItem,
-} from 'src/db/entities/Item'
-const ItemEntity = createEntity({
-  findManyByRecipeIds: findManyByRecipeIdsItem,
-  findManyCustom: findManyCustomItem,
-  findManyExternal: findManyExternalItem,
-  clientUpsert: clientUpsertItem,
-  find: findItem,
-  findMany: findManyItem,
-  insert: insertItem,
-  remove: removeItem,
-  removeAll: removeAllItem,
-  update: updateItem,
-  upsert: upsertItem,
-})
-export { ItemEntity as Item }
-
-import {
   clientUpsert as clientUpsertPerson,
   find as findPerson,
   findMany as findManyPerson,
@@ -97,6 +69,34 @@ const PersonRecipeEntity = createEntity({
   upsert: upsertPersonRecipe,
 })
 export { PersonRecipeEntity as PersonRecipe }
+
+import {
+  findManyByRecipeIds as findManyByRecipeIdsProduct,
+  findManyCustom as findManyCustomProduct,
+  findManyExternal as findManyExternalProduct,
+  clientUpsert as clientUpsertProduct,
+  find as findProduct,
+  findMany as findManyProduct,
+  insert as insertProduct,
+  remove as removeProduct,
+  removeAll as removeAllProduct,
+  update as updateProduct,
+  upsert as upsertProduct,
+} from 'src/db/entities/Product'
+const ProductEntity = createEntity({
+  findManyByRecipeIds: findManyByRecipeIdsProduct,
+  findManyCustom: findManyCustomProduct,
+  findManyExternal: findManyExternalProduct,
+  clientUpsert: clientUpsertProduct,
+  find: findProduct,
+  findMany: findManyProduct,
+  insert: insertProduct,
+  remove: removeProduct,
+  removeAll: removeAllProduct,
+  update: updateProduct,
+  upsert: upsertProduct,
+})
+export { ProductEntity as Product }
 
 import {
   findManyByProductIds as findManyByProductIdsRecipe,
@@ -148,9 +148,9 @@ export { RecipeItemEntity as RecipeItem }
 
 export const allEntities = {
   AppState: AppStateEntity,
-  Item: ItemEntity,
   Person: PersonEntity,
   PersonRecipe: PersonRecipeEntity,
+  Product: ProductEntity,
   Recipe: RecipeEntity,
   RecipeItem: RecipeItemEntity,
 }

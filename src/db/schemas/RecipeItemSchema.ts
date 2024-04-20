@@ -1,7 +1,7 @@
 import {
-  ItemResolvedBeforeSavingSchema,
-  ItemResolvedSchema,
-} from 'src/db/schemas/ItemSchema'
+  ProductResolvedBeforeSavingSchema,
+  ProductResolvedSchema,
+} from 'src/db/schemas/ProductSchema'
 import { DateSchema, addTypeName } from 'src/db/schemas/common'
 import { z } from 'zod'
 
@@ -9,7 +9,7 @@ export const RecipeItemRowSchema = z
   .object({
     __type: addTypeName('RecipeItem'),
     recipeId: z.string(),
-    itemId: z.string(),
+    productId: z.string(),
     weightGrams: z.number(),
     createdAt: DateSchema,
   })
@@ -32,7 +32,7 @@ export type RecipeItemBeforeDatabase = z.infer<
 
 export const RecipeItemResolvedSchema = RecipeItemRowSchema.merge(
   z.object({
-    item: ItemResolvedSchema,
+    product: ProductResolvedSchema,
   })
 ).strict()
 export type RecipeItemResolved = z.infer<typeof RecipeItemResolvedSchema>
@@ -42,9 +42,9 @@ export const RecipeItemResolvedBeforeSavingSchema = z
     __type: RecipeItemRowSchema.shape.__type,
     createdAt: RecipeItemRowSchema.shape.createdAt.optional(),
     recipeId: RecipeItemRowSchema.shape.recipeId.optional(),
-    itemId: RecipeItemRowSchema.shape.itemId.optional(),
+    productId: RecipeItemRowSchema.shape.productId.optional(),
     weightGrams: RecipeItemRowSchema.shape.weightGrams,
-    item: ItemResolvedBeforeSavingSchema,
+    product: ProductResolvedBeforeSavingSchema,
   })
   .strict()
 export type RecipeItemResolvedBeforeSaving = z.infer<

@@ -2,10 +2,10 @@ import { Box, Flex, Paper, Text } from '@mantine/core'
 import { IconInfoCircle } from '@tabler/icons-react'
 import convert, { Unit } from 'convert'
 import {
-  Control,
-  UseFormSetValue,
-  useFieldArray,
-  useWatch,
+    Control,
+    UseFormSetValue,
+    useFieldArray,
+    useWatch,
 } from 'react-hook-form'
 import { RecipeItemResolvedBeforeSaving } from 'src/db/schemas/RecipeItemSchema'
 import { ProductSearch } from 'src/pages/recipes/AddRecipePage/components/ProductSearch'
@@ -76,8 +76,8 @@ function productToItem(product: Product): RecipeItemResolvedBeforeSaving {
       product.product_quantity,
       product.product_quantity_unit ?? 'g'
     ),
-    item: {
-      __type: 'Item',
+    product: {
+      __type: 'Product',
       id: product.id,
       name: product.product_name,
       kcal: product.nutriments['energy-kcal_100g'],

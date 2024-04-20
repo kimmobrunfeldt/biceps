@@ -3,7 +3,7 @@ CREATE TABLE migrations (
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE items (
+CREATE TABLE products (
   id TEXT PRIMARY KEY NOT NULL,
   name TEXT,
   kcal INTEGER,
@@ -17,7 +17,7 @@ CREATE TABLE items (
   image_thumb_url TEXT,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-SELECT crsql_as_crr('items');
+SELECT crsql_as_crr('products');
 
 CREATE TABLE recipes (
   id TEXT PRIMARY KEY NOT NULL,
@@ -28,10 +28,10 @@ SELECT crsql_as_crr('recipes');
 
 CREATE TABLE recipe_items (
   recipe_id TEXT NOT NULL,
-  item_id TEXT NOT NULL,
+  product_id TEXT NOT NULL,
   weight_grams REAL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (recipe_id, item_id)
+  PRIMARY KEY (recipe_id, product_id)
 );
 SELECT crsql_as_crr('recipe_items');
 

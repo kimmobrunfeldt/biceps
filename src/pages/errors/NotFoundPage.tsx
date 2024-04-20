@@ -1,7 +1,7 @@
 import { Box, Button, Container, Group, Text, Title } from '@mantine/core'
-import classes from 'src/pages/NotFoundPage.module.css'
 import { routes } from 'src/routes'
 import { Link } from 'wouter'
+import classes from './NotFoundPage.module.css'
 
 export function NotFoundPage() {
   return (

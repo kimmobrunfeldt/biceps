@@ -26,8 +26,8 @@ export async function upsertSeedData(connection: TXAsync) {
       {
         __type: 'RecipeItem',
         weightGrams: 100,
-        item: {
-          __type: 'Item',
+        product: {
+          __type: 'Product',
           name: 'Pirkka Parhaat Tomato',
           kcal: 10,
           fatTotal: 0,
@@ -41,8 +41,8 @@ export async function upsertSeedData(connection: TXAsync) {
       {
         __type: 'RecipeItem',
         weightGrams: 100,
-        item: {
-          __type: 'Item',
+        product: {
+          __type: 'Product',
           name: 'Pirkka Parhaat Pasta',
           kcal: 10,
           fatTotal: 0,
