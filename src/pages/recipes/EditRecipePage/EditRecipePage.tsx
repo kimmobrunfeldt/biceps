@@ -8,7 +8,7 @@ import { useNotifications } from 'src/hooks/useNotification'
 import {
   RecipeForm,
   RecipeFormFields,
-} from 'src/pages/AddRecipePage/components/RecipeForm'
+} from 'src/pages/recipes/AddRecipePage/components/RecipeForm'
 
 type Props = {
   id: string

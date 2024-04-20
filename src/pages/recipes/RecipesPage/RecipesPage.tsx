@@ -3,7 +3,7 @@ import { IconPlus } from '@tabler/icons-react'
 import { PageTemplate } from 'src/components/PageTemplate'
 import { Query } from 'src/components/Query'
 import { useGetAllRecipes } from 'src/hooks/useDatabase'
-import { RecipesTable } from 'src/pages/RecipesPage/components/RecipesTable'
+import { RecipesTable } from 'src/pages/recipes/RecipesPage/components/RecipesTable'
 import { routes } from 'src/routes'
 import { Link } from 'wouter'
 

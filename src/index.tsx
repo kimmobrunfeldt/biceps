@@ -17,7 +17,7 @@ import schemaContent from 'src/db/schema.sql?raw'
 import { upsertSeedData } from 'src/db/seedData'
 import { DataLoaderContext } from 'src/hooks/useDataLoaders'
 import { runMigrations } from 'src/migrations'
-import { EmergencyFallbackPage } from 'src/pages/EmergencyFallbackPage'
+import { EmergencyFallbackPage } from 'src/pages/errors/EmergencyFallbackPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {

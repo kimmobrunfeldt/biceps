@@ -1,7 +1,7 @@
 import { BoxProps, Flex, Table, Text } from '@mantine/core'
 import { ItemImage } from 'src/components/ItemImage'
 import { RecipeResolved } from 'src/db/schemas/RecipeSchema'
-import { calculateTotals } from 'src/pages/AddRecipePage/components/RecipeItemsTable'
+import { calculateTotals } from 'src/pages/recipes/AddRecipePage/components/RecipeItemsTable'
 import { formatRoute, routes } from 'src/routes'
 import { formatGrams, formatKcal } from 'src/utils/format'
 import { Link } from 'wouter'

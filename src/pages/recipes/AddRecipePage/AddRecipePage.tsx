@@ -1,33 +1,33 @@
 import { IconAlertCircle } from '@tabler/icons-react'
 import { useCallback, useState } from 'react'
 import { PageTemplate } from 'src/components/PageTemplate'
-import { useUpsertProduct } from 'src/hooks/useDatabase'
+import { useCreateRecipe } from 'src/hooks/useDatabase'
 import { useNotifications } from 'src/hooks/useNotification'
 import {
-  ProductForm,
-  ProductFormFields,
-} from 'src/pages/AddProductPage/components/ProductForm'
+  RecipeForm,
+  RecipeFormFields,
+} from 'src/pages/recipes/AddRecipePage/components/RecipeForm'
 import { routes } from 'src/routes'
 import { useLocation } from 'wouter'
 
-export function AddProductPage() {
+export function AddRecipePage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { withNotifications } = useNotifications()
+  const { createRecipe } = useCreateRecipe()
   const [_location, setLocation] = useLocation()
-  const { upsertProduct } = useUpsertProduct()
 
   const onSubmit = useCallback(
-    async (data: ProductFormFields) => {
+    async (data: RecipeFormFields) => {
       if (isSubmitting) return
 
       setIsSubmitting(true)
       try {
         await withNotifications({
           fn: async () => {
-            await upsertProduct(data)
-            setLocation(routes.products.index.path)
+            await createRecipe(data)
+            setLocation(routes.recipes.index.path)
           },
-          success: { message: `Product '${data.name}' added`, color: 'green' },
+          success: { message: `Recipe '${data.name}' added`, color: 'green' },
           error: (err) => ({
             message: `Adding failed: ${err.message}`,
             color: 'red',
@@ -39,12 +39,12 @@ export function AddProductPage() {
         setIsSubmitting(false)
       }
     },
-    [withNotifications, isSubmitting, setLocation, upsertProduct]
+    [withNotifications, isSubmitting, createRecipe, setLocation]
   )
 
   return (
-    <PageTemplate title="Add product">
-      <ProductForm onSubmit={onSubmit} />
+    <PageTemplate title="Add recipe">
+      <RecipeForm onSubmit={onSubmit} />
     </PageTemplate>
   )
 }

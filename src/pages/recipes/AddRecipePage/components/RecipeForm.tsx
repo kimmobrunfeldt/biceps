@@ -4,7 +4,7 @@ import { useCallback, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { RecipeItemResolvedBeforeSavingSchema } from 'src/db/schemas/RecipeItemSchema'
 import { RecipeResolvedBeforeSavingSchema } from 'src/db/schemas/RecipeSchema'
-import { RecipeItemsForm } from 'src/pages/AddRecipePage/components/RecipeItemsForm'
+import { RecipeItemsForm } from 'src/pages/recipes/AddRecipePage/components/RecipeItemsForm'
 import { z } from 'zod'
 
 const RecipeFormSchema = z.object({

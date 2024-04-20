@@ -8,9 +8,9 @@ import {
   useWatch,
 } from 'react-hook-form'
 import { RecipeItemResolvedBeforeSaving } from 'src/db/schemas/RecipeItemSchema'
-import { ProductSearch } from 'src/pages/AddRecipePage/components/ProductSearch'
-import { RecipeFormFields } from 'src/pages/AddRecipePage/components/RecipeForm'
-import { RecipeItemsTable } from 'src/pages/AddRecipePage/components/RecipeItemsTable'
+import { ProductSearch } from 'src/pages/recipes/AddRecipePage/components/ProductSearch'
+import { RecipeFormFields } from 'src/pages/recipes/AddRecipePage/components/RecipeForm'
+import { RecipeItemsTable } from 'src/pages/recipes/AddRecipePage/components/RecipeItemsTable'
 import { Product } from 'src/utils/foodApi'
 import classes from './RecipeItemsForm.module.css'
 

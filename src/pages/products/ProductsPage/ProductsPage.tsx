@@ -13,7 +13,7 @@ import {
   useLazyGetRecipesByProductId,
 } from 'src/hooks/useDatabase'
 import { useNotifications } from 'src/hooks/useNotification'
-import { ProductsTable } from 'src/pages/ProductsPage/components/ProductsTable'
+import { ProductsTable } from 'src/pages/products/ProductsPage/components/ProductsTable'
 import { routes } from 'src/routes'
 import { Link } from 'wouter'
 
