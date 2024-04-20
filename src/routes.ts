@@ -33,6 +33,10 @@ export const routes = {
       path: '/products',
       title: 'Products',
     },
+    add: {
+      path: '/products/add',
+      title: 'Add product',
+    },
   },
   weeklySchedule: {
     index: {

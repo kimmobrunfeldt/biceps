@@ -1,22 +1,79 @@
 import { Blockquote, Box, Button, Flex, Text, Title } from '@mantine/core'
-import { IconInfoCircle, IconPlus } from '@tabler/icons-react'
+import { modals } from '@mantine/modals'
+import { IconAlertCircle, IconInfoCircle, IconPlus } from '@tabler/icons-react'
+import pluralize from 'pluralize'
+import { useCallback } from 'react'
 import { PageTemplate } from 'src/components/PageTemplate'
 import { Query } from 'src/components/Query'
+import { ItemResolved } from 'src/db/schemas/ItemSchema'
 import {
+  useDeleteProduct,
   useGetAllCustomProducts,
   useGetAllExternalProducts,
+  useLazyGetRecipesByProductId,
 } from 'src/hooks/useDatabase'
+import { useNotifications } from 'src/hooks/useNotification'
 import { ProductsTable } from 'src/pages/ProductsPage/components/ProductsTable'
+import { routes } from 'src/routes'
+import { Link } from 'wouter'
 
 export function ProductsPage() {
+  const { withNotifications } = useNotifications()
   const customProductsResult = useGetAllCustomProducts()
   const externalProductsResult = useGetAllExternalProducts()
+  const { deleteProduct } = useDeleteProduct()
+  const { getRecipesByProductId } = useLazyGetRecipesByProductId()
+
+  const onProductRemove = useCallback(
+    async (product: ItemResolved) => {
+      async function executeDelete() {
+        await withNotifications({
+          fn: async () => {
+            await deleteProduct(product.id)
+          },
+          success: {
+            message: `Product '${product.name}' deleted`,
+            color: 'green',
+          },
+          error: {
+            message: 'Failed to delete product!',
+            color: 'red',
+            icon: <IconAlertCircle />,
+          },
+        })
+      }
+
+      const recipes = await getRecipesByProductId(product.id)
+      const text =
+        recipes.length > 0 ? (
+          <>
+            Deletion{' '}
+            <b>will affect {pluralize('recipe', recipes.length, true)}</b> where
+            the product is used.
+          </>
+        ) : (
+          <>The product is not used in any recipe at the moment.</>
+        )
+
+      modals.openConfirmModal({
+        title: `Delete '${product.name}'?`,
+        children: <Text size="sm">{text}</Text>,
+        labels: { confirm: 'Delete', cancel: 'Cancel' },
+        confirmProps: { color: 'red' },
+        closeOnConfirm: true,
+        onConfirm: executeDelete,
+      })
+    },
+    [getRecipesByProductId, withNotifications, deleteProduct]
+  )
 
   return (
     <PageTemplate
       title="Products"
       titleRightSection={
-        <Button leftSection={<IconPlus size={14} />}>Add product</Button>
+        <Link to={routes.products.add.path}>
+          <Button leftSection={<IconPlus size={14} />}>Add product</Button>
+        </Link>
       }
     >
       <Box>
@@ -42,7 +99,13 @@ export function ProductsPage() {
         </Text>
         <Query result={customProductsResult} whenEmpty={() => <NoProducts />}>
           {(products) => {
-            return <ProductsTable products={products} />
+            return (
+              <ProductsTable
+                products={products}
+                showRemove
+                onRemove={onProductRemove}
+              />
+            )
           }}
         </Query>
 

@@ -99,6 +99,7 @@ const PersonRecipeEntity = createEntity({
 export { PersonRecipeEntity as PersonRecipe }
 
 import {
+  findManyByProductIds as findManyByProductIdsRecipe,
   clientUpsert as clientUpsertRecipe,
   find as findRecipe,
   findMany as findManyRecipe,
@@ -110,6 +111,7 @@ import {
   upsert as upsertRecipe,
 } from 'src/db/entities/Recipe'
 const RecipeEntity = createEntity({
+  findManyByProductIds: findManyByProductIdsRecipe,
   clientUpsert: clientUpsertRecipe,
   find: findRecipe,
   findMany: findManyRecipe,

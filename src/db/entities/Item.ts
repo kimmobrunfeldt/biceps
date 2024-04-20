@@ -40,7 +40,7 @@ export {
   upsert,
 }
 
-// Ad-hoc schema for custom the custom method
+// Ad-hoc schema for the custom method
 const ItemRowWithRecipeIdSchema = ItemRowSchema.merge(
   z.object({ recipeId: z.string() })
 )

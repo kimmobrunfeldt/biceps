@@ -3,9 +3,10 @@ import { CtxAsync, useDB } from '@vlcn.io/react'
 import _ from 'lodash'
 import { APP_STATE_KEY, DATABASE_NAME, INDEXEDDB_NAME } from 'src/constants'
 import { createRecipe, upsertRecipe } from 'src/core/recipeCore'
-import { AppState, Item, Person, Recipe } from 'src/db/entities'
+import { AppState, Item, Person, Recipe, RecipeItem } from 'src/db/entities'
 import { is } from 'src/db/interface/entityMethods'
 import { resolver } from 'src/db/resolvers/resolver'
+import { ItemResolvedBeforeSaving } from 'src/db/schemas/ItemSchema'
 import { PersonBeforeDatabase } from 'src/db/schemas/PersonSchema'
 import { RecipeResolvedBeforeSaving } from 'src/db/schemas/RecipeSchema'
 import { useDataLoaders } from 'src/hooks/useDataLoaders'
@@ -178,6 +179,62 @@ export function useGetAllExternalProducts() {
       }
     ),
   })
+}
+
+export function useLazyGetRecipesByProductId() {
+  const ctx = useDB(DATABASE_NAME)
+  const loaders = useDataLoaders()
+
+  return {
+    getRecipesByProductId: async (productId: string) => {
+      const recipes = await Recipe.findManyByProductIds({
+        connection: ctx.db,
+        productIds: [productId],
+      })
+      return await Promise.all(
+        recipes.map((row) => resolver({ row, connection: ctx.db, loaders }))
+      )
+    },
+  }
+}
+
+export function useUpsertProduct() {
+  const ctx = useDB(DATABASE_NAME)
+  const queryClient = useQueryClient()
+
+  return {
+    upsertProduct: async (recipe: ItemResolvedBeforeSaving) => {
+      await Item.clientUpsert({
+        connection: ctx.db,
+        object: recipe,
+        onConflict: ['id'],
+      })
+      queryClient.invalidateQueries({
+        queryKey: getCacheKeyToInvalidate(queryNames.getAllCustomProducts),
+      })
+    },
+  }
+}
+
+export function useDeleteProduct() {
+  const ctx = useDB(DATABASE_NAME)
+  const queryClient = useQueryClient()
+
+  return {
+    deleteProduct: async (productId: string) => {
+      await Item.remove({
+        connection: ctx.db,
+        where: { id: productId },
+      })
+      await RecipeItem.remove({
+        connection: ctx.db,
+        where: { itemId: productId },
+      })
+      queryClient.invalidateQueries({
+        queryKey: getCacheKeyToInvalidate(queryNames.getAllCustomProducts),
+      })
+    },
+  }
 }
 
 export function useDeleteAllData() {

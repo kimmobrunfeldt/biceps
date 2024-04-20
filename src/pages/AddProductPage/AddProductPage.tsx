@@ -1,33 +1,33 @@
 import { IconAlertCircle } from '@tabler/icons-react'
 import { useCallback, useState } from 'react'
 import { PageTemplate } from 'src/components/PageTemplate'
-import { useCreateRecipe } from 'src/hooks/useDatabase'
+import { useUpsertProduct } from 'src/hooks/useDatabase'
 import { useNotifications } from 'src/hooks/useNotification'
 import {
-  RecipeForm,
-  RecipeFormFields,
-} from 'src/pages/AddRecipePage/components/RecipeForm'
+  ProductForm,
+  ProductFormFields,
+} from 'src/pages/AddProductPage/components/ProductForm'
 import { routes } from 'src/routes'
 import { useLocation } from 'wouter'
 
-export function AddRecipePage() {
+export function AddProductPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { withNotifications } = useNotifications()
-  const { createRecipe } = useCreateRecipe()
   const [_location, setLocation] = useLocation()
+  const { upsertProduct } = useUpsertProduct()
 
   const onSubmit = useCallback(
-    async (data: RecipeFormFields) => {
+    async (data: ProductFormFields) => {
       if (isSubmitting) return
 
       setIsSubmitting(true)
       try {
         await withNotifications({
           fn: async () => {
-            await createRecipe(data)
-            setLocation(routes.recipes.index.path)
+            await upsertProduct(data)
+            setLocation(routes.products.index.path)
           },
-          success: { message: `Recipe '${data.name}' added`, color: 'green' },
+          success: { message: `Product '${data.name}' added`, color: 'green' },
           error: (err) => ({
             message: `Adding failed: ${err.message}`,
             color: 'red',
@@ -39,12 +39,12 @@ export function AddRecipePage() {
         setIsSubmitting(false)
       }
     },
-    [withNotifications, isSubmitting, createRecipe, setLocation]
+    [withNotifications, isSubmitting, setLocation, upsertProduct]
   )
 
   return (
-    <PageTemplate title="Add recipe">
-      <RecipeForm onSubmit={onSubmit} />
+    <PageTemplate title="Add product">
+      <ProductForm onSubmit={onSubmit} />
     </PageTemplate>
   )
 }

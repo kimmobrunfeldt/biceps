@@ -1,6 +1,7 @@
 import { Blockquote, Button, Text } from '@mantine/core'
 import { modals } from '@mantine/modals'
 import { IconAlertCircle } from '@tabler/icons-react'
+import { useEffect, useState } from 'react'
 import { PageTemplate } from 'src/components/PageTemplate'
 import { INDEXEDDB_NAME } from 'src/constants'
 import { useNotifications } from 'src/hooks/useNotification'
@@ -20,8 +21,6 @@ export function EmergencyFallbackPage() {
           fn: async () => {
             await indexedDB.deleteDatabase(INDEXEDDB_NAME)
           },
-          minLoadingNotificationMs: 600,
-          loading: { message: 'Deleting database ...', color: 'blue' },
           success: { message: 'Database deleted', color: 'green' },
           error: {
             message: 'Failed to reset database!',
@@ -35,16 +34,36 @@ export function EmergencyFallbackPage() {
   }
 
   return (
-    <PageTemplate title="Error">
-      <Blockquote color="red">
-        Failed to load the application. This likely means that automatic schema
-        migration failed. Please try to reload the page. If the issue persists,
-        you may need to reset the database by deleting all data.
-      </Blockquote>
+    <Delayed>
+      <PageTemplate title="Error">
+        <Blockquote color="red">
+          Failed to load the application. This likely means that automatic
+          schema migration failed. Please try to reload the page. If the issue
+          persists, you may need to reset the database by deleting all data.
+        </Blockquote>
 
-      <Button mt="lg" onClick={onDeleteDatabaseClick} color="red">
-        Delete all data
-      </Button>
-    </PageTemplate>
+        <Button mt="lg" onClick={onDeleteDatabaseClick} color="red">
+          Delete all data
+        </Button>
+      </PageTemplate>
+    </Delayed>
   )
+}
+
+type Props = {
+  children: React.ReactNode
+  waitBeforeShow?: number
+}
+
+const Delayed = ({ children, waitBeforeShow = 5000 }: Props) => {
+  const [isShown, setIsShown] = useState(false)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsShown(true)
+    }, waitBeforeShow)
+    return () => clearTimeout(timer)
+  }, [waitBeforeShow])
+
+  return isShown ? children : null
 }

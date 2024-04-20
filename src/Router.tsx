@@ -1,4 +1,5 @@
 import { App } from 'src/App'
+import { AddProductPage } from 'src/pages/AddProductPage/AddProductPage'
 import { AddRecipePage } from 'src/pages/AddRecipePage/AddRecipePage'
 import { EditRecipePage } from 'src/pages/EditRecipePage/EditRecipePage'
 import { IndexPage } from 'src/pages/IndexPage/IndexPage'
@@ -22,6 +23,7 @@ export function Router() {
         </Route>
 
         <Route path={routes.products.index.path} component={ProductsPage} />
+        <Route path={routes.products.add.path} component={AddProductPage} />
 
         <Route
           path={routes.weeklySchedule.index.path}
