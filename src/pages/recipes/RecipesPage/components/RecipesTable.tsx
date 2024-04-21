@@ -40,21 +40,23 @@ export function RecipesTable({ recipes }: Props) {
     whiteSpace: 'nowrap',
   }
   return (
-    <Table>
-      <Table.Thead>
-        <Table.Tr>
-          <Table.Th miw={200}>Item</Table.Th>
-          <Table.Th style={style}>Quantity (g)</Table.Th>
-          <Table.Th style={style}>Kcal</Table.Th>
-          <Table.Th style={style}>Protein (g)</Table.Th>
-          <Table.Th style={style}>Fat (g)</Table.Th>
-          <Table.Th>Saturated fat&nbsp;(g)</Table.Th>
-          <Table.Th style={style}>Carbs (g)</Table.Th>
-          <Table.Th style={style}>Sugar (g)</Table.Th>
-          <Table.Th style={style}>Salt (g)</Table.Th>
-        </Table.Tr>
-      </Table.Thead>
-      <Table.Tbody>{rows}</Table.Tbody>
-    </Table>
+    <Table.ScrollContainer minWidth={360} w="100%">
+      <Table>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th miw={200}>Item</Table.Th>
+            <Table.Th style={style}>Quantity (g)</Table.Th>
+            <Table.Th style={style}>Kcal</Table.Th>
+            <Table.Th style={style}>Protein (g)</Table.Th>
+            <Table.Th style={style}>Fat (g)</Table.Th>
+            <Table.Th>Saturated fat&nbsp;(g)</Table.Th>
+            <Table.Th style={style}>Carbs (g)</Table.Th>
+            <Table.Th style={style}>Sugar (g)</Table.Th>
+            <Table.Th style={style}>Salt (g)</Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>{rows}</Table.Tbody>
+      </Table>
+    </Table.ScrollContainer>
   )
 }

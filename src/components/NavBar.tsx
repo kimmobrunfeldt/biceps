@@ -1,18 +1,22 @@
 import {
   Avatar,
   Box,
+  Burger,
   Center,
   Image,
+  Menu,
   Stack,
   Tooltip,
   UnstyledButton,
   rem,
 } from '@mantine/core'
+import { useDisclosure } from '@mantine/hooks'
 import {
   IconCalendarWeek,
   IconHome2,
   IconSalad,
   IconShoppingBag,
+  IconUser,
 } from '@tabler/icons-react'
 import logo from 'src/assets/biceps-logo.svg'
 import { Query } from 'src/components/Query'
@@ -82,6 +86,7 @@ const menuItems = [
 
 export function NavBar() {
   const appStateResult = useGetAppState()
+  const [opened, { toggle }] = useDisclosure()
   const links = menuItems.map((link) => (
     <NavBarLink {...link} key={link.label} to={link.to} />
   ))
@@ -89,42 +94,101 @@ export function NavBar() {
   const [settingsRouteActive] = useRoute(routes.settings.path)
 
   return (
-    <nav className={classes.navbar}>
-      <Center>
-        <Image src={logo} w={30} />
-      </Center>
+    <>
+      {/* Left side menu */}
+      <Box component="nav" className={classes.navbar} visibleFrom="sm">
+        <Center>
+          <Image src={logo} w={30} />
+        </Center>
 
-      <Box className={classes.navbarMain}>
-        <Stack justify="center" gap={0}>
-          {links}
+        <Box className={classes.navbarMain}>
+          <Stack justify="center" gap={0}>
+            {links}
+          </Stack>
+        </Box>
+
+        <Stack justify="center" align="center" gap={0}>
+          <NavBarLink to={routes.settings.path} label="Profile & Settings">
+            <Query
+              result={appStateResult}
+              whenEmpty={() => null}
+              whenLoading={
+                <Avatar alt="Placeholder avatar" color="gray">
+                  {' '}
+                </Avatar>
+              }
+            >
+              {(data) => {
+                return (
+                  <Avatar
+                    color={settingsRouteActive ? 'blue' : 'gray'}
+                    radius="xl"
+                    alt={data.selectedPerson.name}
+                  >
+                    {data.selectedPerson.initials}
+                  </Avatar>
+                )
+              }}
+            </Query>
+          </NavBarLink>
         </Stack>
       </Box>
 
-      <Stack justify="center" align="center" gap={0}>
-        <NavBarLink to={routes.settings.path} label="Profile & Settings">
-          <Query
-            result={appStateResult}
-            whenEmpty={() => null}
-            whenLoading={
-              <Avatar alt="Placeholder avatar" color="gray">
-                {' '}
-              </Avatar>
-            }
-          >
-            {(data) => {
+      {/* Burger menu */}
+      <Box
+        pos="fixed"
+        right={20}
+        bottom={20}
+        hiddenFrom="sm"
+        style={{ zIndex: 100 }}
+        className={classes.burgerMenuContainer}
+      >
+        <Menu opened={opened} onChange={toggle} shadow="md" width={200}>
+          <Menu.Target>
+            <Box p={8} bg="primary" style={{ borderRadius: '99999px' }}>
+              <Burger
+                color="white"
+                opened={opened}
+                onClick={toggle}
+                aria-label="Toggle navigation"
+              />
+            </Box>
+          </Menu.Target>
+
+          <Menu.Dropdown>
+            <Menu.Label>Application</Menu.Label>
+            {menuItems.map(({ icon: Icon, label, to }) => {
               return (
-                <Avatar
-                  color={settingsRouteActive ? 'brand' : 'gray'}
-                  radius="xl"
-                  alt={data.selectedPerson.name}
-                >
-                  {data.selectedPerson.initials}
-                </Avatar>
+                <Link key={to} href={to} className={classes.burgerMenuLink}>
+                  <Menu.Item
+                    leftSection={
+                      <Icon style={{ width: rem(14), height: rem(14) }} />
+                    }
+                  >
+                    {label}
+                  </Menu.Item>
+                </Link>
               )
-            }}
-          </Query>
-        </NavBarLink>
-      </Stack>
-    </nav>
+            })}
+
+            <Menu.Divider />
+
+            <Menu.Label>Settings</Menu.Label>
+            <Link
+              href={routes.settings.path}
+              className={classes.burgerMenuLink}
+            >
+              <Menu.Item
+                leftSection={
+                  <IconUser style={{ width: rem(14), height: rem(14) }} />
+                }
+              >
+                Profile
+              </Menu.Item>
+            </Link>
+          </Menu.Dropdown>
+        </Menu>
+      </Box>
+    </>
   )
 }

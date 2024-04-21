@@ -3,7 +3,12 @@
 import '@mantine/core/styles.css'
 import '@mantine/notifications/styles.css'
 
-import { MantineColorsTuple, MantineProvider, createTheme } from '@mantine/core'
+import {
+  MantineColorsTuple,
+  MantineProvider,
+  createTheme,
+  virtualColor,
+} from '@mantine/core'
 import { ModalsProvider } from '@mantine/modals'
 import { Notifications } from '@mantine/notifications'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -11,6 +16,7 @@ import { DBProvider, useDB } from '@vlcn.io/react'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { Router } from 'src/Router'
+import breakpoints from 'src/breakpoints.json'
 import { DATABASE_NAME } from 'src/constants'
 import { createLoaders } from 'src/db/dataLoaders'
 import schemaContent from 'src/db/schema.sql?raw'
@@ -45,8 +51,14 @@ const brandColor: MantineColorsTuple = [
 const theme = createTheme({
   colors: {
     purple: brandColor,
+    primary: virtualColor({
+      name: 'primary',
+      dark: 'blue',
+      light: 'blue',
+    }),
   },
   primaryColor: 'blue',
+  breakpoints,
 })
 
 const UiProviders = ({ children }: { children: React.ReactNode }) => {

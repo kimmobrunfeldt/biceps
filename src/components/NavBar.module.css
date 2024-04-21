@@ -60,3 +60,8 @@
     }
   }
 }
+
+.burgerMenuLink {
+  color: red;
+  text-decoration: none !important;
+}

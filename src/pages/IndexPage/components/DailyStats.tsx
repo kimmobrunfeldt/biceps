@@ -1,20 +1,10 @@
 import { Temporal } from '@js-temporal/polyfill'
 import { Group, Paper, Text, UnstyledButton, rem } from '@mantine/core'
-import {
-  IconBike,
-  IconChevronDown,
-  IconChevronUp,
-  IconRun,
-  IconSwimming,
-} from '@tabler/icons-react'
+import { IconChevronDown, IconChevronUp, IconSalad } from '@tabler/icons-react'
 import { useState } from 'react'
 import classes from './DailyStats.module.css'
 
-const data = [
-  { icon: IconRun, label: 'Running' },
-  { icon: IconSwimming, label: 'Swimming' },
-  { icon: IconBike, label: 'Bike' },
-]
+const data = [{ icon: IconSalad, label: 'Calories' }]
 
 const calendar = new Intl.DateTimeFormat().resolvedOptions().calendar
 
@@ -29,6 +19,7 @@ export function DailyStats() {
       shadow="md"
       p="xs"
       key={stat.label}
+      maw={200}
     >
       <stat.icon
         style={{ width: rem(32), height: rem(32) }}
@@ -38,10 +29,7 @@ export function DailyStats() {
       <div>
         <Text className={classes.label}>{stat.label}</Text>
         <Text fz="xs" className={classes.count}>
-          <span className={classes.value}>
-            {Math.floor(Math.random() * 6 + 4)}km
-          </span>{' '}
-          / 10km
+          <span className={classes.value}>1200 kcal</span> / 3000
         </Text>
       </div>
     </Paper>

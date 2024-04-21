@@ -1,4 +1,4 @@
-import { Box, Flex, ScrollArea } from '@mantine/core'
+import { Box, Flex } from '@mantine/core'
 import { NavBar } from 'src/components/NavBar'
 
 import 'src/App.css'
@@ -8,10 +8,8 @@ export function App({ children }: { children?: React.ReactNode }) {
     <Flex w="100%" h="100%">
       <NavBar />
 
-      <Box flex={1}>
-        <ScrollArea w="100%" h="100%" scrollbars="y">
-          <Box>{children}</Box>
-        </ScrollArea>
+      <Box flex={1} miw={0} style={{ overflow: 'hidden auto' }}>
+        <Box>{children}</Box>
       </Box>
     </Flex>
   )

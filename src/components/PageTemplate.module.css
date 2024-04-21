@@ -1,0 +1,20 @@
+.container {
+  padding-left: var(--mantine-spacing-md);
+  padding-right: var(--mantine-spacing-md);
+  padding-top: var(--mantine-spacing-sm);
+  padding-bottom: var(--mantine-spacing-md);
+
+  @media (min-width: $mantine-breakpoint-sm) {
+    padding-left: var(--mantine-spacing-lg);
+    padding-right: var(--mantine-spacing-lg);
+    padding-top: var(--mantine-spacing-md);
+    padding-bottom: var(--mantine-spacing-lg);
+  }
+
+  @media (min-width: $mantine-breakpoint-lg) {
+    padding-left: var(--mantine-spacing-xl);
+    padding-right: var(--mantine-spacing-xl);
+    padding-top: var(--mantine-spacing-lg);
+    padding-bottom: var(--mantine-spacing-xl);
+  }
+}

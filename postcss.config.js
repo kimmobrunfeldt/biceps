@@ -1,14 +1,17 @@
+const breakpoints = rquire('./src/breakpoints.json');
+
 module.exports = {
   plugins: {
     'postcss-preset-mantine': {},
     'postcss-simple-vars': {
       variables: {
-        'mantine-breakpoint-xs': '36em',
-        'mantine-breakpoint-sm': '48em',
-        'mantine-breakpoint-md': '62em',
-        'mantine-breakpoint-lg': '75em',
-        'mantine-breakpoint-xl': '88em',
+        'mantine-breakpoint-xs': breakpoints['xs'],
+        'mantine-breakpoint-sm': breakpoints['sm'],
+        'mantine-breakpoint-md': breakpoints['md'],
+        'mantine-breakpoint-lg': breakpoints['lg'],
+        'mantine-breakpoint-xl': breakpoints['xl'],
       },
     },
   },
 };
+

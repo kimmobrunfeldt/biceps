@@ -1,5 +1,6 @@
 import { Box, BoxProps } from '@mantine/core'
 import { PageTitleBar } from 'src/components/PageTitleBar'
+import classes from './PageTemplate.module.css'
 
 type Props = {
   title: string
@@ -14,7 +15,7 @@ export function PageTemplate({
   ...rest
 }: Props) {
   return (
-    <Box px="xl" pt="lg" pb="xl" {...rest}>
+    <Box className={classes.container} {...rest}>
       <PageTitleBar title={title} rightSection={titleRightSection} pb="md" />
       {children}
     </Box>

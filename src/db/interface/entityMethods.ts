@@ -246,7 +246,6 @@ export function makeUtils<
       throw new Error('clientUpsert requires onConflict to be an array')
     }
     const validObject = beforeDatabaseSchema.parse(object)
-    console.log('validObject', validObject)
     const onConflictWhere = _.pick(validObject, onConflict) as WhereConditions<
       z.infer<SchemaT>
     >

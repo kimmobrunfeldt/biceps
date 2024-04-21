@@ -54,21 +54,23 @@ export function ProductsTable({
     whiteSpace: 'nowrap',
   }
   return (
-    <Table>
-      <Table.Thead>
-        <Table.Tr>
-          <Table.Th miw={200}>Item</Table.Th>
-          <Table.Th style={style}>Kcal (per 100g)</Table.Th>
-          <Table.Th style={style}>Protein (per 100g)</Table.Th>
-          <Table.Th style={style}>Fat (per 100g)</Table.Th>
-          <Table.Th>Saturated fat&nbsp;(per 100g)</Table.Th>
-          <Table.Th style={style}>Carbs (per 100g)</Table.Th>
-          <Table.Th style={style}>Sugar (per 100g)</Table.Th>
-          <Table.Th style={style}>Salt (per 100g)</Table.Th>
-          <Table.Th style={style}></Table.Th>
-        </Table.Tr>
-      </Table.Thead>
-      <Table.Tbody>{rows}</Table.Tbody>
-    </Table>
+    <Table.ScrollContainer minWidth={360}>
+      <Table>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th miw={200}>Item</Table.Th>
+            <Table.Th style={style}>Kcal (per 100g)</Table.Th>
+            <Table.Th style={style}>Protein (per 100g)</Table.Th>
+            <Table.Th style={style}>Fat (per 100g)</Table.Th>
+            <Table.Th>Saturated fat&nbsp;(per 100g)</Table.Th>
+            <Table.Th style={style}>Carbs (per 100g)</Table.Th>
+            <Table.Th style={style}>Sugar (per 100g)</Table.Th>
+            <Table.Th style={style}>Salt (per 100g)</Table.Th>
+            <Table.Th style={style}></Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>{rows}</Table.Tbody>
+      </Table>
+    </Table.ScrollContainer>
   )
 }
