@@ -1,5 +1,6 @@
 import { ActionIcon, BoxProps, Flex, Table, Text, Tooltip } from '@mantine/core'
 import { IconX } from '@tabler/icons-react'
+import { NutritionCircle } from 'src/components/NutritionCircle'
 import { ProductImage } from 'src/components/ProductImage'
 import { ProductResolved } from 'src/db/schemas/ProductSchema'
 import { formatGrams, formatKcal } from 'src/utils/format'
@@ -20,7 +21,10 @@ export function ProductsTable({
       <Table.Tr key={index}>
         <Table.Td>
           <Flex align="center" gap="sm">
-            <ProductImage product={product} />
+            <Flex gap={4}>
+              <NutritionCircle nutrition={product} variant="icon" />
+              <ProductImage product={product} />
+            </Flex>
             <Text>{product.name}</Text>
           </Flex>
         </Table.Td>

@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { DATABASE_ID_PREFIX } from 'src/constants'
 import { nanoId } from 'src/utils/nanoid'
+import { calculateMacros } from 'src/utils/nutrition'
 import { z } from 'zod'
 
 export const preprocessors = {
@@ -35,6 +36,14 @@ export const AddBicepsIdSchema = z.preprocess(
   z.string().optional()
 )
 
+export const GramsPer100GramsSchema = z
+  .number()
+  .max(100, {
+    message:
+      'Maximum value is 100. For example 200g of sugar per 100g is impossible.',
+  })
+  .nonnegative()
+
 export function addTypeName<T extends string>(name: T) {
   return z.preprocess(() => name, z.literal(name))
 }
@@ -48,3 +57,34 @@ export const NameSchema = z
   .string()
   .min(2, { message: 'Minimum length is 2 characters' })
   .max(100, { message: 'Maximum length is 100 characters' })
+
+export const NutritionPer100GramsSchema = z
+  .object({
+    kcal: z.number().int().nonnegative(),
+    fatTotal: GramsPer100GramsSchema,
+    fatSaturated: GramsPer100GramsSchema,
+    carbsTotal: GramsPer100GramsSchema,
+    carbsSugar: GramsPer100GramsSchema,
+    protein: GramsPer100GramsSchema,
+    salt: GramsPer100GramsSchema,
+  })
+  .strict()
+export type NutritionPer100Grams = z.infer<typeof NutritionPer100GramsSchema>
+
+export function isTotalLessOrEqualTo100Grams(nutrition: NutritionPer100Grams) {
+  const macros = calculateMacros(nutrition)
+  const total = _.sum(Object.values(macros.macroDistribution))
+  return total <= 100
+}
+
+export function isTotalFatGreaterOrEqualToSaturatedFat(
+  nutrition: NutritionPer100Grams
+) {
+  return nutrition.fatTotal >= nutrition.fatSaturated
+}
+
+export function isTotalCarbsGreaterOrEqualToSugars(
+  nutrition: NutritionPer100Grams
+) {
+  return nutrition.carbsTotal >= nutrition.carbsSugar
+}

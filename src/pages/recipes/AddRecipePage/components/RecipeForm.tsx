@@ -75,12 +75,14 @@ export function RecipeForm({ initialData, onSubmit: inputOnSubmit }: Props) {
             placeholder="Name"
             error={errors.name?.message}
             disabled={isSubmitting}
-            maw={400}
+            maw={380}
           />
         )}
       />
 
-      <RecipeItemsForm control={control} setValue={setValue} />
+      <Box py="lg">
+        <RecipeItemsForm control={control} setValue={setValue} />
+      </Box>
 
       {Object.keys(errors).length > 0 ? (
         <Box>
@@ -91,7 +93,6 @@ export function RecipeForm({ initialData, onSubmit: inputOnSubmit }: Props) {
       ) : null}
       <Button
         type="submit"
-        mt="lg"
         disabled={!isDirty || isSubmitting}
         loading={isSubmitting}
       >

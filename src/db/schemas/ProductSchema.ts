@@ -3,23 +3,18 @@ import {
   DateSchema,
   IdSchema,
   NameSchema,
+  NutritionPer100GramsSchema,
   addTypeName,
+  isTotalLessOrEqualTo100Grams,
   preprocessors,
 } from 'src/db/schemas/common'
 import { z } from 'zod'
 
-export const ProductRowSchema = z
+export const BaseProductRowSchema = z
   .object({
     __type: addTypeName('Product'),
     id: IdSchema,
     name: NameSchema,
-    kcal: z.number().int().nonnegative(),
-    fatTotal: z.number().nonnegative(),
-    fatSaturated: z.number().nonnegative(),
-    carbsTotal: z.number().nonnegative(),
-    carbsSugar: z.number().nonnegative(),
-    protein: z.number().nonnegative(),
-    salt: z.number().nonnegative(),
     imageThumbUrl: z.preprocess(
       preprocessors.nullToUndefined,
       z.string().url().optional()
@@ -30,20 +25,27 @@ export const ProductRowSchema = z
     ),
     createdAt: DateSchema,
   })
+  .merge(NutritionPer100GramsSchema)
   .strict()
-export type ProductRow = z.infer<typeof ProductRowSchema>
 
-export const ProductBeforeDatabaseSchema = ProductRowSchema.omit({
+export const ProductRowSchema = BaseProductRowSchema.refine(
+  isTotalLessOrEqualTo100Grams
+)
+
+export type ProductRow = z.infer<typeof BaseProductRowSchema>
+
+export const ProductBeforeDatabaseSchema = BaseProductRowSchema.omit({
   id: true,
   createdAt: true,
 })
   .merge(
     z.object({
       id: AddBicepsIdSchema,
-      createdAt: ProductRowSchema.shape.createdAt.optional(),
+      createdAt: BaseProductRowSchema.shape.createdAt.optional(),
     })
   )
   .strict()
+
 export type ProductBeforeDatabase = z.infer<typeof ProductBeforeDatabaseSchema>
 
 export const ProductResolvedSchema = ProductRowSchema

@@ -1,24 +1,72 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Box, Button, Code, NumberInput, Stack, TextInput } from '@mantine/core'
-import { useCallback, useState } from 'react'
-import { Controller, useForm } from 'react-hook-form'
+import { Button, NumberInput, Stack, TextInput } from '@mantine/core'
+import { useCallback, useEffect, useState } from 'react'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 import { ProductResolvedBeforeSavingSchema } from 'src/db/schemas/ProductSchema'
+import {
+  NutritionPer100Grams,
+  isTotalCarbsGreaterOrEqualToSugars,
+  isTotalFatGreaterOrEqualToSaturatedFat,
+  isTotalLessOrEqualTo100Grams,
+} from 'src/db/schemas/common'
+import { getLabel } from 'src/utils/nutrition'
 import { z } from 'zod'
 
-const ProductFormSchema = ProductResolvedBeforeSavingSchema
+const ProductFormSchema = ProductResolvedBeforeSavingSchema.superRefine(
+  (values, ctx) => {
+    if (!isTotalLessOrEqualTo100Grams(values)) {
+      const fields = [
+        'fatTotal',
+        'fatSaturated',
+        'carbsTotal',
+        'carbsSugar',
+        'protein',
+        'salt',
+      ] as const
+      fields.forEach((field) => {
+        ctx.addIssue({
+          code: 'custom',
+          path: [field],
+          message: 'Nutrition values per 100g add up to more than 100 grams',
+        })
+      })
+    } else if (!isTotalFatGreaterOrEqualToSaturatedFat(values)) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['fatTotal'],
+        message: `Total fat must be greater than or equal to saturated fat (${values.fatSaturated})`,
+      })
+    } else if (!isTotalCarbsGreaterOrEqualToSugars(values)) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['carbsTotal'],
+        message: `Total carbs must be greater than or equal to sugar (${values.carbsSugar})`,
+      })
+    }
+
+    return values
+  }
+)
+
 export type ProductFormFields = z.infer<typeof ProductFormSchema>
 
 type Props = {
   initialData?: ProductFormFields
   onSubmit: (data: ProductFormFields) => void
+  onChange?: (data: NutritionPer100Grams) => void
 }
 
-export function ProductForm({ initialData, onSubmit: inputOnSubmit }: Props) {
+export function ProductForm({
+  initialData,
+  onSubmit: inputOnSubmit,
+  onChange,
+}: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const {
     control,
     handleSubmit,
+    getValues,
     formState: { isDirty, errors },
   } = useForm<ProductFormFields>({
     defaultValues: {
@@ -34,6 +82,12 @@ export function ProductForm({ initialData, onSubmit: inputOnSubmit }: Props) {
     resolver: zodResolver(ProductFormSchema),
   })
 
+  const values = useWatch({ control, defaultValue: getValues() })
+
+  useEffect(() => {
+    onChange?.(getNutritionValues(values))
+  }, [onChange, values])
+
   const onSubmit = useCallback(
     async (data: ProductFormFields) => {
       if (isSubmitting) return
@@ -48,14 +102,18 @@ export function ProductForm({ initialData, onSubmit: inputOnSubmit }: Props) {
     [isSubmitting, inputOnSubmit, initialData]
   )
 
-  const gramFields = [
-    { key: 'fatTotal', label: 'Fat' },
-    { key: 'fatSaturated', label: 'Saturated fat' },
-    { key: 'carbsTotal', label: 'Carbs' },
-    { key: 'carbsSugar', label: 'Sugar' },
-    { key: 'protein', label: 'Protein' },
-    { key: 'salt', label: 'Salt' },
-  ] satisfies Array<{ key: keyof ProductFormFields; label: string }>
+  const keys = [
+    'fatTotal',
+    'fatSaturated',
+    'carbsTotal',
+    'carbsSugar',
+    'protein',
+    'salt',
+  ] as const
+  const gramFields = keys.map((key) => ({
+    key,
+    label: getLabel(key),
+  })) satisfies Array<{ key: keyof ProductFormFields; label: string }>
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -115,13 +173,6 @@ export function ProductForm({ initialData, onSubmit: inputOnSubmit }: Props) {
         })}
       </Stack>
 
-      {Object.keys(errors).length > 0 ? (
-        <Box>
-          <Code bg="red.0" block>
-            {JSON.stringify(errors, null, 2)}
-          </Code>
-        </Box>
-      ) : null}
       <Button
         type="submit"
         mt="lg"
@@ -132,4 +183,16 @@ export function ProductForm({ initialData, onSubmit: inputOnSubmit }: Props) {
       </Button>
     </form>
   )
+}
+
+function getNutritionValues(nutrition: Partial<NutritionPer100Grams>) {
+  return {
+    kcal: nutrition.kcal ?? 0,
+    fatTotal: nutrition.fatTotal ?? 0,
+    fatSaturated: nutrition.fatSaturated ?? 0,
+    carbsTotal: nutrition.carbsTotal ?? 0,
+    carbsSugar: nutrition.carbsSugar ?? 0,
+    protein: nutrition.protein ?? 0,
+    salt: nutrition.salt ?? 0,
+  }
 }

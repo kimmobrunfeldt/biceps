@@ -8,6 +8,7 @@ import {
   makeUtils,
 } from 'src/db/interface/entityMethods'
 import {
+  BaseProductRowSchema,
   ProductBeforeDatabaseSchema,
   ProductRow,
   ProductRowSchema,
@@ -42,7 +43,7 @@ export {
 }
 
 // Ad-hoc schema for the custom method
-const ProductRowWithRecipeIdSchema = ProductRowSchema.merge(
+const ProductRowWithRecipeIdSchema = BaseProductRowSchema.merge(
   z.object({ recipeId: z.string() })
 )
 type ProductRowWithRecipeId = z.infer<typeof ProductRowWithRecipeIdSchema>

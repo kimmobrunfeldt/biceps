@@ -19,7 +19,7 @@ export function RecipesPage() {
         </Link>
       }
     >
-      <Blockquote my="lg" maw={900}>
+      <Blockquote my="lg" maw={900} p="lg">
         <Text c="gray">
           Recipes can be a single meal or food prepping batch that serves
           multiple meals. Product search is powered by{' '}

@@ -1,4 +1,5 @@
-import { IconAlertCircle } from '@tabler/icons-react'
+import { Flex } from '@mantine/core'
+import { IconAlertCircle, IconChevronLeft } from '@tabler/icons-react'
 import { useCallback, useState } from 'react'
 import { PageTemplate } from 'src/components/PageTemplate'
 import { useCreateRecipe } from 'src/hooks/useDatabase'
@@ -8,7 +9,7 @@ import {
   RecipeFormFields,
 } from 'src/pages/recipes/AddRecipePage/components/RecipeForm'
 import { routes } from 'src/routes'
-import { useLocation } from 'wouter'
+import { Link, useLocation } from 'wouter'
 
 export function AddRecipePage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -43,7 +44,16 @@ export function AddRecipePage() {
   )
 
   return (
-    <PageTemplate title="Add recipe">
+    <PageTemplate
+      title="Add recipe"
+      titleRightSection={
+        <Link to={routes.recipes.index.path}>
+          <Flex direction="row" align="center">
+            <IconChevronLeft /> Back to Recipes
+          </Flex>
+        </Link>
+      }
+    >
       <RecipeForm onSubmit={onSubmit} />
     </PageTemplate>
   )

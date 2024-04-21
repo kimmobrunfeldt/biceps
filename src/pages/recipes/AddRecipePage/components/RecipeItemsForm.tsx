@@ -39,33 +39,28 @@ export function RecipeItemsForm({ control, setValue }: Props) {
   }
 
   return (
-    <Flex py="xl" direction="column">
-      <Box w="100%" maw={380} style={{ alignSelf: 'flex-end' }} mb="sm">
-        <ProductSearch onProductSelect={(p) => append(productToItem(p))} />
-      </Box>
+    <Paper px="md" pt="lg" pb="xl" radius="md" className={classes.table}>
+      <Flex direction="column">
+        <Box w="100%" maw={380} mb="sm" style={{ alignSelf: 'flex-start' }}>
+          <ProductSearch onProductSelect={(p) => append(productToItem(p))} />
+        </Box>
 
-      <Paper px="md" py="lg" radius="md" className={classes.table}>
-        <RecipeItemsTable
-          recipeItems={recipeItems}
-          editable
-          onRecipeItemRemove={remove}
-          onRecipeItemChange={onRecipeItemChange}
-        />
-        {fields.length === 0 ? (
-          <Flex
-            py="md"
-            px="sm"
-            direction="row"
-            align="center"
-            gap={4}
-            opacity={0.7}
-          >
-            <IconInfoCircle width={20} color="gray" />
-            <Text c="gray">Add items by searching products</Text>
-          </Flex>
-        ) : null}
-      </Paper>
-    </Flex>
+        <Paper py="lg" radius="md" className={classes.table}>
+          <RecipeItemsTable
+            recipeItems={recipeItems}
+            editable
+            onRecipeItemRemove={remove}
+            onRecipeItemChange={onRecipeItemChange}
+          />
+          {fields.length === 0 ? (
+            <Flex px="sm" direction="row" align="center" gap={4} opacity={0.7}>
+              <IconInfoCircle width={20} color="gray" />
+              <Text c="gray">Add items by searching products</Text>
+            </Flex>
+          ) : null}
+        </Paper>
+      </Flex>
+    </Paper>
   )
 }
 
