@@ -34,7 +34,6 @@ export function RecipeForm({ initialData, onSubmit: inputOnSubmit }: Props) {
     control,
     handleSubmit,
     setValue,
-    getValues,
     formState: { isDirty, errors },
   } = useForm<RecipeFormFields>({
     defaultValues: {
@@ -47,10 +46,9 @@ export function RecipeForm({ initialData, onSubmit: inputOnSubmit }: Props) {
   const recipeItems = useWatch({
     control,
     name: 'recipeItems',
-    defaultValue: [],
+    defaultValue: initialData?.recipeItems ?? [],
   })
-
-  console.log('values', getValues())
+  const totals = calculateTotals(recipeItems)
 
   const onSubmit = useCallback(
     async (data: RecipeFormFields) => {
@@ -98,8 +96,9 @@ export function RecipeForm({ initialData, onSubmit: inputOnSubmit }: Props) {
             Macros
           </Text>
           <NutritionCircle
-            nutrition={calculateTotals(recipeItems)}
+            nutrition={totals}
             variant="large"
+            weightGrams={totals.weightGrams}
           />
           <Button
             mt="sm"

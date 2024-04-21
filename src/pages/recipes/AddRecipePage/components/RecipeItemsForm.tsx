@@ -24,7 +24,11 @@ export function RecipeItemsForm({ control, setValue }: Props) {
     keyName: '__reactHookFormId',
   })
 
-  const recipeItems = useWatch({ control, name: 'recipeItems' })
+  const recipeItems = useWatch({
+    control,
+    name: 'recipeItems',
+    defaultValue: fields,
+  })
 
   function onRecipeItemChange(
     index: number,

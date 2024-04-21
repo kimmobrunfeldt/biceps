@@ -7,17 +7,23 @@ import { calculateMacros, getColor, getLabel } from 'src/utils/nutrition'
 type Props = {
   variant: 'icon' | 'large'
   nutrition: NutritionPer100Grams
+  weightGrams?: number
 }
 
-export function NutritionCircle({ nutrition, variant }: Props) {
+export function NutritionCircle({
+  nutrition,
+  variant,
+  weightGrams = 100,
+}: Props) {
   const macros = calculateMacros(nutrition)
 
   const sections = macros.keys.map((key) => {
     const value = macros.macroDistribution[key]
+    const percentage = (value / weightGrams) * 100
     return {
-      value,
+      value: percentage,
       color: getColor(key),
-      tooltip: `${formatGrams(value)}g ${getLabel(key).toLocaleLowerCase()} per 100g (${Math.round(value)}%)`,
+      tooltip: `${formatGrams(value)}g ${getLabel(key).toLocaleLowerCase()} per ${weightGrams}g (${Math.round(percentage)}%)`,
     }
   })
 

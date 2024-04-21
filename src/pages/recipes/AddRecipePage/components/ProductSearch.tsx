@@ -3,6 +3,7 @@ import {
   Combobox,
   Flex,
   Loader,
+  Stack,
   Text,
   TextInput,
   useCombobox,
@@ -34,9 +35,14 @@ export function ProductSearch({ onSelect }: Props) {
   const dbProducts = dbSearchResult.data ?? []
   const apiProducts = apiSearchResult.data?.products ?? []
 
-  const errorMessage = apiSearchResult.error
-    ? `Search failed: ${apiSearchResult.error?.message ?? 'unknown error'}`
-    : ''
+  const errorMessage = getErrorMessage([
+    apiSearchResult.error
+      ? `Search failed: ${apiSearchResult.error?.message ?? 'unknown error'}`
+      : undefined,
+    dbSearchResult.error
+      ? `Search failed: ${dbSearchResult.error?.message ?? 'unknown error'}`
+      : undefined,
+  ])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValue(e.currentTarget.value)
@@ -99,11 +105,13 @@ export function ProductSearch({ onSelect }: Props) {
   ))
 
   const isLoading =
-    (apiSearchResult.isLoading || apiSearchResult.isPending) &&
-    (dbSearchResult.isLoading || dbSearchResult.isPending)
-
+    value.length > 0 &&
+    (apiSearchResult.isLoading ||
+      apiSearchResult.isPending ||
+      dbSearchResult.isLoading ||
+      dbSearchResult.isPending)
   return (
-    <Flex gap="sm">
+    <Stack gap="sm">
       <Combobox
         onOptionSubmit={(optionValue) => {
           setValue(optionValue)
@@ -153,8 +161,10 @@ export function ProductSearch({ onSelect }: Props) {
           </Combobox.Group>
         </Combobox.Dropdown>
       </Combobox>
-      <Box>{errorMessage ? <Text c="red">{errorMessage}</Text> : null}</Box>
-    </Flex>
+      <Box pl={4}>
+        {errorMessage ? <Text c="red">{errorMessage}</Text> : null}
+      </Box>
+    </Stack>
   )
 }
 
@@ -188,4 +198,8 @@ function toGrams(quantity: number, unit: string) {
   } catch (err) {
     return 0
   }
+}
+
+function getErrorMessage(errorMessages: (string | undefined)[]) {
+  return errorMessages.find((message) => message !== undefined)
 }

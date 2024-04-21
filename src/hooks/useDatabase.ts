@@ -254,7 +254,10 @@ export function useDeleteProduct() {
         where: { productId },
       })
       queryClient.invalidateQueries({
-        queryKey: getCacheKeyToInvalidate(queryNames.getAllCustomProducts),
+        queryKey: [
+          getCacheKeyToInvalidate(queryNames.getAllCustomProducts),
+          getCacheKeyToInvalidate(queryNames.getProduct(productId)),
+        ],
       })
     },
   }

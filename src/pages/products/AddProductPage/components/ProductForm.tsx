@@ -24,11 +24,14 @@ const ProductFormSchema = ProductResolvedBeforeSavingSchema.superRefine(
         'salt',
       ] as const
       fields.forEach((field) => {
-        ctx.addIssue({
-          code: 'custom',
-          path: [field],
-          message: 'Nutrition values per 100g add up to more than 100 grams',
-        })
+        const value = Number.isFinite(values[field]) ? values[field] : 0
+        if (value > 0) {
+          ctx.addIssue({
+            code: 'custom',
+            path: [field],
+            message: 'Nutrition values per 100g add up to more than 100 grams',
+          })
+        }
       })
     } else if (!isTotalFatGreaterOrEqualToSaturatedFat(values)) {
       ctx.addIssue({
@@ -187,12 +190,12 @@ export function ProductForm({
 
 function getNutritionValues(nutrition: Partial<NutritionPer100Grams>) {
   return {
-    kcal: nutrition.kcal ?? 0,
-    fatTotal: nutrition.fatTotal ?? 0,
-    fatSaturated: nutrition.fatSaturated ?? 0,
-    carbsTotal: nutrition.carbsTotal ?? 0,
-    carbsSugar: nutrition.carbsSugar ?? 0,
-    protein: nutrition.protein ?? 0,
-    salt: nutrition.salt ?? 0,
+    kcal: nutrition.kcal || 0, // Also convert '' to 0
+    fatTotal: nutrition.fatTotal || 0,
+    fatSaturated: nutrition.fatSaturated || 0,
+    carbsTotal: nutrition.carbsTotal || 0,
+    carbsSugar: nutrition.carbsSugar || 0,
+    protein: nutrition.protein || 0,
+    salt: nutrition.salt || 0,
   }
 }

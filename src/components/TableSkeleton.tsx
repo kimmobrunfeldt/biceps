@@ -8,7 +8,6 @@ export function TableSkeleton(props: Props) {
       <Skeleton height={12} width="40%" radius="xl" />
       <Skeleton height={12} mt={20} width="80%" radius="xl" />
       <Skeleton height={12} mt={12} width="80%" radius="xl" />
-      <Skeleton height={12} mt={12} width="80%" radius="xl" />
     </Box>
   )
 }

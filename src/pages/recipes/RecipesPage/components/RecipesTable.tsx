@@ -20,7 +20,11 @@ export function RecipesTable({ recipes }: Props) {
         <Table.Td>
           <Flex align="center" gap="sm">
             <Flex gap={4}>
-              <NutritionCircle nutrition={values} variant="icon" />
+              <NutritionCircle
+                nutrition={values}
+                variant="icon"
+                weightGrams={values.weightGrams}
+              />
               <ProductImage product={recipe.recipeItems[0]?.product} />
             </Flex>
             <Link to={formatRoute(routes.recipes.edit.path, { id: recipe.id })}>
