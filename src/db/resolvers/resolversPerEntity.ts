@@ -7,6 +7,10 @@ import {
   RecipeItemRow,
 } from 'src/db/schemas/RecipeItemSchema'
 import { RecipeResolved, RecipeRow } from 'src/db/schemas/RecipeSchema'
+import {
+  RecurringEventResolved,
+  RecurringEventRow,
+} from 'src/db/schemas/RecurringEventSchema'
 
 export const resolvers = {
   Recipe: recipeResolver,
@@ -14,6 +18,7 @@ export const resolvers = {
   Person: personResolver,
   Product: productResolver,
   RecipeItem: recipeItemResolver,
+  RecurringEvent: recurringEventResolver,
 }
 
 export async function recipeResolver({
@@ -84,4 +89,22 @@ export async function personResolver({
 } & CommonResolverOptions): Promise<PersonResolved> {
   const [first, second] = row.name.split(' ')
   return { ...row, initials: `${first[0]}${second[0]}`.toLocaleUpperCase() }
+}
+
+export async function recurringEventResolver({
+  row,
+  loaders,
+  connection,
+}: {
+  row: RecurringEventRow
+} & CommonResolverOptions): Promise<RecurringEventResolved> {
+  const recipeRow = await loaders.recipesById.load(row.recipeToEatId)
+  return {
+    ...row,
+    recipeToEat: await recipeResolver({
+      row: recipeRow,
+      loaders,
+      connection,
+    }),
+  }
 }

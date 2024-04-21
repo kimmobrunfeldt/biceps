@@ -148,6 +148,30 @@ const RecipeItemEntity = createEntity({
 })
 export { RecipeItemEntity as RecipeItem }
 
+import {
+  clientUpsert as clientUpsertRecurringEvent,
+  find as findRecurringEvent,
+  findMany as findManyRecurringEvent,
+  insert as insertRecurringEvent,
+  maybeFind as maybeFindRecurringEvent,
+  remove as removeRecurringEvent,
+  removeAll as removeAllRecurringEvent,
+  update as updateRecurringEvent,
+  upsert as upsertRecurringEvent,
+} from 'src/db/entities/RecurringEvent'
+const RecurringEventEntity = createEntity({
+  clientUpsert: clientUpsertRecurringEvent,
+  find: findRecurringEvent,
+  findMany: findManyRecurringEvent,
+  insert: insertRecurringEvent,
+  maybeFind: maybeFindRecurringEvent,
+  remove: removeRecurringEvent,
+  removeAll: removeAllRecurringEvent,
+  update: updateRecurringEvent,
+  upsert: upsertRecurringEvent,
+})
+export { RecurringEventEntity as RecurringEvent }
+
 export const allEntities = {
   AppState: AppStateEntity,
   Person: PersonEntity,
@@ -155,5 +179,6 @@ export const allEntities = {
   Product: ProductEntity,
   Recipe: RecipeEntity,
   RecipeItem: RecipeItemEntity,
+  RecurringEvent: RecurringEventEntity,
 }
 export type AnyDatabaseEntity = (typeof allEntities)[keyof typeof allEntities]

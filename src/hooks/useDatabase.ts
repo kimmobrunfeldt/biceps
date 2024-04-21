@@ -3,12 +3,20 @@ import { CtxAsync, useDB } from '@vlcn.io/react'
 import _ from 'lodash'
 import { APP_STATE_KEY, DATABASE_NAME, INDEXEDDB_NAME } from 'src/constants'
 import { createRecipe, upsertRecipe } from 'src/core/recipeCore'
-import { AppState, Person, Product, Recipe, RecipeItem } from 'src/db/entities'
+import {
+  AppState,
+  Person,
+  Product,
+  Recipe,
+  RecipeItem,
+  RecurringEvent,
+} from 'src/db/entities'
 import { is } from 'src/db/interface/entityMethods'
 import { resolver } from 'src/db/resolvers/resolver'
 import { PersonBeforeDatabase } from 'src/db/schemas/PersonSchema'
 import { ProductResolvedBeforeSaving } from 'src/db/schemas/ProductSchema'
 import { RecipeResolvedBeforeSaving } from 'src/db/schemas/RecipeSchema'
+import { RecurringEventResolvedBeforeSaving } from 'src/db/schemas/RecurringEventSchema'
 import { useDataLoaders } from 'src/hooks/useDataLoaders'
 
 const queryNames = {
@@ -19,6 +27,8 @@ const queryNames = {
   useCustomProductSearch: 'useCustomProductSearch',
   getAllExternalProducts: 'getAllExternalProducts',
   getProduct: (id: string) => `getProduct-${id}`,
+  getRecurringEvent: (id: string) => `getRecurringEvent-${id}`,
+  getAllRecurringEvents: 'getAllRecurringEvents',
 }
 
 /**
@@ -261,6 +271,52 @@ export function useDeleteProduct() {
       })
     },
   }
+}
+
+export function useUpsertRecurringEvent() {
+  const ctx = useDB(DATABASE_NAME)
+  const queryClient = useQueryClient()
+
+  return {
+    upsertRecurringEvent: async (
+      recurringEvent: RecurringEventResolvedBeforeSaving
+    ) => {
+      await RecurringEvent.clientUpsert({
+        connection: ctx.db,
+        object: recurringEvent,
+        onConflict: ['id'],
+      })
+      queryClient.invalidateQueries({
+        queryKey: _.compact([
+          getCacheKeyToInvalidate(queryNames.getAllRecurringEvents),
+          recurringEvent.id
+            ? getCacheKeyToInvalidate(
+                queryNames.getRecurringEvent(recurringEvent.id)
+              )
+            : undefined,
+        ]),
+      })
+    },
+  }
+}
+
+export function useGetAllRecurringEvents() {
+  const ctx = useDB(DATABASE_NAME)
+  const loaders = useDataLoaders()
+
+  return useQuery({
+    queryKey: getCacheKey(ctx, queryNames.getAllRecurringEvents),
+    queryFn: withQueryErrorHandling(
+      queryNames.getAllRecurringEvents,
+      async () => {
+        const rows = await RecurringEvent.findMany({ connection: ctx.db })
+        const recurringEvents = await Promise.all(
+          rows.map((row) => resolver({ row, connection: ctx.db, loaders }))
+        )
+        return recurringEvents
+      }
+    ),
+  })
 }
 
 export function useDeleteAllData() {

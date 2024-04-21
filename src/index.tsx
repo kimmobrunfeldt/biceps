@@ -55,7 +55,7 @@ async function main() {
       <DBProvider
         dbname={DATABASE_NAME}
         schema={{
-          name: 'schema.sql',
+          name: DATABASE_NAME,
           content: schemaContent,
         }}
         manualSetup={async (ctx) => {

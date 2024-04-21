@@ -19,17 +19,29 @@ export async function runMigrations() {
       'Migrations table does not exist, this must be a new database..'
     )
     console.log('Applying schema with auto-migration ...')
-    await db.automigrateTo('schema.sql', schemaContent)
-    // We can assume that when applying latest schema.sql, the previous migrations
-    // are already included in the schema
-    await markMigrationDone(db, migrations.length - 1)
+    await db.automigrateTo(DATABASE_NAME, schemaContent)
+    console.log('Auto-migration applied')
+
+    if (migrations.length > 0) {
+      // We can assume that when applying latest schema.sql, the previous migrations
+      // are already included in the schema
+      await markMigrationDone(db, migrations.length - 1)
+    }
+    return
+  }
+
+  if (migrations.length === 0) {
+    console.log('No migrations defined. Database is up to date.')
+    return
   }
 
   const latestMigrationVersion = (await getMigrationVersion(db)) ?? -1
   const migrateStartingFromVersion = latestMigrationVersion + 1
 
   if (migrateStartingFromVersion > migrations.length - 1) {
-    console.log('Latest migrations already applied. Database is up to date.')
+    console.log(
+      `Migration version ${migrations.length - 1} (latest) already applied. Database is up to date.`
+    )
     return
   }
 
@@ -65,6 +77,7 @@ async function markMigrationDone(connection: TXAsync, version: number) {
   await connection.execO(`INSERT INTO migrations (version) VALUES (?)`, [
     version,
   ])
+  console.log('Marking migration', version, 'done')
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -88,7 +101,7 @@ type Migration = {
 
 // Array index defines the version number
 const migrations: Migration[] = [
-  /**
+  /*
   {
     up: async (connection: TXAsync) => {},
   },

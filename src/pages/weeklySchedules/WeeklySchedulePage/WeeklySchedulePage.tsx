@@ -4,7 +4,7 @@ import { PageTemplate } from 'src/components/PageTemplate'
 import {
   DaySchedule,
   WEEKDAY_MAPPING,
-} from 'src/pages/WeeklySchedulePage/components/DaySchedule'
+} from 'src/pages/weeklySchedules/WeeklySchedulePage/components/DaySchedule'
 
 export function WeeklySchedulePage() {
   const weekdays = Object.keys(WEEKDAY_MAPPING) as Array<
