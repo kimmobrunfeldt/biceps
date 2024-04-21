@@ -3,6 +3,7 @@ import {
   Box,
   Burger,
   Center,
+  Flex,
   Image,
   Menu,
   Stack,
@@ -145,14 +146,22 @@ export function NavBar() {
       >
         <Menu opened={opened} onChange={toggle} shadow="md" width={200}>
           <Menu.Target>
-            <Box p={8} bg="primary" style={{ borderRadius: '99999px' }}>
+            <Flex
+              bg="primary"
+              style={{ borderRadius: '99999px' }}
+              w={44}
+              h={44}
+              justify="center"
+              align="center"
+            >
               <Burger
                 color="white"
                 opened={opened}
                 onClick={toggle}
                 aria-label="Toggle navigation"
+                size="sm"
               />
-            </Box>
+            </Flex>
           </Menu.Target>
 
           <Menu.Dropdown>

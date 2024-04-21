@@ -35,7 +35,7 @@ Starting from back towards front:
 
   - [src/db/interface/databaseMethods.ts](src/db/interface/databaseMethods.ts) wraps the lower level SQLite API with a few useful primitives similar to [slonik](https://github.com/gajus/slonik/)
 
-  - [src/db/interface/entityInterface.ts](src/db/interface/entityInterface.ts) defines the public API contract that each entity must implement. In addition, every entity can implement any custom method outside the interface for more complicated operations (for example see [Recipe.findManyByProductIds](src/db/entities/Recipe.ts#L27)).
+  - [src/db/interface/entityInterface.ts](src/db/interface/entityInterface.ts) defines the public API contract that each entity must implement. In addition, every entity can implement any custom method outside the interface for more complicated operations (for example see [Recipe.findManyByProductIds](src/db/entities/Recipe.ts#L45)).
 
   - [src/db/interface/entityMethods.ts](src/db/interface/entityMethods.ts) implements the API that `entityInterface.ts` specifies. Takes the entity schema and database table name as input.
 
