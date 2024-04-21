@@ -84,6 +84,7 @@ export function RecipeItemsTable({
           {editable && hasItem ? (
             <Tooltip label="Remove item">
               <ActionIcon
+                variant="light"
                 aria-label="Remove"
                 radius="lg"
                 size="sm"

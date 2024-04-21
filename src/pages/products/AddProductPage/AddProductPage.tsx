@@ -76,7 +76,9 @@ export function AddProductPage() {
       <Flex direction="row" gap="xl">
         <ProductForm onSubmit={onSubmit} onChange={onChange} />
         <Flex direction="column" align="center">
-          <Text>Macros</Text>
+          <Text mb={-5} c="gray">
+            Macros
+          </Text>
           <NutritionCircle nutrition={nutrition} variant="large" />
         </Flex>
       </Flex>

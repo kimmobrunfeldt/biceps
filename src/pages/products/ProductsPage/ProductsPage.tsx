@@ -1,9 +1,15 @@
 import { Blockquote, Box, Button, Flex, Text, Title } from '@mantine/core'
 import { modals } from '@mantine/modals'
-import { IconAlertCircle, IconInfoCircle, IconPlus } from '@tabler/icons-react'
+import {
+  IconAlertCircle,
+  IconExternalLink,
+  IconInfoCircle,
+  IconPlus,
+} from '@tabler/icons-react'
 import pluralize from 'pluralize'
 import { useCallback } from 'react'
 import { PageTemplate } from 'src/components/PageTemplate'
+import { PaperContainer } from 'src/components/PaperContainer'
 import { Query } from 'src/components/Query'
 import { ProductResolved } from 'src/db/schemas/ProductSchema'
 import {
@@ -85,7 +91,11 @@ export function ProductsPage() {
               target="_blank"
               rel="noreferrer"
             >
-              Open Food Facts
+              Open Food Facts{' '}
+              <IconExternalLink
+                size={16}
+                style={{ position: 'relative', top: '2px' }}
+              />
             </a>{' '}
             project. In addition, you can add custom products in this page.
           </Text>
@@ -94,32 +104,39 @@ export function ProductsPage() {
         <Title order={2} size="md" mt="xl">
           Custom products
         </Title>
-        <Text py="md" c="gray" opacity={0.7}>
+        <Text py="sm" c="gray" opacity={0.7}>
           Products added automatically by Biceps app or manually by you.
         </Text>
-        <Query result={customProductsResult} whenEmpty={() => <NoProducts />}>
-          {(products) => {
-            return (
-              <ProductsTable
-                products={products}
-                showRemove
-                onRemove={onProductRemove}
-              />
-            )
-          }}
-        </Query>
+        <PaperContainer>
+          <Query result={customProductsResult} whenEmpty={() => <NoProducts />}>
+            {(products) => {
+              return (
+                <ProductsTable
+                  products={products}
+                  showRemove
+                  onRemove={onProductRemove}
+                />
+              )
+            }}
+          </Query>
+        </PaperContainer>
 
-        <Title order={2} size="md" mt={100}>
+        <Title order={2} size="md" mt={80}>
           Open Food Facts
         </Title>
-        <Text py="md" c="gray" opacity={0.7}>
+        <Text py="sm" c="gray" opacity={0.7}>
           Products added from Open Food Facts
         </Text>
-        <Query result={externalProductsResult} whenEmpty={() => <NoProducts />}>
-          {(products) => {
-            return <ProductsTable products={products} />
-          }}
-        </Query>
+        <PaperContainer>
+          <Query
+            result={externalProductsResult}
+            whenEmpty={() => <NoProducts />}
+          >
+            {(products) => {
+              return <ProductsTable products={products} />
+            }}
+          </Query>
+        </PaperContainer>
       </Box>
     </PageTemplate>
   )
@@ -129,16 +146,9 @@ const NoProducts = () => {
   return (
     <Box>
       <ProductsTable products={[]} />
-      <Flex
-        py="md"
-        px="sm"
-        direction="row"
-        align="center"
-        gap={4}
-        opacity={0.7}
-      >
+      <Flex px="sm" direction="row" align="center" gap={4} opacity={0.7}>
         <IconInfoCircle width={20} color="gray" />
-        <Text c="gray">No products found</Text>
+        <Text c="gray">No products</Text>
       </Flex>
     </Box>
   )

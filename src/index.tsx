@@ -3,12 +3,7 @@
 import '@mantine/core/styles.css'
 import '@mantine/notifications/styles.css'
 
-import {
-  MantineColorsTuple,
-  MantineProvider,
-  createTheme,
-  virtualColor,
-} from '@mantine/core'
+import { MantineProvider } from '@mantine/core'
 import { ModalsProvider } from '@mantine/modals'
 import { Notifications } from '@mantine/notifications'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -16,7 +11,6 @@ import { DBProvider, useDB } from '@vlcn.io/react'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { Router } from 'src/Router'
-import breakpoints from 'src/breakpoints.json'
 import { DATABASE_NAME } from 'src/constants'
 import { createLoaders } from 'src/db/dataLoaders'
 import schemaContent from 'src/db/schema.sql?raw'
@@ -24,6 +18,7 @@ import { upsertSeedData } from 'src/db/seedData'
 import { DataLoaderContext } from 'src/hooks/useDataLoaders'
 import { runMigrations } from 'src/migrations'
 import { EmergencyFallbackPage } from 'src/pages/errors/EmergencyFallbackPage'
+import { theme } from 'src/theme'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -33,32 +28,6 @@ const queryClient = new QueryClient({
       refetchOnWindowFocus: false, // Disables automatic refetching when browser window is focused.
     },
   },
-})
-
-const brandColor: MantineColorsTuple = [
-  '#f5ecff',
-  '#e5d4fa',
-  '#c8a6f3',
-  '#aa75ed',
-  '#904ce7',
-  '#8032e4',
-  '#7825e3',
-  '#6619ca',
-  '#5b14b5',
-  '#4e0da0',
-]
-
-const theme = createTheme({
-  colors: {
-    purple: brandColor,
-    primary: virtualColor({
-      name: 'primary',
-      dark: 'blue',
-      light: 'blue',
-    }),
-  },
-  primaryColor: 'blue',
-  breakpoints,
 })
 
 const UiProviders = ({ children }: { children: React.ReactNode }) => {

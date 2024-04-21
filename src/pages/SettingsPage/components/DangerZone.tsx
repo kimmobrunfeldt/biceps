@@ -43,7 +43,7 @@ export function DangerZone() {
         Danger zone
       </Title>
 
-      <Blockquote color="red" icon={<IconAlertTriangle />} p="lg">
+      <Blockquote color="red" icon={<IconAlertTriangle />} p="lg" maw={650}>
         Be careful! The following actions need to be handled with care.
       </Blockquote>
 

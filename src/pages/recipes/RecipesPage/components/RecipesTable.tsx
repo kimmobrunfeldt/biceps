@@ -1,4 +1,5 @@
 import { BoxProps, Flex, Table, Text } from '@mantine/core'
+import { NutritionCircle } from 'src/components/NutritionCircle'
 import { ProductImage } from 'src/components/ProductImage'
 import { RecipeResolved } from 'src/db/schemas/RecipeSchema'
 import { calculateTotals } from 'src/pages/recipes/AddRecipePage/components/RecipeItemsTable'
@@ -18,7 +19,10 @@ export function RecipesTable({ recipes }: Props) {
       <Table.Tr key={index}>
         <Table.Td>
           <Flex align="center" gap="sm">
-            <ProductImage product={recipe.recipeItems[0]?.product} />
+            <Flex gap={4}>
+              <NutritionCircle nutrition={values} variant="icon" />
+              <ProductImage product={recipe.recipeItems[0]?.product} />
+            </Flex>
             <Link to={formatRoute(routes.recipes.edit.path, { id: recipe.id })}>
               <Text>{recipe.name}</Text>
             </Link>

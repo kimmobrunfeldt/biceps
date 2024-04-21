@@ -69,6 +69,7 @@ export function ProfileSettings() {
           render={({ field }) => (
             <TextInput
               {...field}
+              maw={300}
               label="Your name"
               placeholder="Name"
               error={errors.name?.message}

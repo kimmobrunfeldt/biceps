@@ -39,11 +39,12 @@ export function ProductsTable({
           {showRemove ? (
             <Tooltip label="Remove product">
               <ActionIcon
+                variant="light"
                 aria-label="Remove"
                 radius="lg"
                 size="sm"
-                color="red"
                 onClick={onRemove?.bind(null, product)}
+                color="red"
               >
                 <IconX height="70%" />
               </ActionIcon>

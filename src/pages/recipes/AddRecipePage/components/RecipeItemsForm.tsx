@@ -1,18 +1,16 @@
-import { Box, Flex, Paper, Text } from '@mantine/core'
+import { Box, Flex, Text } from '@mantine/core'
 import { IconInfoCircle } from '@tabler/icons-react'
-import convert, { Unit } from 'convert'
 import {
   Control,
   UseFormSetValue,
   useFieldArray,
   useWatch,
 } from 'react-hook-form'
+import { PaperContainer } from 'src/components/PaperContainer'
 import { RecipeItemResolvedBeforeSaving } from 'src/db/schemas/RecipeItemSchema'
 import { ProductSearch } from 'src/pages/recipes/AddRecipePage/components/ProductSearch'
 import { RecipeFormFields } from 'src/pages/recipes/AddRecipePage/components/RecipeForm'
 import { RecipeItemsTable } from 'src/pages/recipes/AddRecipePage/components/RecipeItemsTable'
-import { Product } from 'src/utils/foodApi'
-import classes from './RecipeItemsForm.module.css'
 
 type Props = {
   control: Control<RecipeFormFields>
@@ -39,13 +37,13 @@ export function RecipeItemsForm({ control, setValue }: Props) {
   }
 
   return (
-    <Paper px="md" pt="lg" pb="xl" radius="md" className={classes.table}>
+    <PaperContainer>
       <Flex direction="column">
         <Box w="100%" maw={380} mb="sm" style={{ alignSelf: 'flex-start' }}>
-          <ProductSearch onProductSelect={(p) => append(productToItem(p))} />
+          <ProductSearch onSelect={(recipeItem) => append(recipeItem)} />
         </Box>
 
-        <Paper py="lg" radius="md" className={classes.table}>
+        <Box py="lg">
           <RecipeItemsTable
             recipeItems={recipeItems}
             editable
@@ -58,40 +56,8 @@ export function RecipeItemsForm({ control, setValue }: Props) {
               <Text c="gray">Add items by searching products</Text>
             </Flex>
           ) : null}
-        </Paper>
+        </Box>
       </Flex>
-    </Paper>
+    </PaperContainer>
   )
-}
-
-function productToItem(product: Product): RecipeItemResolvedBeforeSaving {
-  return {
-    __type: 'RecipeItem',
-    weightGrams: toGrams(
-      product.product_quantity,
-      product.product_quantity_unit ?? 'g'
-    ),
-    product: {
-      __type: 'Product',
-      id: product.id,
-      name: product.product_name,
-      kcal: product.nutriments['energy-kcal_100g'],
-      fatTotal: product.nutriments.fat_100g,
-      fatSaturated: product.nutriments['saturated-fat_100g'],
-      carbsTotal: product.nutriments.carbohydrates_100g,
-      carbsSugar: product.nutriments.sugars_100g,
-      protein: product.nutriments.proteins_100g,
-      salt: product.nutriments.salt_100g,
-      imageThumbUrl: product.image_thumb_url,
-      imageUrl: product.image_url,
-    },
-  }
-}
-
-function toGrams(quantity: number, unit: string) {
-  try {
-    return convert(quantity, unit as Unit).to('g')
-  } catch (err) {
-    return 0
-  }
 }

@@ -1,10 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Box, Button, Code, TextInput } from '@mantine/core'
+import { Box, Button, Flex, Text, TextInput } from '@mantine/core'
 import { useCallback, useState } from 'react'
-import { Controller, useForm } from 'react-hook-form'
+import { Controller, useForm, useWatch } from 'react-hook-form'
+import { NutritionCircle } from 'src/components/NutritionCircle'
 import { RecipeItemResolvedBeforeSavingSchema } from 'src/db/schemas/RecipeItemSchema'
 import { RecipeResolvedBeforeSavingSchema } from 'src/db/schemas/RecipeSchema'
 import { RecipeItemsForm } from 'src/pages/recipes/AddRecipePage/components/RecipeItemsForm'
+import { calculateTotals } from 'src/pages/recipes/AddRecipePage/components/RecipeItemsTable'
 import { z } from 'zod'
 
 const RecipeFormSchema = z.object({
@@ -40,6 +42,12 @@ export function RecipeForm({ initialData, onSubmit: inputOnSubmit }: Props) {
       recipeItems: initialData?.recipeItems ?? [],
     },
     resolver: zodResolver(RecipeFormSchema),
+  })
+
+  const recipeItems = useWatch({
+    control,
+    name: 'recipeItems',
+    defaultValue: [],
   })
 
   console.log('values', getValues())
@@ -84,20 +92,25 @@ export function RecipeForm({ initialData, onSubmit: inputOnSubmit }: Props) {
         <RecipeItemsForm control={control} setValue={setValue} />
       </Box>
 
-      {Object.keys(errors).length > 0 ? (
-        <Box>
-          <Code bg="red.0" block>
-            {JSON.stringify(errors, null, 2)}
-          </Code>
-        </Box>
-      ) : null}
-      <Button
-        type="submit"
-        disabled={!isDirty || isSubmitting}
-        loading={isSubmitting}
-      >
-        {initialData ? 'Save recipe' : 'Add recipe'}
-      </Button>
+      <Flex maw={200}>
+        <Flex direction="column" align="center">
+          <Text mb={-5} c="gray">
+            Macros
+          </Text>
+          <NutritionCircle
+            nutrition={calculateTotals(recipeItems)}
+            variant="large"
+          />
+          <Button
+            mt="sm"
+            type="submit"
+            disabled={!isDirty || isSubmitting}
+            loading={isSubmitting}
+          >
+            {initialData ? 'Save recipe' : 'Add recipe'}
+          </Button>
+        </Flex>
+      </Flex>
     </form>
   )
 }

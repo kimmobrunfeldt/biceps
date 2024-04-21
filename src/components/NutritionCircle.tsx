@@ -1,6 +1,7 @@
 import { Center, RingProgress } from '@mantine/core'
 import { IconToolsKitchen2 } from '@tabler/icons-react'
 import { NutritionPer100Grams } from 'src/db/schemas/common'
+import { formatGrams } from 'src/utils/format'
 import { calculateMacros, getColor, getLabel } from 'src/utils/nutrition'
 
 type Props = {
@@ -16,7 +17,7 @@ export function NutritionCircle({ nutrition, variant }: Props) {
     return {
       value,
       color: getColor(key),
-      tooltip: `${value}g ${getLabel(key).toLocaleLowerCase()} per 100g (${Math.round(value)}%)`,
+      tooltip: `${formatGrams(value)}g ${getLabel(key).toLocaleLowerCase()} per 100g (${Math.round(value)}%)`,
     }
   })
 
