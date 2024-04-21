@@ -1,4 +1,4 @@
-const breakpoints = rquire('./src/breakpoints.json');
+const breakpoints = require('./src/breakpoints.json');
 
 module.exports = {
   plugins: {
