@@ -18,6 +18,7 @@ import { z } from 'zod'
 const {
   find,
   findMany,
+  maybeFind,
   insert,
   update,
   remove,
@@ -36,6 +37,7 @@ export {
   find,
   findMany,
   insert,
+  maybeFind,
   remove,
   removeAll,
   update,

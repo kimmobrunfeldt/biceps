@@ -72,11 +72,11 @@ export function ProductForm({
     defaultValues: {
       name: initialData?.name ?? '',
       kcal: initialData?.kcal ?? 0,
+      protein: initialData?.protein ?? 0,
       fatTotal: initialData?.fatTotal ?? 0,
       fatSaturated: initialData?.fatSaturated ?? 0,
       carbsTotal: initialData?.carbsTotal ?? 0,
       carbsSugar: initialData?.carbsSugar ?? 0,
-      protein: initialData?.protein ?? 0,
       salt: initialData?.salt ?? 0,
     },
     resolver: zodResolver(ProductFormSchema),
@@ -103,11 +103,11 @@ export function ProductForm({
   )
 
   const keys = [
+    'protein',
     'fatTotal',
     'fatSaturated',
     'carbsTotal',
     'carbsSugar',
-    'protein',
     'salt',
   ] as const
   const gramFields = keys.map((key) => ({

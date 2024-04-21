@@ -3,6 +3,7 @@ import { IconExternalLink, IconPlus } from '@tabler/icons-react'
 import { PageTemplate } from 'src/components/PageTemplate'
 import { PaperContainer } from 'src/components/PaperContainer'
 import { Query } from 'src/components/Query'
+import { TableSkeleton } from 'src/components/TableSkeleton'
 import { useGetAllRecipes } from 'src/hooks/useDatabase'
 import { RecipesTable } from 'src/pages/recipes/RecipesPage/components/RecipesTable'
 import { routes } from 'src/routes'
@@ -20,7 +21,7 @@ export function RecipesPage() {
         </Link>
       }
     >
-      <Blockquote my="lg" maw={900} p="lg">
+      <Blockquote my="lg" maw={900} p="lg" radius="md">
         <Text c="gray">
           Recipe can be a snack, single meal, or food prepping batch that serves
           multiple meals. Product search is powered by{' '}
@@ -41,7 +42,7 @@ export function RecipesPage() {
       </Blockquote>
 
       <PaperContainer>
-        <Query result={recipesResult}>
+        <Query result={recipesResult} whenLoading={<TableSkeleton />}>
           {(recipes) => {
             return <RecipesTable recipes={recipes} onRemove={() => undefined} />
           }}

@@ -18,6 +18,7 @@ const queryNames = {
   getAllCustomProducts: 'getAllCustomProducts',
   useCustomProductSearch: 'useCustomProductSearch',
   getAllExternalProducts: 'getAllExternalProducts',
+  getProduct: (id: string) => `getProduct-${id}`,
 }
 
 /**
@@ -198,19 +199,41 @@ export function useLazyGetRecipesByProductId() {
   }
 }
 
+export function useGetProduct(id: string) {
+  const ctx = useDB(DATABASE_NAME)
+  const loaders = useDataLoaders()
+
+  return useQuery({
+    queryKey: getCacheKey(ctx, queryNames.getProduct(id)),
+    queryFn: withQueryErrorHandling(queryNames.getProduct(id), async () => {
+      const product = await Product.maybeFind({
+        where: { id },
+        connection: ctx.db,
+      })
+      if (!product) return null
+      return await resolver({ row: product, connection: ctx.db, loaders })
+    }),
+  })
+}
+
 export function useUpsertProduct() {
   const ctx = useDB(DATABASE_NAME)
   const queryClient = useQueryClient()
 
   return {
-    upsertProduct: async (recipe: ProductResolvedBeforeSaving) => {
+    upsertProduct: async (product: ProductResolvedBeforeSaving) => {
       await Product.clientUpsert({
         connection: ctx.db,
-        object: recipe,
+        object: product,
         onConflict: ['id'],
       })
       queryClient.invalidateQueries({
-        queryKey: getCacheKeyToInvalidate(queryNames.getAllCustomProducts),
+        queryKey: _.compact([
+          getCacheKeyToInvalidate(queryNames.getAllCustomProducts),
+          product.id
+            ? getCacheKeyToInvalidate(queryNames.getProduct(product.id))
+            : undefined,
+        ]),
       })
     },
   }

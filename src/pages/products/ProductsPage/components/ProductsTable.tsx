@@ -3,7 +3,9 @@ import { IconX } from '@tabler/icons-react'
 import { NutritionCircle } from 'src/components/NutritionCircle'
 import { ProductImage } from 'src/components/ProductImage'
 import { ProductResolved } from 'src/db/schemas/ProductSchema'
+import { formatRoute, routes } from 'src/routes'
 import { formatGrams, formatKcal } from 'src/utils/format'
+import { Link } from 'wouter'
 
 type Props = {
   products: ProductResolved[]
@@ -25,7 +27,11 @@ export function ProductsTable({
               <NutritionCircle nutrition={product} variant="icon" />
               <ProductImage product={product} />
             </Flex>
-            <Text>{product.name}</Text>
+            <Link
+              to={formatRoute(routes.products.edit.path, { id: product.id })}
+            >
+              <Text>{product.name}</Text>
+            </Link>
           </Flex>
         </Table.Td>
         <Table.Td>{formatKcal(product.kcal)}</Table.Td>
@@ -63,7 +69,7 @@ export function ProductsTable({
       <Table>
         <Table.Thead>
           <Table.Tr>
-            <Table.Th miw={200}>Item</Table.Th>
+            <Table.Th miw={260}>Item</Table.Th>
             <Table.Th style={style}>Kcal (per 100g)</Table.Th>
             <Table.Th style={style}>Protein (per 100g)</Table.Th>
             <Table.Th style={style}>Fat (per 100g)</Table.Th>

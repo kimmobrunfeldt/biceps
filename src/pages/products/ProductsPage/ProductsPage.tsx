@@ -11,6 +11,7 @@ import { useCallback } from 'react'
 import { PageTemplate } from 'src/components/PageTemplate'
 import { PaperContainer } from 'src/components/PaperContainer'
 import { Query } from 'src/components/Query'
+import { TableSkeleton } from 'src/components/TableSkeleton'
 import { ProductResolved } from 'src/db/schemas/ProductSchema'
 import {
   useDeleteProduct,
@@ -83,7 +84,7 @@ export function ProductsPage() {
       }
     >
       <Box>
-        <Blockquote my="lg" maw={900} p="lg">
+        <Blockquote my="lg" maw={900} p="lg" radius="md">
           <Text>
             Product search is powered by{' '}
             <a
@@ -108,7 +109,11 @@ export function ProductsPage() {
           Products added automatically by Biceps app or manually by you.
         </Text>
         <PaperContainer>
-          <Query result={customProductsResult} whenEmpty={() => <NoProducts />}>
+          <Query
+            result={customProductsResult}
+            whenEmpty={() => <NoProducts />}
+            whenLoading={<TableSkeleton />}
+          >
             {(products) => {
               return (
                 <ProductsTable
@@ -131,6 +136,7 @@ export function ProductsPage() {
           <Query
             result={externalProductsResult}
             whenEmpty={() => <NoProducts />}
+            whenLoading={<TableSkeleton />}
           >
             {(products) => {
               return <ProductsTable products={products} />

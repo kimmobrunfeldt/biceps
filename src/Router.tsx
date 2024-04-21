@@ -4,6 +4,7 @@ import { SettingsPage } from 'src/pages/SettingsPage/SettingsPage'
 import { WeeklySchedulePage } from 'src/pages/WeeklySchedulePage/WeeklySchedulePage'
 import { NotFoundPage } from 'src/pages/errors/NotFoundPage'
 import { AddProductPage } from 'src/pages/products/AddProductPage/AddProductPage'
+import { EditProductPage } from 'src/pages/products/EditProductPage/EditProductPage'
 import { ProductsPage } from 'src/pages/products/ProductsPage/ProductsPage'
 import { AddRecipePage } from 'src/pages/recipes/AddRecipePage/AddRecipePage'
 import { EditRecipePage } from 'src/pages/recipes/EditRecipePage/EditRecipePage'
@@ -24,6 +25,9 @@ export function Router() {
 
         <Route path={routes.products.index.path} component={ProductsPage} />
         <Route path={routes.products.add.path} component={AddProductPage} />
+        <Route<{ id: string }> path={routes.products.edit.path}>
+          {(params) => <EditProductPage id={params.id} />}
+        </Route>
 
         <Route
           path={routes.weeklySchedule.index.path}

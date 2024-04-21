@@ -37,6 +37,10 @@ export const routes = {
       path: '/products/add',
       title: 'Add product',
     },
+    edit: {
+      path: '/products/edit/:id',
+      title: 'Edit product',
+    },
   },
   weeklySchedule: {
     index: {

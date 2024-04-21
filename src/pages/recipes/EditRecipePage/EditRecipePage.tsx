@@ -1,5 +1,5 @@
-import { Box } from '@mantine/core'
-import { IconAlertCircle } from '@tabler/icons-react'
+import { Box, Flex } from '@mantine/core'
+import { IconAlertCircle, IconChevronLeft } from '@tabler/icons-react'
 import { useCallback, useState } from 'react'
 import { PageTemplate } from 'src/components/PageTemplate'
 import { Query } from 'src/components/Query'
@@ -9,6 +9,8 @@ import {
   RecipeForm,
   RecipeFormFields,
 } from 'src/pages/recipes/AddRecipePage/components/RecipeForm'
+import { routes } from 'src/routes'
+import { Link } from 'wouter'
 
 type Props = {
   id: string
@@ -29,7 +31,7 @@ export function EditRecipePage({ id }: Props) {
           fn: async () => {
             await upsertRecipe(data)
           },
-          success: { message: `'${data.name}' saved`, color: 'green' },
+          success: { message: `Recipe '${data.name}' saved`, color: 'green' },
           error: (err) => ({
             message: `Saving failed: ${err.message}`,
             color: 'red',
@@ -44,7 +46,16 @@ export function EditRecipePage({ id }: Props) {
   )
 
   return (
-    <PageTemplate title="Edit recipe">
+    <PageTemplate
+      title="Edit recipe"
+      titleRightSection={
+        <Link to={routes.recipes.index.path}>
+          <Flex direction="row" align="center">
+            <IconChevronLeft /> Back to Recipes
+          </Flex>
+        </Link>
+      }
+    >
       <Query result={recipeResult} isEmpty={() => false}>
         {(recipe) => {
           if (!recipe) {
