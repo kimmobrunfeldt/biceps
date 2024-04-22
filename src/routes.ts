@@ -47,6 +47,10 @@ export const routes = {
       path: '/weekly-schedule',
       title: 'Weekly Schedule',
     },
+    add: {
+      path: '/weekly-schedule/add',
+      title: 'Add recurring event',
+    },
   },
   settings: {
     path: '/settings',

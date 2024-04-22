@@ -281,9 +281,10 @@ export function useUpsertRecurringEvent() {
     upsertRecurringEvent: async (
       recurringEvent: RecurringEventResolvedBeforeSaving
     ) => {
+      const { time, ...rest } = recurringEvent
       await RecurringEvent.clientUpsert({
         connection: ctx.db,
-        object: recurringEvent,
+        object: { ...rest, hour: time.hour, minute: time.minute },
         onConflict: ['id'],
       })
       queryClient.invalidateQueries({

@@ -8,6 +8,7 @@ import { ProductsPage } from 'src/pages/products/ProductsPage/ProductsPage'
 import { AddRecipePage } from 'src/pages/recipes/AddRecipePage/AddRecipePage'
 import { EditRecipePage } from 'src/pages/recipes/EditRecipePage/EditRecipePage'
 import { RecipesPage } from 'src/pages/recipes/RecipesPage/RecipesPage'
+import { AddRecurringEventPage } from 'src/pages/weeklySchedules/AddRecurringEventPage/AddRecurringEventPage'
 import { WeeklySchedulePage } from 'src/pages/weeklySchedules/WeeklySchedulePage/WeeklySchedulePage'
 import { routes } from 'src/routes'
 import { Route, Switch } from 'wouter'
@@ -32,6 +33,10 @@ export function Router() {
         <Route
           path={routes.weeklySchedule.index.path}
           component={WeeklySchedulePage}
+        />
+        <Route
+          path={routes.weeklySchedule.add.path}
+          component={AddRecurringEventPage}
         />
         <Route path={routes.settings.path} component={SettingsPage} />
 

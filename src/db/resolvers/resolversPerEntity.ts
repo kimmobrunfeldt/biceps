@@ -99,8 +99,13 @@ export async function recurringEventResolver({
   row: RecurringEventRow
 } & CommonResolverOptions): Promise<RecurringEventResolved> {
   const recipeRow = await loaders.recipesById.load(row.recipeToEatId)
+  const { hour, minute, ...rest } = row
   return {
-    ...row,
+    ...rest,
+    time: {
+      hour,
+      minute,
+    },
     recipeToEat: await recipeResolver({
       row: recipeRow,
       loaders,
