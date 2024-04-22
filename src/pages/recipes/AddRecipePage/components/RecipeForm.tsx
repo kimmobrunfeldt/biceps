@@ -1,5 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Box, Button, Flex, Text, TextInput } from '@mantine/core'
+import {
+  Box,
+  Button,
+  Flex,
+  NumberInput,
+  Stack,
+  Text,
+  TextInput,
+} from '@mantine/core'
 import { useCallback, useState } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import { NutritionCircle } from 'src/components/NutritionCircle'
@@ -8,10 +16,12 @@ import { RecipeResolvedBeforeSavingSchema } from 'src/db/schemas/RecipeSchema'
 import { RecipeItemsForm } from 'src/pages/recipes/AddRecipePage/components/RecipeItemsForm'
 import { calculateTotals } from 'src/pages/recipes/AddRecipePage/components/RecipeItemsTable'
 import { z } from 'zod'
+import classes from './RecipeForm.module.css'
 
 const RecipeFormSchema = z.object({
   id: RecipeResolvedBeforeSavingSchema.shape.id,
   name: RecipeResolvedBeforeSavingSchema.shape.name,
+  portions: RecipeResolvedBeforeSavingSchema.shape.portions,
   recipeItems: z.array(
     RecipeItemResolvedBeforeSavingSchema.merge(
       z.object({
@@ -39,6 +49,7 @@ export function RecipeForm({ initialData, onSubmit: inputOnSubmit }: Props) {
     defaultValues: {
       name: initialData?.name ?? '',
       recipeItems: initialData?.recipeItems ?? [],
+      portions: initialData?.portions ?? 1,
     },
     resolver: zodResolver(RecipeFormSchema),
   })
@@ -71,20 +82,40 @@ export function RecipeForm({ initialData, onSubmit: inputOnSubmit }: Props) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <Controller
-        name="name"
-        control={control}
-        render={({ field }) => (
-          <TextInput
-            {...field}
-            label="Recipe name"
-            placeholder="Name"
-            error={errors.name?.message}
-            disabled={isSubmitting}
-            maw={380}
-          />
-        )}
-      />
+      <Stack gap="sm">
+        <Controller
+          name="name"
+          control={control}
+          render={({ field }) => (
+            <TextInput
+              {...field}
+              label="Recipe name"
+              placeholder="Name"
+              error={errors.name?.message}
+              disabled={isSubmitting}
+              maw={380}
+            />
+          )}
+        />
+        <Controller
+          name="portions"
+          control={control}
+          render={({ field }) => (
+            <NumberInput
+              {...field}
+              className={classes.portionsInput}
+              label="Portions"
+              placeholder="Amount of portions"
+              description="How many portions does this recipe make? This will be used when planning weekly meal schedule."
+              allowNegative={false}
+              decimalScale={0}
+              error={errors.portions?.message}
+              disabled={isSubmitting}
+              maw={200}
+            />
+          )}
+        />
+      </Stack>
 
       <Box py="lg">
         <RecipeItemsForm control={control} setValue={setValue} />

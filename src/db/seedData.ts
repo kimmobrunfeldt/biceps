@@ -22,6 +22,7 @@ export async function upsertSeedData(connection: TXAsync) {
   })
   const { recipeId } = await upsertRecipe(connection, {
     name: 'My recipe',
+    portions: 1,
     recipeItems: [
       {
         __type: 'RecipeItem',

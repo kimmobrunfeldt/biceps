@@ -32,6 +32,7 @@ export function RecipesTable({ recipes }: Props) {
             </Link>
           </Flex>
         </Table.Td>
+        <Table.Td>{recipe.portions}</Table.Td>
         <Table.Td>{formatGrams(values.weightGrams)}</Table.Td>
         <Table.Td>{formatKcal(values.kcal)}</Table.Td>
         <Table.Td>{formatGrams(values.protein)}</Table.Td>
@@ -53,6 +54,7 @@ export function RecipesTable({ recipes }: Props) {
         <Table.Thead>
           <Table.Tr>
             <Table.Th miw={200}>Item</Table.Th>
+            <Table.Th style={style}>Portions</Table.Th>
             <Table.Th style={style}>Quantity (g)</Table.Th>
             <Table.Th style={style}>Kcal</Table.Th>
             <Table.Th style={style}>Protein (g)</Table.Th>

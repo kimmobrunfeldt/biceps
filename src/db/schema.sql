@@ -22,6 +22,7 @@ SELECT crsql_as_crr('products');
 CREATE TABLE recipes (
   id TEXT PRIMARY KEY NOT NULL,
   name TEXT,
+  portions INTEGER,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 SELECT crsql_as_crr('recipes');
