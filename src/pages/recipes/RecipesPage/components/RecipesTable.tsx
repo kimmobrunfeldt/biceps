@@ -10,11 +10,15 @@ import { Link } from 'wouter'
 type Props = {
   recipes: RecipeResolved[]
   onRemove: (index: number) => void
+  amountsPerPortion?: boolean
 }
 
-export function RecipesTable({ recipes }: Props) {
+export function RecipesTable({ recipes, amountsPerPortion = true }: Props) {
   const rows = recipes.map((recipe, index) => {
-    const values = calculateTotals(recipe.recipeItems)
+    const values = calculateTotals(recipe.recipeItems, {
+      amountsPerPortion,
+      portions: recipe.portions,
+    })
     return (
       <Table.Tr key={index}>
         <Table.Td>

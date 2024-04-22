@@ -1,5 +1,6 @@
-import { Blockquote, Button, Text } from '@mantine/core'
+import { Blockquote, Button, Flex, Switch, Text } from '@mantine/core'
 import { IconExternalLink, IconPlus } from '@tabler/icons-react'
+import { useState } from 'react'
 import { PageTemplate } from 'src/components/PageTemplate'
 import { PaperContainer } from 'src/components/PaperContainer'
 import { Query } from 'src/components/Query'
@@ -11,6 +12,7 @@ import { Link } from 'wouter'
 
 export function RecipesPage() {
   const recipesResult = useGetAllRecipes()
+  const [amountsPerPortion, setAmountsPerPortion] = useState(true)
 
   return (
     <PageTemplate
@@ -41,10 +43,27 @@ export function RecipesPage() {
         </Text>
       </Blockquote>
 
+      <Flex justify="flex-end" py="sm" px={4}>
+        <Switch
+          label="Amounts per portion"
+          checked={amountsPerPortion}
+          onChange={(event) =>
+            setAmountsPerPortion(event.currentTarget.checked)
+          }
+          labelPosition="left"
+        />
+      </Flex>
+
       <PaperContainer>
         <Query result={recipesResult} whenLoading={<TableSkeleton />}>
           {(recipes) => {
-            return <RecipesTable recipes={recipes} onRemove={() => undefined} />
+            return (
+              <RecipesTable
+                recipes={recipes}
+                onRemove={() => undefined}
+                amountsPerPortion={amountsPerPortion}
+              />
+            )
           }}
         </Query>
       </PaperContainer>

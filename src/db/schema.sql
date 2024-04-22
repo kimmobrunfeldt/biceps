@@ -63,7 +63,7 @@ CREATE TABLE recurring_events (
   hour INTEGER,
   minute INTEGER,
   recipe_to_eat_id TEXT,
-  percentage_to_eat REAL,
+  portions_to_eat REAL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 SELECT crsql_as_crr('recurring_events');

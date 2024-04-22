@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import { ProductResolvedBeforeSavingSchema } from 'src/db/schemas/ProductSchema'
 import {
-  NutritionPer100Grams,
+  Nutrition,
   isTotalCarbsGreaterOrEqualToSugars,
   isTotalFatGreaterOrEqualToSaturatedFat,
   isTotalLessOrEqualTo100Grams,
@@ -12,7 +12,7 @@ import {
 import { getLabel } from 'src/utils/nutrition'
 import { z } from 'zod'
 
-const ProductFormSchema = ProductResolvedBeforeSavingSchema.superRefine(
+export const ProductFormSchema = ProductResolvedBeforeSavingSchema.superRefine(
   (values, ctx) => {
     if (!isTotalLessOrEqualTo100Grams(values)) {
       const fields = [
@@ -56,7 +56,7 @@ export type ProductFormFields = z.infer<typeof ProductFormSchema>
 type Props = {
   initialData?: ProductFormFields
   onSubmit: (data: ProductFormFields) => void
-  onChange?: (data: NutritionPer100Grams) => void
+  onChange?: (data: Nutrition) => void
 }
 
 export function ProductForm({
@@ -188,7 +188,7 @@ export function ProductForm({
   )
 }
 
-function getNutritionValues(nutrition: Partial<NutritionPer100Grams>) {
+function getNutritionValues(nutrition: Partial<Nutrition>) {
   return {
     kcal: nutrition.kcal || 0, // Also convert '' to 0
     fatTotal: nutrition.fatTotal || 0,

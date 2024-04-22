@@ -1,12 +1,12 @@
 import { Center, RingProgress } from '@mantine/core'
 import { IconToolsKitchen2 } from '@tabler/icons-react'
-import { NutritionPer100Grams } from 'src/db/schemas/common'
+import { Nutrition } from 'src/db/schemas/common'
 import { formatGrams } from 'src/utils/format'
 import { calculateMacros, getColor, getLabel } from 'src/utils/nutrition'
 
 type Props = {
   variant: 'icon' | 'large'
-  nutrition: NutritionPer100Grams
+  nutrition: Nutrition
   weightGrams?: number
 }
 

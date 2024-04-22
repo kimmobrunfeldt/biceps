@@ -1,12 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Button, NumberInput, Select, Stack } from '@mantine/core'
+import { Button, Select, Stack } from '@mantine/core'
 import { useCallback, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { InputSkeleton } from 'src/components/InputSkeleton'
 import { Query } from 'src/components/Query'
 import { TimePicker } from 'src/components/TimePicker'
 import { RecurringEventResolvedBeforeSavingSchema } from 'src/db/schemas/RecurringEventSchema'
-import { NutritionPer100Grams } from 'src/db/schemas/common'
+import { Nutrition } from 'src/db/schemas/common'
 import { useGetAllRecipes } from 'src/hooks/useDatabase'
 import {
   WeekdayLongName,
@@ -17,7 +17,6 @@ import {
   weekdayNumberToLongName,
 } from 'src/utils/time'
 import { z } from 'zod'
-import classes from './RecurringEventForm.module.css'
 
 const RecurringEventFormSchema = RecurringEventResolvedBeforeSavingSchema
 export type RecurringEventFormFields = z.infer<typeof RecurringEventFormSchema>
@@ -25,7 +24,7 @@ export type RecurringEventFormFields = z.infer<typeof RecurringEventFormSchema>
 type Props = {
   initialData?: RecurringEventFormFields
   onSubmit: (data: RecurringEventFormFields) => void
-  onChange?: (data: NutritionPer100Grams) => void
+  onChange?: (data: Nutrition) => void
 }
 
 export function RecurringEventForm({
@@ -42,9 +41,9 @@ export function RecurringEventForm({
   } = useForm<RecurringEventFormFields>({
     defaultValues: {
       weekday: initialData?.weekday ?? 1,
-      time: initialData?.time ?? { hour: 0, minute: 0 },
+      time: initialData?.time ?? { hour: 12, minute: 0 },
       recipeToEatId: initialData?.recipeToEatId ?? '',
-      percentageToEat: initialData?.percentageToEat ?? 100,
+      portionsToEat: initialData?.portionsToEat ?? 1,
     },
     resolver: zodResolver(RecurringEventFormSchema),
   })
@@ -76,7 +75,7 @@ export function RecurringEventForm({
               placeholder="Weekday"
               error={errors.weekday?.message}
               disabled={isSubmitting}
-              maw={400}
+              maw={340}
               data={getWeekdayLongNames()}
               onChange={(value) =>
                 onChange(
@@ -110,7 +109,7 @@ export function RecurringEventForm({
 
         <Query
           result={recipesResult}
-          whenLoading={<InputSkeleton label="Recipe to eat" maw={400} />}
+          whenLoading={<InputSkeleton label="Recipe to eat" maw={340} />}
         >
           {(recipes) => (
             <Controller
@@ -123,7 +122,7 @@ export function RecurringEventForm({
                   placeholder="Select recipe"
                   error={errors.recipeToEatId?.message}
                   disabled={isSubmitting}
-                  maw={400}
+                  maw={340}
                   data={recipes.map((r) => ({ value: r.id, label: r.name }))}
                 />
               )}
@@ -132,20 +131,25 @@ export function RecurringEventForm({
         </Query>
 
         <Controller
-          name="percentageToEat"
+          name="portionsToEat"
           control={control}
-          render={({ field }) => (
-            <NumberInput
+          render={({ field: { value, onChange, ...field } }) => (
+            <Select
               {...field}
-              className={classes.percentageInput}
-              max={100}
-              label="How much of the recipe to eat? (%)"
-              placeholder="50 (%)"
-              description="When making a large batch of food, you can split it into multiple meals. For example if the recipe makes 4 meals, you can set this to 25% to eat 1 meal."
-              allowNegative={false}
-              error={errors.percentageToEat?.message}
+              label="How many portions?"
+              error={errors.portionsToEat?.message}
               disabled={isSubmitting}
-              maw={200}
+              maw={340}
+              value={convertPortionsToSelectValue(value)}
+              onChange={(value) =>
+                onChange(convertSelectValueToPortions(value ?? '1'))
+              }
+              data={[
+                { value: '1/2', label: '1/2 portion' },
+                { value: '1', label: '1 portion' },
+                { value: '1 1/2', label: '1 1/2 portions' },
+                { value: '2', label: '2 portions' },
+              ]}
             />
           )}
         />
@@ -161,4 +165,23 @@ export function RecurringEventForm({
       </Button>
     </form>
   )
+}
+
+const SELECTABLE_PORTIONS = [
+  { value: '1/2', label: '1/2 portion', numeric: 0.5 },
+  { value: '1', label: '1 portion', numeric: 1 },
+  { value: '1 1/2', label: '1 1/2 portions', numeric: 1.5 },
+  { value: '2', label: '2 portions', numeric: 2 },
+]
+
+function convertPortionsToSelectValue(portions: number): string {
+  const found = SELECTABLE_PORTIONS.find(
+    (p) => Math.abs(p.numeric - portions) < 0.005
+  )
+  return found?.value ?? '1'
+}
+
+function convertSelectValueToPortions(selectValue: string): number {
+  const found = SELECTABLE_PORTIONS.find((p) => p.value === selectValue)
+  return found?.numeric ?? 1
 }

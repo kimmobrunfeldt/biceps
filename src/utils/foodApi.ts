@@ -1,4 +1,10 @@
 import _ from 'lodash'
+import {
+  Nutrition,
+  isTotalCarbsGreaterOrEqualToSugars,
+  isTotalFatGreaterOrEqualToSaturatedFat,
+  isTotalLessOrEqualTo100Grams,
+} from 'src/db/schemas/common'
 import { ApiHttpError, fetchWrapper } from 'src/utils/fetch'
 import { isNotUndefined } from 'src/utils/typeUtils'
 import { z } from 'zod'
@@ -25,6 +31,53 @@ const ProductSchema = z
       .passthrough(),
   })
   .passthrough()
+
+const ProductRefinedSchema = ProductSchema.superRefine((values, ctx) => {
+  const nutrition: Nutrition = {
+    kcal: values.nutriments['energy-kcal_100g'],
+    fatTotal: values.nutriments.fat_100g,
+    fatSaturated: values.nutriments['saturated-fat_100g'],
+    carbsTotal: values.nutriments.carbohydrates_100g,
+    carbsSugar: values.nutriments.sugars_100g,
+    protein: values.nutriments.proteins_100g,
+    salt: values.nutriments.salt_100g,
+  }
+
+  if (!isTotalLessOrEqualTo100Grams(nutrition)) {
+    const fields = [
+      'fatTotal',
+      'fatSaturated',
+      'carbsTotal',
+      'carbsSugar',
+      'protein',
+      'salt',
+    ] as const
+    fields.forEach((field) => {
+      const value = Number.isFinite(nutrition[field]) ? nutrition[field] : 0
+      if (value > 0) {
+        ctx.addIssue({
+          code: 'custom',
+          path: [field],
+          message: 'Nutrition values per 100g add up to more than 100 grams',
+        })
+      }
+    })
+  } else if (!isTotalFatGreaterOrEqualToSaturatedFat(nutrition)) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['fatTotal'],
+      message: `Total fat must be greater than or equal to saturated fat (${nutrition.fatSaturated})`,
+    })
+  } else if (!isTotalCarbsGreaterOrEqualToSugars(nutrition)) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['carbsTotal'],
+      message: `Total carbs must be greater than or equal to sugar (${nutrition.carbsSugar})`,
+    })
+  }
+
+  return values
+})
 export type Product = z.infer<typeof ProductSchema>
 
 const SearchResponseSchema = z
@@ -46,22 +99,28 @@ const apiResponseMapping = {
         throw new Error('Invalid response')
       }
 
-      const validProducts = json.products
+      const validProducts: Product[] = json.products
         .map((product: any) => {
           try {
-            return ProductSchema.parse(product)
+            return ProductRefinedSchema.parse(product)
           } catch (e) {
-            console.error(
-              'Invalid product:',
+            console.log(
+              'Discarding invalid product from search results',
               _.pick(product, Object.keys(ProductSchema.shape))
             )
-            console.error(e)
+            console.log('Discarded due to error', e)
             return undefined
           }
         })
         .filter(isNotUndefined)
 
-      console.log('validProducts', validProducts)
+      console.log(
+        'Found',
+        validProducts.length,
+        'valid products',
+        validProducts.map((p) => _.pick(p, Object.keys(ProductSchema.shape)))
+      )
+      console.log('Full valid products', validProducts)
       return SearchResponseSchema.parse({
         ...json,
         products: validProducts,

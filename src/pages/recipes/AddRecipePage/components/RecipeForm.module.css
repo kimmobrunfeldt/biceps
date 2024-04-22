@@ -1,9 +1,9 @@
 .portionsInput {
   & label {
-    min-width: 400px;
+    min-width: 360px;
   }
 
   & p {
-    min-width: 400px;
+    min-width: 360px;
   }
 }

@@ -23,7 +23,7 @@ export const RecurringEventRowSchema = z
     hour: z.number().int().min(0).max(23),
     minute: z.number().int().min(0).max(59),
     recipeToEatId: IdSchema,
-    percentageToEat: z.number().int().min(0).max(100),
+    portionsToEat: z.number().min(0).max(100),
     createdAt: DateSchema,
   })
   .strict()

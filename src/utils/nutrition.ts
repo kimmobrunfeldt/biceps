@@ -1,5 +1,5 @@
 import { MantineColor } from '@mantine/core'
-import { NutritionPer100Grams } from 'src/db/schemas/common'
+import { Nutrition } from 'src/db/schemas/common'
 
 export const NUTRITION_CONSTANTS = {
   kcal: {
@@ -58,7 +58,9 @@ export type MacroDistribution = {
   protein: number
 }
 
-export function calculateMacros(nutrition: NutritionPer100Grams) {
+export function calculateMacros(
+  nutrition: Pick<Nutrition, 'kcal' | 'carbsTotal' | 'fatTotal' | 'protein'>
+) {
   return {
     weightGrams: 100,
     kcal: nutrition.kcal,

@@ -3,7 +3,7 @@ import { IconAlertCircle, IconChevronLeft } from '@tabler/icons-react'
 import { useCallback, useState } from 'react'
 import { NutritionCircle } from 'src/components/NutritionCircle'
 import { PageTemplate } from 'src/components/PageTemplate'
-import { NutritionPer100Grams } from 'src/db/schemas/common'
+import { Nutrition } from 'src/db/schemas/common'
 import { useUpsertProduct } from 'src/hooks/useDatabase'
 import { useNotifications } from 'src/hooks/useNotification'
 import {
@@ -19,7 +19,7 @@ export function AddProductPage() {
   const { withNotifications } = useNotifications()
   const [_location, setLocation] = useLocation()
   const { upsertProduct } = useUpsertProduct()
-  const [nutrition, setNutrition] = useState<NutritionPer100Grams>({
+  const [nutrition, setNutrition] = useState<Nutrition>({
     kcal: 0,
     fatTotal: 0,
     fatSaturated: 0,
@@ -56,7 +56,7 @@ export function AddProductPage() {
   )
 
   const onChange = useCallback(
-    (nutrition: NutritionPer100Grams) => {
+    (nutrition: Nutrition) => {
       setNutrition(nutrition)
     },
     [setNutrition]

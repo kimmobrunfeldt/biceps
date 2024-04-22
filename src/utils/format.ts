@@ -1,3 +1,4 @@
+import { formatQuantity } from 'format-quantity'
 import _ from 'lodash'
 
 export function formatKcal(value: number) {
@@ -15,4 +16,8 @@ export function removeUnnecessaryDecimals(numberAsStr: string): string {
 
   const withoutTrailingZeros = _.trimEnd(numberAsStr, '0')
   return _.trimEnd(withoutTrailingZeros, '.')
+}
+
+export function formatPortions(value: number) {
+  return formatQuantity(value)
 }

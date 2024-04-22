@@ -8,6 +8,7 @@ import {
   Text,
   TextInput,
 } from '@mantine/core'
+import _ from 'lodash'
 import { useCallback, useState } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import { NutritionCircle } from 'src/components/NutritionCircle'
@@ -54,6 +55,11 @@ export function RecipeForm({ initialData, onSubmit: inputOnSubmit }: Props) {
     resolver: zodResolver(RecipeFormSchema),
   })
 
+  const portions = useWatch({
+    control,
+    name: 'portions',
+    defaultValue: 1,
+  })
   const recipeItems = useWatch({
     control,
     name: 'recipeItems',
@@ -106,7 +112,7 @@ export function RecipeForm({ initialData, onSubmit: inputOnSubmit }: Props) {
               className={classes.portionsInput}
               label="Portions"
               placeholder="Amount of portions"
-              description="How many portions does this recipe make? This will be used when planning weekly meal schedule."
+              description="How many portions does this recipe yield? It will help in organizing the weekly schedule."
               allowNegative={false}
               decimalScale={0}
               error={errors.portions?.message}
@@ -123,13 +129,14 @@ export function RecipeForm({ initialData, onSubmit: inputOnSubmit }: Props) {
 
       <Flex maw={200}>
         <Flex direction="column" align="center">
-          <Text mb={-5} c="gray">
-            Macros
+          <Text mb={-5} c="gray" ta="center">
+            Macros <br />
+            per portion
           </Text>
           <NutritionCircle
-            nutrition={totals}
+            nutrition={_.mapValues(totals, (val) => val / portions)}
             variant="large"
-            weightGrams={totals.weightGrams}
+            weightGrams={totals.weightGrams / portions}
           />
           <Button
             mt="sm"

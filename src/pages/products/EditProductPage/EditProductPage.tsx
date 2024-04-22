@@ -5,7 +5,7 @@ import { EditProductSkeleton } from 'src/components/EditProductSkeleton'
 import { NutritionCircle } from 'src/components/NutritionCircle'
 import { PageTemplate } from 'src/components/PageTemplate'
 import { Query } from 'src/components/Query'
-import { NutritionPer100Grams } from 'src/db/schemas/common'
+import { Nutrition } from 'src/db/schemas/common'
 import { useGetProduct, useUpsertProduct } from 'src/hooks/useDatabase'
 import { useNotifications } from 'src/hooks/useNotification'
 import {
@@ -23,7 +23,7 @@ export function EditProductPage({ id }: Props) {
   const { withNotifications } = useNotifications()
   const { upsertProduct } = useUpsertProduct()
   const result = useGetProduct(id)
-  const [nutrition, setNutrition] = useState<NutritionPer100Grams>({
+  const [nutrition, setNutrition] = useState<Nutrition>({
     kcal: 0,
     fatTotal: 0,
     fatSaturated: 0,
@@ -58,7 +58,7 @@ export function EditProductPage({ id }: Props) {
   )
 
   const onChange = useCallback(
-    (nutrition: NutritionPer100Grams) => {
+    (nutrition: Nutrition) => {
       setNutrition(nutrition)
     },
     [setNutrition]

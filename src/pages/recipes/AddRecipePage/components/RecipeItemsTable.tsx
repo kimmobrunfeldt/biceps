@@ -9,6 +9,7 @@ import {
   Tooltip,
 } from '@mantine/core'
 import { IconX } from '@tabler/icons-react'
+import _ from 'lodash'
 import { ProductImage } from 'src/components/ProductImage'
 import { RecipeItemResolvedBeforeSaving } from 'src/db/schemas/RecipeItemSchema'
 import { formatGrams, formatKcal } from 'src/utils/format'
@@ -133,8 +134,14 @@ export function calculateNutrition(
   return valuePer100Grams * (weightGrams / 100)
 }
 
-export function calculateTotals(recipeItems: RecipeItemResolvedBeforeSaving[]) {
-  return recipeItems.reduce(
+export function calculateTotals(
+  recipeItems: RecipeItemResolvedBeforeSaving[],
+  {
+    amountsPerPortion = true,
+    portions = 1,
+  }: { amountsPerPortion?: boolean; portions?: number } = {}
+) {
+  const totals = recipeItems.reduce(
     (acc, recipeItem) => {
       const values = calculateValuesForItem(recipeItem)
       return {
@@ -159,6 +166,8 @@ export function calculateTotals(recipeItems: RecipeItemResolvedBeforeSaving[]) {
       salt: 0,
     }
   )
+  const divisor = amountsPerPortion ? portions : 1
+  return _.mapValues(totals, (val) => val / divisor)
 }
 
 export function calculateValuesForItem(
