@@ -1,10 +1,10 @@
-import { returnByReferenceIds } from 'src/db/dataLoaders'
+import { returnOneByReferenceIds } from 'src/db/dataLoaders'
 
 describe('dataLoaders', () => {
-  describe('returnByReferenceIds', () => {
+  describe('returnOneByReferenceIds', () => {
     test('sorts by id by default', () => {
       const ids = ['1', '3', '2']
-      const sorted = returnByReferenceIds(ids, [
+      const sorted = returnOneByReferenceIds(ids, [
         { id: '3' },
         { id: '2' },
         { id: '1' },
@@ -14,7 +14,7 @@ describe('dataLoaders', () => {
 
     test('allows custom picker function', () => {
       const locationIds = ['1', '4', '2']
-      const sorted = returnByReferenceIds(
+      const sorted = returnOneByReferenceIds(
         locationIds,
         [
           { id: '3', locationId: '1' },
@@ -32,7 +32,7 @@ describe('dataLoaders', () => {
 
     test('duplicates items when same id is requested', () => {
       const locationIds = ['1', '1', '4', '1', '2']
-      const sorted = returnByReferenceIds(
+      const sorted = returnOneByReferenceIds(
         locationIds,
         [
           { id: '3', locationId: '1' },
@@ -52,7 +52,7 @@ describe('dataLoaders', () => {
 
     test('returns Error when given id not found', () => {
       const locationIds = ['1', '1', '4', '1', '2']
-      const sorted = returnByReferenceIds(
+      const sorted = returnOneByReferenceIds(
         locationIds,
         [
           { id: '2', locationId: '2' },
