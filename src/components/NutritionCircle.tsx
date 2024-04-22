@@ -16,16 +16,20 @@ export function NutritionCircle({
   weightGrams = 100,
 }: Props) {
   const macros = calculateMacros(nutrition)
-
-  const sections = macros.keys.map((key) => {
-    const value = macros.macroDistribution[key]
-    const percentage = (value / weightGrams) * 100
-    return {
-      value: percentage,
-      color: getColor(key),
-      tooltip: `${formatGrams(value)}g ${getLabel(key).toLocaleLowerCase()} per ${weightGrams}g (${Math.round(percentage)}%)`,
-    }
-  })
+  const allZero = Object.values(macros.macroDistribution).every(
+    (value) => value === 0
+  )
+  const sections = allZero
+    ? []
+    : macros.keys.map((key) => {
+        const value = macros.macroDistribution[key]
+        const percentage = (value / weightGrams) * 100
+        return {
+          value: percentage,
+          color: getColor(key),
+          tooltip: `${formatGrams(value)}g ${getLabel(key).toLocaleLowerCase()} per ${weightGrams}g (${Math.round(percentage)}%)`,
+        }
+      })
 
   const large = (
     <RingProgress
@@ -40,6 +44,5 @@ export function NutritionCircle({
     />
   )
   const icon = <RingProgress size={36} thickness={8} sections={sections} />
-
   return variant === 'icon' ? icon : large
 }

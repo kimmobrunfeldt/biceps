@@ -7,6 +7,7 @@ import {
   Product,
   Recipe,
   RecipeItem,
+  allEntities,
 } from 'src/db/entities'
 import { is } from 'src/db/interface/entityMethods'
 
@@ -27,9 +28,9 @@ export function createLoaders(connection: TXAsync) {
           connection,
           recipeIds,
         })
-        return groupAndSortByReference(
-          recipeItems,
+        return returnManyByReferenceIds(
           recipeIds,
+          recipeItems,
           (item) => item.recipeId
         )
       },
@@ -40,7 +41,10 @@ export function createLoaders(connection: TXAsync) {
   }
 }
 
-function createSimpleLoader<T extends AnyDatabaseEntity>({
+function createSimpleLoader<
+  // App state does not have .id field
+  T extends Exclude<AnyDatabaseEntity, typeof allEntities.AppState>,
+>({
   entity: Entity,
   connection,
 }: {
@@ -52,37 +56,56 @@ function createSimpleLoader<T extends AnyDatabaseEntity>({
       connection,
       where: { id: is('IN', ids) },
     })
-    if (ids.length !== entities.length) {
+
+    const results = returnOneByReferenceIds(
+      ids,
+      entities as readonly { id: string; [key: string]: any }[],
+      (entity) => entity.id
+    )
+    if (ids.length !== results.length) {
+      console.error('Expected to find all entities with IDs', ids)
+      console.error('Found the following entities', entities)
+      console.error('Got the following results', results)
       throw new Error('Not all entities were found in the database')
     }
-    // @ts-expect-error Wasn't able to make TS happy
-    const sorted = sortByReference(entities, ids, (entity) => entity.id)
-    return sorted
+    return results
   }
   // Cast to any because https://github.com/graphql/dataloader/pull/248/
   return new DataLoader(loaderFn as any, DEFAULT_DATALOADER_OPTIONS)
 }
 
-export function sortByReference<T extends { [key: string]: any }>(
+export function returnOneByReferenceIds<T extends { [key: string]: any }>(
+  referenceIds: readonly string[],
   collection: readonly T[],
-  referenceValues: readonly string[],
   picker: (val: T) => T[keyof T] = (item) => item.id as T[keyof T]
-): T[] {
-  const sortedCollection = _.sortBy(collection, (item) => {
-    return referenceValues.indexOf(picker(item))
+): (T | Error)[] {
+  const grouped = _.groupBy(collection, picker)
+  Object.keys(grouped).forEach((key) => {
+    if (grouped[key].length > 1) {
+      console.error(collection, grouped)
+      throw new Error('Duplicate items found in collection')
+    }
   })
-  return sortedCollection
+
+  const results = referenceIds.map((id) => {
+    return grouped[id]
+      ? grouped[id][0]
+      : new Error(`Entity not found with id '${id}'`)
+  })
+  return results
 }
 
-export function groupAndSortByReference<T extends { [key: string]: any }>(
+export function returnManyByReferenceIds<T extends { [key: string]: any }>(
+  referenceIds: readonly string[],
   collection: readonly T[],
-  referenceValues: readonly string[],
   picker: (val: T) => T[keyof T] = (item) => item.id as T[keyof T]
-): T[][] {
+): (T[] | Error)[] {
   const grouped = _.groupBy(collection, picker)
-  const groupedAndSortedCollection = referenceValues.map((item) => {
-    const result = grouped[item]
-    return result ? result : []
+
+  const results = referenceIds.map((id) => {
+    return grouped[id]
+      ? grouped[id]
+      : new Error(`Entity not found with id '${id}'`)
   })
-  return groupedAndSortedCollection
+  return results
 }

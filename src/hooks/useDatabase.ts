@@ -1,6 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { CtxAsync, useDB } from '@vlcn.io/react'
-import _ from 'lodash'
 import { APP_STATE_KEY, DATABASE_NAME, INDEXEDDB_NAME } from 'src/constants'
 import { createRecipe, upsertRecipe } from 'src/core/recipeCore'
 import {
@@ -99,14 +98,16 @@ export function useUpsertRecipe() {
   return {
     upsertRecipe: async (recipe: RecipeResolvedBeforeSaving) => {
       await upsertRecipe(ctx.db, recipe)
+
       queryClient.invalidateQueries({
-        queryKey: _.compact([
-          getCacheKeyToInvalidate(queryNames.getAllRecipes),
-          recipe.id
-            ? getCacheKeyToInvalidate(queryNames.getRecipe(recipe.id))
-            : undefined,
-        ]),
+        queryKey: getCacheKeyToInvalidate(queryNames.getAllRecipes),
       })
+
+      if (recipe.id) {
+        queryClient.invalidateQueries({
+          queryKey: getCacheKeyToInvalidate(queryNames.getRecipe(recipe.id)),
+        })
+      }
     },
   }
 }
@@ -238,13 +239,17 @@ export function useUpsertProduct() {
         onConflict: ['id'],
       })
       queryClient.invalidateQueries({
-        queryKey: _.compact([
-          getCacheKeyToInvalidate(queryNames.getAllCustomProducts),
-          product.id
-            ? getCacheKeyToInvalidate(queryNames.getProduct(product.id))
-            : undefined,
-        ]),
+        queryKey: getCacheKeyToInvalidate(queryNames.getAllCustomProducts),
       })
+      queryClient.invalidateQueries({
+        queryKey: getCacheKeyToInvalidate(queryNames.getAllExternalProducts),
+      })
+
+      if (product.id) {
+        queryClient.invalidateQueries({
+          queryKey: getCacheKeyToInvalidate(queryNames.getProduct(product.id)),
+        })
+      }
     },
   }
 }
@@ -264,10 +269,13 @@ export function useDeleteProduct() {
         where: { productId },
       })
       queryClient.invalidateQueries({
-        queryKey: [
-          getCacheKeyToInvalidate(queryNames.getAllCustomProducts),
-          getCacheKeyToInvalidate(queryNames.getProduct(productId)),
-        ],
+        queryKey: getCacheKeyToInvalidate(queryNames.getAllCustomProducts),
+      })
+      queryClient.invalidateQueries({
+        queryKey: getCacheKeyToInvalidate(queryNames.getAllExternalProducts),
+      })
+      queryClient.invalidateQueries({
+        queryKey: getCacheKeyToInvalidate(queryNames.getProduct(productId)),
       })
     },
   }
@@ -288,15 +296,16 @@ export function useUpsertRecurringEvent() {
         onConflict: ['id'],
       })
       queryClient.invalidateQueries({
-        queryKey: _.compact([
-          getCacheKeyToInvalidate(queryNames.getAllRecurringEvents),
-          recurringEvent.id
-            ? getCacheKeyToInvalidate(
-                queryNames.getRecurringEvent(recurringEvent.id)
-              )
-            : undefined,
-        ]),
+        queryKey: getCacheKeyToInvalidate(queryNames.getAllRecurringEvents),
       })
+
+      if (recurringEvent.id) {
+        queryClient.invalidateQueries({
+          queryKey: getCacheKeyToInvalidate(
+            queryNames.getRecurringEvent(recurringEvent.id)
+          ),
+        })
+      }
     },
   }
 }

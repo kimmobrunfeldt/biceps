@@ -21,7 +21,22 @@ export function WeeklySchedulePage() {
         </Link>
       }
     >
-      <Query result={recurringEventsResult}>
+      <Query
+        result={recurringEventsResult}
+        whenEmpty={() => (
+          <Box>
+            {weekdays.map((weekday) => {
+              return (
+                <DaySchedule
+                  key={weekday}
+                  weekday={weekday}
+                  recurringEvents={[]}
+                />
+              )
+            })}
+          </Box>
+        )}
+      >
         {(recurringEvents) => {
           const recurringEventsByWeekday = weekdays.map((weekday) => {
             return recurringEvents.filter((e) => e.weekday === weekday)
