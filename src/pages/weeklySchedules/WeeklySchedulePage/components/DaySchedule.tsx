@@ -1,5 +1,4 @@
 import { Box, Flex, Text, Title } from '@mantine/core'
-import _ from 'lodash'
 import pluralize from 'pluralize'
 import { NutritionCircle } from 'src/components/NutritionCircle'
 import {
@@ -9,7 +8,7 @@ import {
 import { Nutrition } from 'src/db/schemas/common'
 import { calculateTotals } from 'src/pages/recipes/AddRecipePage/components/RecipeItemsTable'
 import { formatRoute, routes } from 'src/routes'
-import { formatPortions } from 'src/utils/format'
+import { formatGrams, formatKcal, formatPortions } from 'src/utils/format'
 import { formatTime, weekdayNumberToLongName } from 'src/utils/time'
 import { Link } from 'wouter'
 
@@ -19,13 +18,6 @@ type Props = {
 }
 
 export function DaySchedule({ weekday, recurringEvents }: Props) {
-  const totalKcal = _.sum(
-    recurringEvents.map((event) => {
-      const recipeTotals = calculateTotals(event.recipeToEat.recipeItems)
-      return recipeTotals.kcal
-    })
-  )
-
   const nutritionsPerDay = recurringEvents.reduce(
     (acc, event) => {
       const portionTotals = calculateTotals(event.recipeToEat.recipeItems, {
@@ -60,7 +52,8 @@ export function DaySchedule({ weekday, recurringEvents }: Props) {
 
         <Title order={2}>{weekdayNumberToLongName(weekday)}</Title>
         <Text style={{ position: 'relative', top: '2px' }}>
-          {totalKcal} kcal
+          {formatKcal(nutritionsPerDay.kcal)} kcal,{' '}
+          {formatGrams(nutritionsPerDay.protein)}g protein
         </Text>
       </Flex>
 

@@ -1,5 +1,6 @@
 import { Center, RingProgress } from '@mantine/core'
 import { IconToolsKitchen2 } from '@tabler/icons-react'
+import _ from 'lodash'
 import { Nutrition } from 'src/db/schemas/common'
 import { formatGrams } from 'src/utils/format'
 import { calculateMacros, getColor, getLabel } from 'src/utils/nutrition'
@@ -19,7 +20,7 @@ export function NutritionCircle({
   const allZero = Object.values(macros.macroDistribution).every(
     (value) => value === 0
   )
-  const sections = allZero
+  const macroSections = allZero
     ? []
     : macros.keys.map((key) => {
         const value = macros.macroDistribution[key]
@@ -30,6 +31,17 @@ export function NutritionCircle({
           tooltip: `${formatGrams(value)}g ${getLabel(key).toLocaleLowerCase()} per ${weightGrams}g (${Math.round(percentage)}%)`,
         }
       })
+
+  const total = _.sum(macroSections.map((s) => s.value))
+  const rest = 100 - total
+  const sections = [
+    ...macroSections,
+    {
+      value: rest,
+      color: 'gray',
+      tooltip: 'Nutrition macros distribution',
+    },
+  ]
 
   const large = (
     <RingProgress

@@ -1,6 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { CtxAsync, useDB } from '@vlcn.io/react'
-import { APP_STATE_KEY, DATABASE_NAME, INDEXEDDB_NAME } from 'src/constants'
+import { APP_STATE_KEY, INDEXEDDB_NAME } from 'src/constants'
 import { createRecipe, upsertRecipe } from 'src/core/recipeCore'
 import {
   AppState,
@@ -17,6 +16,7 @@ import { ProductResolvedBeforeSaving } from 'src/db/schemas/ProductSchema'
 import { RecipeResolvedBeforeSaving } from 'src/db/schemas/RecipeSchema'
 import { RecurringEventResolvedBeforeSaving } from 'src/db/schemas/RecurringEventSchema'
 import { useDataLoaders } from 'src/hooks/useDataLoaders'
+import { DatabaseContext, useSqlite } from 'src/hooks/useSqlite'
 
 const queryNames = {
   getAppState: 'getAppState',
@@ -35,7 +35,7 @@ const queryNames = {
  */
 const SQL_QUERY_CACHE_KEY = 'sqlQuery'
 
-function getCacheKey(ctx: CtxAsync, key: string): string[] {
+function getCacheKey(ctx: DatabaseContext, key: string): string[] {
   return [SQL_QUERY_CACHE_KEY, key, ctx.db.siteid]
 }
 
@@ -59,7 +59,7 @@ function withQueryErrorHandling<T extends (...args: any[]) => Promise<any>>(
 }
 
 export function useGetAllRecipes() {
-  const ctx = useDB(DATABASE_NAME)
+  const ctx = useSqlite()
   const loaders = useDataLoaders()
 
   return useQuery({
@@ -75,7 +75,7 @@ export function useGetAllRecipes() {
 }
 
 export function useGetRecipe(id: string) {
-  const ctx = useDB(DATABASE_NAME)
+  const ctx = useSqlite()
   const loaders = useDataLoaders()
 
   return useQuery({
@@ -92,7 +92,7 @@ export function useGetRecipe(id: string) {
 }
 
 export function useUpsertRecipe() {
-  const ctx = useDB(DATABASE_NAME)
+  const ctx = useSqlite()
   const queryClient = useQueryClient()
 
   return {
@@ -113,7 +113,7 @@ export function useUpsertRecipe() {
 }
 
 export function useCreateRecipe() {
-  const ctx = useDB(DATABASE_NAME)
+  const ctx = useSqlite()
   const queryClient = useQueryClient()
 
   return {
@@ -127,7 +127,7 @@ export function useCreateRecipe() {
 }
 
 export function useGetAllCustomProducts() {
-  const ctx = useDB(DATABASE_NAME)
+  const ctx = useSqlite()
   const loaders = useDataLoaders()
 
   return useQuery({
@@ -150,7 +150,7 @@ export function useCustomProductSearch({
 }: {
   searchTerms: string
 }) {
-  const ctx = useDB(DATABASE_NAME)
+  const ctx = useSqlite()
   const loaders = useDataLoaders()
 
   return useQuery({
@@ -175,7 +175,7 @@ export function useCustomProductSearch({
 }
 
 export function useGetAllExternalProducts() {
-  const ctx = useDB(DATABASE_NAME)
+  const ctx = useSqlite()
   const loaders = useDataLoaders()
 
   return useQuery({
@@ -194,7 +194,7 @@ export function useGetAllExternalProducts() {
 }
 
 export function useLazyGetRecipesByProductId() {
-  const ctx = useDB(DATABASE_NAME)
+  const ctx = useSqlite()
   const loaders = useDataLoaders()
 
   return {
@@ -211,7 +211,7 @@ export function useLazyGetRecipesByProductId() {
 }
 
 export function useGetProduct(id: string) {
-  const ctx = useDB(DATABASE_NAME)
+  const ctx = useSqlite()
   const loaders = useDataLoaders()
 
   return useQuery({
@@ -228,7 +228,7 @@ export function useGetProduct(id: string) {
 }
 
 export function useUpsertProduct() {
-  const ctx = useDB(DATABASE_NAME)
+  const ctx = useSqlite()
   const queryClient = useQueryClient()
 
   return {
@@ -255,7 +255,7 @@ export function useUpsertProduct() {
 }
 
 export function useDeleteProduct() {
-  const ctx = useDB(DATABASE_NAME)
+  const ctx = useSqlite()
   const queryClient = useQueryClient()
 
   return {
@@ -282,7 +282,7 @@ export function useDeleteProduct() {
 }
 
 export function useUpsertRecurringEvent() {
-  const ctx = useDB(DATABASE_NAME)
+  const ctx = useSqlite()
   const queryClient = useQueryClient()
 
   return {
@@ -311,7 +311,7 @@ export function useUpsertRecurringEvent() {
 }
 
 export function useGetAllRecurringEvents() {
-  const ctx = useDB(DATABASE_NAME)
+  const ctx = useSqlite()
   const loaders = useDataLoaders()
 
   return useQuery({
@@ -330,7 +330,7 @@ export function useGetAllRecurringEvents() {
 }
 
 export function useDeleteAllData() {
-  const ctx = useDB(DATABASE_NAME)
+  const ctx = useSqlite()
   const queryClient = useQueryClient()
 
   return {
@@ -343,7 +343,7 @@ export function useDeleteAllData() {
 }
 
 export function useGetAppState() {
-  const ctx = useDB(DATABASE_NAME)
+  const ctx = useSqlite()
   const loaders = useDataLoaders()
 
   return useQuery({
@@ -364,7 +364,7 @@ export function useGetAppState() {
 }
 
 export function useUpdatePerson() {
-  const ctx = useDB(DATABASE_NAME)
+  const ctx = useSqlite()
   const queryClient = useQueryClient()
 
   return {

@@ -2,6 +2,7 @@ import { Flex } from '@mantine/core'
 import { IconAlertCircle, IconChevronLeft } from '@tabler/icons-react'
 import { useCallback, useState } from 'react'
 import { PageTemplate } from 'src/components/PageTemplate'
+import { NBSP } from 'src/constants'
 import { useUpsertRecurringEvent } from 'src/hooks/useDatabase'
 import { useNotifications } from 'src/hooks/useNotification'
 import {
@@ -49,11 +50,12 @@ export function AddRecurringEventPage() {
 
   return (
     <PageTemplate
-      title="Add recurring event"
+      title="Add meal"
+      description="Meal can be a breakfast, lunch, dinner, or a snack."
       titleRightSection={
         <Link to={routes.weeklySchedule.index.path}>
           <Flex direction="row" align="center">
-            <IconChevronLeft /> Back to Weekly Schedule
+            <IconChevronLeft /> Back to Weekly{NBSP}Schedule
           </Flex>
         </Link>
       }

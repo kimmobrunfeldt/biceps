@@ -19,9 +19,9 @@ export function PageTemplate({
   return (
     <Box className={classes.container} {...rest}>
       <Box pb="md">
-        <PageTitleBar title={title} rightSection={titleRightSection} />
+        <PageTitleBar title={title} rightSection={titleRightSection} mb="sm" />
         {description ? (
-          <Text c="gray" mb="xl">
+          <Text c="gray" mb="xl" maw={600}>
             {description}
           </Text>
         ) : null}

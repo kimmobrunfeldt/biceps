@@ -15,10 +15,10 @@ export function WeeklySchedulePage() {
   return (
     <PageTemplate
       title="Weekly Schedule"
-      description="This is your plan for the week. Add schedules to make sure your meals are balanced."
+      description="Here's your weekly meal schedule. Planning all meals beforehand makes it easier to hit your nutrition goals."
       titleRightSection={
         <Link to={routes.weeklySchedule.add.path}>
-          <Button leftSection={<IconPlus size={14} />}>Add schedule</Button>
+          <Button leftSection={<IconPlus size={14} />}>Add meal</Button>
         </Link>
       }
     >

@@ -8,18 +8,22 @@ import { MantineProvider } from '@mantine/core'
 import { ModalsProvider } from '@mantine/modals'
 import { Notifications } from '@mantine/notifications'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { DBProvider, useDB } from '@vlcn.io/react'
+import initWasm, { DB, SQLite3 } from '@vlcn.io/crsqlite-wasm'
+import wasmUrl from '@vlcn.io/crsqlite-wasm/crsqlite.wasm?url'
+import tblrx from '@vlcn.io/rx-tbl'
+import { wdbRtc } from '@vlcn.io/sync-p2p'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { Router } from 'src/Router'
 import { DATABASE_NAME } from 'src/constants'
 import { createLoaders } from 'src/db/dataLoaders'
-import schemaContent from 'src/db/schema.sql?raw'
 import { upsertSeedData } from 'src/db/seedData'
 import { DataLoaderContext } from 'src/hooks/useDataLoaders'
+import { DatabaseContext } from 'src/hooks/useSqlite'
 import { runMigrations } from 'src/migrations'
 import { EmergencyFallbackPage } from 'src/pages/errors/EmergencyFallbackPage'
 import { theme } from 'src/theme'
+import { stringify as uuidStringify } from 'uuid'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -44,41 +48,86 @@ const UiProviders = ({ children }: { children: React.ReactNode }) => {
   )
 }
 
-async function main() {
-  try {
-    await runMigrations()
-  } catch (err) {
-    console.error('Error running migrations:', err)
-  }
+const ROOT_ELEMENT = document.getElementById('root')!
 
-  await ReactDOM.createRoot(document.getElementById('root')!).render(
-    <React.StrictMode>
-      <DBProvider
-        dbname={DATABASE_NAME}
-        schema={{
-          name: DATABASE_NAME,
-          content: schemaContent,
-        }}
-        manualSetup={async (ctx) => {
-          await upsertSeedData(ctx.db)
-        }}
-        fallback={
-          <UiProviders>
-            <EmergencyFallbackPage />
-          </UiProviders>
-        }
-        Render={() => {
-          const ctx = useDB(DATABASE_NAME)
-          const dataLoaders = ctx ? createLoaders(ctx.db) : undefined
-          return (
-            <DataLoaderContext.Provider value={dataLoaders}>
-              <UiProviders>{ctx ? <Router /> : null}</UiProviders>
-            </DataLoaderContext.Provider>
-          )
-        }}
-      />
-    </React.StrictMode>
-  )
+// TODO: This setup doesn't seem to work correctly with vite refreshing
+async function main() {
+  const crsqlite = await initWasm(() => wasmUrl)
+
+  // In case the initialization fails, we'll close the DB connection.
+  // This should close the IndexedDB connection so that in case emergency fallback page
+  // data deletion is needed, the IndexedDB connection is not locked.
+  await withConnectionCloseOnError(crsqlite, async (db) => {
+    console.log('Connected to database:', db)
+
+    // TODO: Move initial schema here
+    await runMigrations()
+    await upsertSeedData(db)
+
+    // Copied from https://github.com/vlcn-io/live-examples/blob/main/src/todomvc-p2p/main.tsx
+    const row = await db.execA('SELECT crsql_site_id()')
+    const siteid = uuidStringify(row[0][0])
+
+    const rx = await tblrx(db)
+    const rtc = await wdbRtc(
+      db,
+      // If you want to run local peerjs server:
+      // window.location.hostname === "localhost"
+      //   ? {
+      //       host: "localhost",
+      //       port: 9000,
+      //       path: "/examples",
+      //     }
+      // : undefined
+      undefined
+    )
+
+    const dataLoaders = createLoaders(db)
+
+    ReactDOM.createRoot(ROOT_ELEMENT).render(
+      <React.StrictMode>
+        <DatabaseContext.Provider value={{ db, siteid, rtc, rx }}>
+          <DataLoaderContext.Provider value={dataLoaders}>
+            <UiProviders>
+              <Router />
+            </UiProviders>
+          </DataLoaderContext.Provider>
+        </DatabaseContext.Provider>
+      </React.StrictMode>
+    )
+  })
 }
 
-void main()
+async function withConnectionCloseOnError(
+  crsqlite: SQLite3,
+  callback: (db: DB) => Promise<void>
+) {
+  let db: DB | undefined
+  try {
+    db = await crsqlite.open(DATABASE_NAME)
+    await callback(db)
+  } catch (err) {
+    if (db) {
+      await closeAndIgnoreErrors(db)
+    }
+  }
+}
+
+async function closeAndIgnoreErrors(db: DB) {
+  try {
+    await db.close()
+  } catch (err) {
+    console.error('Error closing database:', err)
+    console.log('Ignoring error and continuing ...')
+  }
+}
+
+void main().catch(async (err) => {
+  console.error('Error initializing app:', err)
+
+  ReactDOM.createRoot(ROOT_ELEMENT).render(
+    <UiProviders>
+      <EmergencyFallbackPage />
+    </UiProviders>
+  )
+})
