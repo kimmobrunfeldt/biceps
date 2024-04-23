@@ -14,6 +14,7 @@ import tblrx from '@vlcn.io/rx-tbl'
 import { wdbRtc } from '@vlcn.io/sync-p2p'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import { ErrorBoundary } from 'react-error-boundary'
 import { Router } from 'src/Router'
 import { DATABASE_NAME } from 'src/constants'
 import { createLoaders } from 'src/db/dataLoaders'
@@ -60,8 +61,7 @@ async function main() {
   await withConnectionCloseOnError(crsqlite, async (db) => {
     console.log('Connected to database:', db)
 
-    // TODO: Move initial schema here
-    await runMigrations()
+    await runMigrations(db)
     await upsertSeedData(db)
 
     // Copied from https://github.com/vlcn-io/live-examples/blob/main/src/todomvc-p2p/main.tsx
@@ -85,15 +85,23 @@ async function main() {
     const dataLoaders = createLoaders(db)
 
     ReactDOM.createRoot(ROOT_ELEMENT).render(
-      <React.StrictMode>
-        <DatabaseContext.Provider value={{ db, siteid, rtc, rx }}>
-          <DataLoaderContext.Provider value={dataLoaders}>
-            <UiProviders>
-              <Router />
-            </UiProviders>
-          </DataLoaderContext.Provider>
-        </DatabaseContext.Provider>
-      </React.StrictMode>
+      <ErrorBoundary
+        fallback={
+          <UiProviders>
+            <EmergencyFallbackPage />
+          </UiProviders>
+        }
+      >
+        <React.StrictMode>
+          <DatabaseContext.Provider value={{ db, siteid, rtc, rx }}>
+            <DataLoaderContext.Provider value={dataLoaders}>
+              <UiProviders>
+                <Router />
+              </UiProviders>
+            </DataLoaderContext.Provider>
+          </DatabaseContext.Provider>
+        </React.StrictMode>
+      </ErrorBoundary>
     )
   })
 }
@@ -110,6 +118,7 @@ async function withConnectionCloseOnError(
     if (db) {
       await closeAndIgnoreErrors(db)
     }
+    throw err
   }
 }
 

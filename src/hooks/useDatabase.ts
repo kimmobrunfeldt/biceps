@@ -1,4 +1,9 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import {
+  keepPreviousData,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query'
+import { useCallback, useState } from 'react'
 import { APP_STATE_KEY, INDEXEDDB_NAME } from 'src/constants'
 import { createRecipe, upsertRecipe } from 'src/core/recipeCore'
 import {
@@ -129,13 +134,32 @@ export function useCreateRecipe() {
 export function useGetAllCustomProducts() {
   const ctx = useSqlite()
   const loaders = useDataLoaders()
+  const [lastUpdatedAt, setLastUpdatedAt] = useState<Date>(new Date())
+
+  const onUpdate = useCallback(
+    (updates: unknown[]) => {
+      console.log('update to products', updates)
+      setLastUpdatedAt(new Date())
+    },
+    [setLastUpdatedAt]
+  )
+
+  // TODO: Handle disposer
+  const disposer = ctx.rx.onRange(['products'], onUpdate)
 
   return useQuery({
-    queryKey: getCacheKey(ctx, queryNames.getAllCustomProducts),
+    placeholderData: keepPreviousData,
+    queryKey: [
+      ...getCacheKey(ctx, queryNames.getAllCustomProducts),
+      lastUpdatedAt.toISOString(),
+    ],
     queryFn: withQueryErrorHandling(
       queryNames.getAllCustomProducts,
       async () => {
-        const rows = await Product.findManyCustom({ connection: ctx.db })
+        const rows = await Product.findManyCustom({
+          connection: ctx.db,
+          orderBy: ['createdAt', 'desc'],
+        })
         const products = await Promise.all(
           rows.map((row) => resolver({ row, connection: ctx.db, loaders }))
         )
@@ -345,9 +369,24 @@ export function useDeleteAllData() {
 export function useGetAppState() {
   const ctx = useSqlite()
   const loaders = useDataLoaders()
+  const [lastUpdatedAt, setLastUpdatedAt] = useState<Date>(new Date())
+
+  const onUpdate = useCallback(
+    (updates: unknown[]) => {
+      console.log('update to app_state', updates)
+      setLastUpdatedAt(new Date())
+    },
+    [setLastUpdatedAt]
+  )
+
+  // TODO: Handle disposer
+  const disposer = ctx.rx.onRange(['app_state'], onUpdate)
 
   return useQuery({
-    queryKey: getCacheKey(ctx, queryNames.getAppState),
+    queryKey: [
+      ...getCacheKey(ctx, queryNames.getAppState),
+      lastUpdatedAt.toISOString(),
+    ],
     queryFn: withQueryErrorHandling(queryNames.getAppState, async () => {
       const appState = await AppState.find({
         connection: ctx.db,

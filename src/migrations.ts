@@ -1,5 +1,4 @@
-import initWasm from '@vlcn.io/crsqlite-wasm'
-import wasmUrl from '@vlcn.io/crsqlite-wasm/crsqlite.wasm?url'
+import { DB } from '@vlcn.io/crsqlite-wasm'
 import { TXAsync } from '@vlcn.io/xplat-api'
 import sql from 'sql-template-tag'
 import { DATABASE_NAME } from 'src/constants'
@@ -7,11 +6,8 @@ import { createDatabaseMethods } from 'src/db/interface/databaseMethods'
 import schemaContent from 'src/db/schema.sql?raw'
 import { z } from 'zod'
 
-export async function runMigrations() {
+export async function runMigrations(db: DB) {
   console.log('Running migrations ...')
-  const crsqlite = await initWasm(() => wasmUrl)
-  const db = await crsqlite.open(DATABASE_NAME)
-  console.log('Connected to database:', db)
 
   const exists = await doesMigrationTableExist(db)
   if (!exists) {

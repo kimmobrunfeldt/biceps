@@ -32,6 +32,7 @@ export default function Peers() {
       >
         Connect
       </a>
+      Pending
       <ul className="pending">
         {pending.map((p) => (
           <li key={p} id={p}>
@@ -39,6 +40,7 @@ export default function Peers() {
           </li>
         ))}
       </ul>
+      Established
       <ul className="established">
         {established.map((p) => (
           <li key={p} id={p}>

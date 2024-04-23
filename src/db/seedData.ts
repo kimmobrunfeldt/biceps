@@ -4,11 +4,11 @@ import { upsertRecipe } from 'src/core/recipeCore'
 import { AppState, Person, PersonRecipe } from 'src/db/entities'
 
 export async function upsertSeedData(connection: TXAsync) {
-  const maybePerson = await Person.maybeFind({
+  console.log('Upserting seed data')
+  const persons = await Person.findMany({
     connection,
-    where: { name: 'John Doe' },
   })
-  if (maybePerson) {
+  if (persons.length > 0) {
     console.log('Seed data already exists')
     return
   }
