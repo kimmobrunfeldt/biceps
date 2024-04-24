@@ -3,7 +3,6 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query'
-import { useCallback, useState } from 'react'
 import { APP_STATE_KEY, INDEXEDDB_NAME } from 'src/constants'
 import { createRecipe, upsertRecipe } from 'src/core/recipeCore'
 import {
@@ -21,7 +20,11 @@ import { ProductResolvedBeforeSaving } from 'src/db/schemas/ProductSchema'
 import { RecipeResolvedBeforeSaving } from 'src/db/schemas/RecipeSchema'
 import { RecurringEventResolvedBeforeSaving } from 'src/db/schemas/RecurringEventSchema'
 import { useDataLoaders } from 'src/hooks/useDataLoaders'
-import { DatabaseContext, useSqlite } from 'src/hooks/useSqlite'
+import {
+  DatabaseContext,
+  useSqlite,
+  useTableLastUpdatedAt,
+} from 'src/hooks/useSqlite'
 
 const queryNames = {
   getAppState: 'getAppState',
@@ -66,9 +69,10 @@ function withQueryErrorHandling<T extends (...args: any[]) => Promise<any>>(
 export function useGetAllRecipes() {
   const ctx = useSqlite()
   const loaders = useDataLoaders()
+  const lastUpdatedAt = useTableLastUpdatedAt(['products'])
 
   return useQuery({
-    queryKey: getCacheKey(ctx, queryNames.getAllRecipes),
+    queryKey: [...getCacheKey(ctx, queryNames.getAllRecipes), lastUpdatedAt],
     queryFn: withQueryErrorHandling(queryNames.getAllRecipes, async () => {
       const recipeRows = await Recipe.findMany({ connection: ctx.db })
       const recipes = await Promise.all(
@@ -82,9 +86,10 @@ export function useGetAllRecipes() {
 export function useGetRecipe(id: string) {
   const ctx = useSqlite()
   const loaders = useDataLoaders()
+  const lastUpdatedAt = useTableLastUpdatedAt(['recipes'])
 
   return useQuery({
-    queryKey: getCacheKey(ctx, queryNames.getRecipe(id)),
+    queryKey: [...getCacheKey(ctx, queryNames.getRecipe(id)), lastUpdatedAt],
     queryFn: withQueryErrorHandling(queryNames.getRecipe(id), async () => {
       const recipe = await Recipe.maybeFind({
         where: { id },
@@ -134,24 +139,13 @@ export function useCreateRecipe() {
 export function useGetAllCustomProducts() {
   const ctx = useSqlite()
   const loaders = useDataLoaders()
-  const [lastUpdatedAt, setLastUpdatedAt] = useState<Date>(new Date())
-
-  const onUpdate = useCallback(
-    (updates: unknown[]) => {
-      console.log('update to products', updates)
-      setLastUpdatedAt(new Date())
-    },
-    [setLastUpdatedAt]
-  )
-
-  // TODO: Handle disposer
-  const disposer = ctx.rx.onRange(['products'], onUpdate)
+  const lastUpdatedAt = useTableLastUpdatedAt(['products'])
 
   return useQuery({
     placeholderData: keepPreviousData,
     queryKey: [
       ...getCacheKey(ctx, queryNames.getAllCustomProducts),
-      lastUpdatedAt.toISOString(),
+      lastUpdatedAt,
     ],
     queryFn: withQueryErrorHandling(
       queryNames.getAllCustomProducts,
@@ -176,6 +170,7 @@ export function useCustomProductSearch({
 }) {
   const ctx = useSqlite()
   const loaders = useDataLoaders()
+  // Don't use table reactivity here as it could potentially make searching UX confusing
 
   return useQuery({
     queryKey: [
@@ -201,9 +196,13 @@ export function useCustomProductSearch({
 export function useGetAllExternalProducts() {
   const ctx = useSqlite()
   const loaders = useDataLoaders()
+  const lastUpdatedAt = useTableLastUpdatedAt(['products'])
 
   return useQuery({
-    queryKey: getCacheKey(ctx, queryNames.getAllExternalProducts),
+    queryKey: [
+      ...getCacheKey(ctx, queryNames.getAllExternalProducts),
+      lastUpdatedAt,
+    ],
     queryFn: withQueryErrorHandling(
       queryNames.getAllExternalProducts,
       async () => {
@@ -237,9 +236,10 @@ export function useLazyGetRecipesByProductId() {
 export function useGetProduct(id: string) {
   const ctx = useSqlite()
   const loaders = useDataLoaders()
+  const lastUpdatedAt = useTableLastUpdatedAt(['products'])
 
   return useQuery({
-    queryKey: getCacheKey(ctx, queryNames.getProduct(id)),
+    queryKey: [...getCacheKey(ctx, queryNames.getProduct(id)), lastUpdatedAt],
     queryFn: withQueryErrorHandling(queryNames.getProduct(id), async () => {
       const product = await Product.maybeFind({
         where: { id },
@@ -337,9 +337,13 @@ export function useUpsertRecurringEvent() {
 export function useGetAllRecurringEvents() {
   const ctx = useSqlite()
   const loaders = useDataLoaders()
+  const lastUpdatedAt = useTableLastUpdatedAt(['recurring_events'])
 
   return useQuery({
-    queryKey: getCacheKey(ctx, queryNames.getAllRecurringEvents),
+    queryKey: [
+      ...getCacheKey(ctx, queryNames.getAllRecurringEvents),
+      lastUpdatedAt,
+    ],
     queryFn: withQueryErrorHandling(
       queryNames.getAllRecurringEvents,
       async () => {
@@ -369,24 +373,10 @@ export function useDeleteAllData() {
 export function useGetAppState() {
   const ctx = useSqlite()
   const loaders = useDataLoaders()
-  const [lastUpdatedAt, setLastUpdatedAt] = useState<Date>(new Date())
-
-  const onUpdate = useCallback(
-    (updates: unknown[]) => {
-      console.log('update to app_state', updates)
-      setLastUpdatedAt(new Date())
-    },
-    [setLastUpdatedAt]
-  )
-
-  // TODO: Handle disposer
-  const disposer = ctx.rx.onRange(['app_state'], onUpdate)
+  const lastUpdatedAt = useTableLastUpdatedAt(['app_state'])
 
   return useQuery({
-    queryKey: [
-      ...getCacheKey(ctx, queryNames.getAppState),
-      lastUpdatedAt.toISOString(),
-    ],
+    queryKey: [...getCacheKey(ctx, queryNames.getAppState), lastUpdatedAt],
     queryFn: withQueryErrorHandling(queryNames.getAppState, async () => {
       const appState = await AppState.find({
         connection: ctx.db,
