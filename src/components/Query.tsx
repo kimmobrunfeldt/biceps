@@ -26,7 +26,6 @@ export function Query<T>({
   whenEmpty = () => <Text>No results found</Text>,
   whenLoading = <Loader size="sm" />,
 }: Props<T>): JSX.Element {
-  console.log('result', result.data)
   const showSpinner = useSpinDelay(isLoading(result), {
     delay: loaderDelayMs,
     minDuration: 500,

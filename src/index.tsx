@@ -24,6 +24,7 @@ import { DatabaseContext } from 'src/hooks/useSqlite'
 import { runMigrations } from 'src/migrations'
 import { EmergencyFallbackPage } from 'src/pages/errors/EmergencyFallbackPage'
 import { theme } from 'src/theme'
+import { getLogger } from 'src/utils/logger'
 import { stringify as uuidStringify } from 'uuid'
 
 const queryClient = new QueryClient({
@@ -51,6 +52,8 @@ const UiProviders = ({ children }: { children: React.ReactNode }) => {
 
 const ROOT_ELEMENT = document.getElementById('root')!
 
+const logger = getLogger('main')
+
 // TODO: This setup doesn't seem to work correctly with vite refreshing
 async function main() {
   const crsqlite = await initWasm(() => wasmUrl)
@@ -59,7 +62,7 @@ async function main() {
   // This should close the IndexedDB connection so that in case emergency fallback page
   // data deletion is needed, the IndexedDB connection is not locked.
   await withConnectionCloseOnError(crsqlite, async (db) => {
-    console.log('Connected to database:', db)
+    logger.info('Connected to database:', db)
 
     await runMigrations(db)
     await upsertSeedData(db)
@@ -126,13 +129,13 @@ async function closeAndIgnoreErrors(db: DB) {
   try {
     await db.close()
   } catch (err) {
-    console.error('Error closing database:', err)
-    console.log('Ignoring error and continuing ...')
+    logger.error('Error closing database:', err)
+    logger.info('Ignoring error and continuing ...')
   }
 }
 
 void main().catch(async (err) => {
-  console.error('Error initializing app:', err)
+  logger.error('Error initializing app:', err)
 
   ReactDOM.createRoot(ROOT_ELEMENT).render(
     <UiProviders>

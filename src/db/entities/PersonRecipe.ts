@@ -6,6 +6,7 @@ import {
 
 const { find, findMany, insert, upsert, clientUpsert, removeAll } = makeUtils({
   tableName: 'person_recipes',
+  name: 'PersonRecipe',
   beforeDatabaseSchema: PersonRecipeBeforeDatabaseSchema,
   schema: PersonRecipeRowSchema,
 })

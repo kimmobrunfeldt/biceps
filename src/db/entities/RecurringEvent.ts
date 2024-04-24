@@ -16,6 +16,7 @@ const {
   removeAll,
 } = makeUtils({
   tableName: 'recurring_events',
+  name: 'RecurringEvent',
   beforeDatabaseSchema: RecurringEventBeforeDatabaseSchema,
   schema: RecurringEventRowSchema,
 })

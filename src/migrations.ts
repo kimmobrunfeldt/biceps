@@ -4,19 +4,22 @@ import sql from 'sql-template-tag'
 import { DATABASE_NAME } from 'src/constants'
 import { createDatabaseMethods } from 'src/db/interface/databaseMethods'
 import schemaContent from 'src/db/schema.sql?raw'
+import { getLogger } from 'src/utils/logger'
 import { z } from 'zod'
 
+const logger = getLogger('db:migrations')
+
 export async function runMigrations(db: DB) {
-  console.log('Running migrations ...')
+  logger.info('Running migrations ...')
 
   const exists = await doesMigrationTableExist(db)
   if (!exists) {
-    console.log(
+    logger.info(
       'Migrations table does not exist, this must be a new database..'
     )
-    console.log('Applying schema with auto-migration ...')
+    logger.info('Applying schema with auto-migration ...')
     await db.automigrateTo(DATABASE_NAME, schemaContent)
-    console.log('Auto-migration applied')
+    logger.info('Auto-migration applied')
 
     if (migrations.length > 0) {
       // We can assume that when applying latest schema.sql, the previous migrations
@@ -27,7 +30,7 @@ export async function runMigrations(db: DB) {
   }
 
   if (migrations.length === 0) {
-    console.log('No migrations defined. Database is up to date.')
+    logger.info('No migrations defined. Database is up to date.')
     return
   }
 
@@ -35,14 +38,14 @@ export async function runMigrations(db: DB) {
   const migrateStartingFromVersion = latestMigrationVersion + 1
 
   if (migrateStartingFromVersion > migrations.length - 1) {
-    console.log(
+    logger.info(
       `Migration version ${migrations.length - 1} (latest) already applied. Database is up to date.`
     )
     return
   }
 
   for (let i = migrateStartingFromVersion; i < migrations.length; ++i) {
-    console.log('Applying migration', i, '...')
+    logger.info('Applying migration', i, '...')
     const migration = migrations[i]
     await db.tx(async (tx) => {
       await migration.up(tx)
@@ -50,7 +53,7 @@ export async function runMigrations(db: DB) {
     })
   }
 
-  console.log('Migrations done!')
+  logger.info('Migrations done!')
 }
 
 async function getMigrationVersion(connection: TXAsync) {
@@ -73,7 +76,7 @@ async function markMigrationDone(connection: TXAsync, version: number) {
   await connection.execO(`INSERT INTO migrations (version) VALUES (?)`, [
     version,
   ])
-  console.log('Marking migration', version, 'done')
+  logger.info('Marking migration', version, 'done')
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

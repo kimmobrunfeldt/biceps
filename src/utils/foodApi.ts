@@ -6,8 +6,11 @@ import {
   isTotalLessOrEqualTo100Grams,
 } from 'src/db/schemas/common'
 import { ApiHttpError, fetchWrapper } from 'src/utils/fetch'
+import { getLogger } from 'src/utils/logger'
 import { isNotUndefined } from 'src/utils/typeUtils'
 import { z } from 'zod'
+
+const logger = getLogger('foodApi')
 
 const ProductSchema = z
   .object({
@@ -104,23 +107,23 @@ const apiResponseMapping = {
           try {
             return ProductRefinedSchema.parse(product)
           } catch (e) {
-            console.log(
+            logger.debug(
               'Discarding invalid product from search results',
               _.pick(product, Object.keys(ProductSchema.shape))
             )
-            console.log('Discarded due to error', e)
+            logger.debug('Discarded due to error', e)
             return undefined
           }
         })
         .filter(isNotUndefined)
 
-      console.log(
+      logger.debug(
         'Found',
         validProducts.length,
         'valid products',
         validProducts.map((p) => _.pick(p, Object.keys(ProductSchema.shape)))
       )
-      console.log('Full valid products', validProducts)
+      logger.debug('Full valid products', validProducts)
       return SearchResponseSchema.parse({
         ...json,
         products: validProducts,

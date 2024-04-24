@@ -18,6 +18,7 @@ const {
   createDatabaseMethodsWithTransform,
 } = makeUtils({
   tableName: 'recipe_items',
+  name: 'RecipeItem',
   beforeDatabaseSchema: RecipeItemBeforeDatabaseSchema,
   schema: RecipeItemRowSchema,
 })

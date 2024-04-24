@@ -9,7 +9,6 @@ export default function Peers() {
 
   useEffect(() => {
     const cleanup = ctx.rtc.onConnectionsChanged((pending, established) => {
-      console.log('conns changes')
       setPending(pending)
       setEstablished(established)
     })

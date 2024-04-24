@@ -2,14 +2,17 @@ import { TXAsync } from '@vlcn.io/xplat-api'
 import { APP_STATE_KEY } from 'src/constants'
 import { upsertRecipe } from 'src/core/recipeCore'
 import { AppState, Person, PersonRecipe } from 'src/db/entities'
+import { getLogger } from 'src/utils/logger'
+
+const logger = getLogger('db:seedData')
 
 export async function upsertSeedData(connection: TXAsync) {
-  console.log('Upserting seed data')
+  logger.info('Upserting seed data')
   const persons = await Person.findMany({
     connection,
   })
   if (persons.length > 0) {
-    console.log('Seed data already exists')
+    logger.info('Seed data already exists')
     return
   }
 

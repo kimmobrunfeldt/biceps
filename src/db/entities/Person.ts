@@ -16,6 +16,7 @@ const {
   removeAll,
 } = makeUtils({
   tableName: 'persons',
+  name: 'Person',
   beforeDatabaseSchema: PersonBeforeDatabaseSchema,
   schema: PersonRowSchema,
 })

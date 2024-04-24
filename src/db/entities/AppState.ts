@@ -16,6 +16,7 @@ const {
   removeAll,
 } = makeUtils({
   tableName: 'app_state',
+  name: 'AppState',
   beforeDatabaseSchema: AppStateBeforeDatabaseSchema,
   schema: AppStateRowSchema,
 })
