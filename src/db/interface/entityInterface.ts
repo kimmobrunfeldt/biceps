@@ -1,6 +1,7 @@
 import { TXAsync } from '@vlcn.io/xplat-api'
 import _ from 'lodash'
 import { Sql } from 'sql-template-tag'
+import { getLogger, withEntityLogging } from 'src/utils/logger'
 
 export type Options = {
   connection: TXAsync
@@ -83,16 +84,23 @@ type EntityForCaller<T extends DatabaseEntity<any, any>> = {
 }
 
 export function createEntity<T extends DatabaseEntity<any, any>>(
+  name: string,
   entity: T
 ): EntityForCaller<T> {
-  return _.mapValues(entity, (val) => {
+  const logger = getLogger(`db:${name}`)
+
+  return _.mapValues(entity, (val, key) => {
     if (!_.isFunction(val)) {
       return val
     }
 
     // This is a place to do centralized actions before any method is called
     return async (params: Record<string, any> = {}) => {
-      return await val(params)
+      return await withEntityLogging({
+        logger,
+        methodName: key,
+        cb: () => val(params),
+      })
     }
   }) as EntityForCaller<T>
 }

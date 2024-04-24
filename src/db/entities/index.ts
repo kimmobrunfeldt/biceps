@@ -15,7 +15,7 @@ import {
   update as updateAppState,
   upsert as upsertAppState,
 } from 'src/db/entities/AppState'
-const AppStateEntity = createEntity({
+const AppStateEntity = createEntity('AppState', {
   clientUpsert: clientUpsertAppState,
   find: findAppState,
   findMany: findManyAppState,
@@ -39,7 +39,7 @@ import {
   update as updatePerson,
   upsert as upsertPerson,
 } from 'src/db/entities/Person'
-const PersonEntity = createEntity({
+const PersonEntity = createEntity('Person', {
   clientUpsert: clientUpsertPerson,
   find: findPerson,
   findMany: findManyPerson,
@@ -60,7 +60,7 @@ import {
   removeAll as removeAllPersonRecipe,
   upsert as upsertPersonRecipe,
 } from 'src/db/entities/PersonRecipe'
-const PersonRecipeEntity = createEntity({
+const PersonRecipeEntity = createEntity('PersonRecipe', {
   clientUpsert: clientUpsertPersonRecipe,
   find: findPersonRecipe,
   findMany: findManyPersonRecipe,
@@ -84,7 +84,7 @@ import {
   update as updateProduct,
   upsert as upsertProduct,
 } from 'src/db/entities/Product'
-const ProductEntity = createEntity({
+const ProductEntity = createEntity('Product', {
   findManyByRecipeIds: findManyByRecipeIdsProduct,
   findManyCustom: findManyCustomProduct,
   findManyExternal: findManyExternalProduct,
@@ -112,7 +112,7 @@ import {
   update as updateRecipe,
   upsert as upsertRecipe,
 } from 'src/db/entities/Recipe'
-const RecipeEntity = createEntity({
+const RecipeEntity = createEntity('Recipe', {
   findManyByProductIds: findManyByProductIdsRecipe,
   clientUpsert: clientUpsertRecipe,
   find: findRecipe,
@@ -136,7 +136,7 @@ import {
   removeAll as removeAllRecipeItem,
   upsert as upsertRecipeItem,
 } from 'src/db/entities/RecipeItem'
-const RecipeItemEntity = createEntity({
+const RecipeItemEntity = createEntity('RecipeItem', {
   findManyByRecipeIds: findManyByRecipeIdsRecipeItem,
   clientUpsert: clientUpsertRecipeItem,
   find: findRecipeItem,
@@ -159,7 +159,7 @@ import {
   update as updateRecurringEvent,
   upsert as upsertRecurringEvent,
 } from 'src/db/entities/RecurringEvent'
-const RecurringEventEntity = createEntity({
+const RecurringEventEntity = createEntity('RecurringEvent', {
   clientUpsert: clientUpsertRecurringEvent,
   find: findRecurringEvent,
   findMany: findManyRecurringEvent,

@@ -1,9 +1,8 @@
 import _ from 'lodash'
 import sql, { Sql, join, raw } from 'sql-template-tag'
-import { NBSP } from 'src/constants'
 import { createDatabaseMethods } from 'src/db/interface/databaseMethods'
 import { Options } from 'src/db/interface/entityInterface'
-import { dim, getLogger } from 'src/utils/logger'
+import { getLogger, withSqlLogging } from 'src/utils/logger'
 import { isNotUndefined } from 'src/utils/typeUtils'
 import { deepOmitBy } from 'src/utils/utils'
 import { ZodSchema, z } from 'zod'
@@ -127,40 +126,6 @@ export function makeUtils<
     `
   }
 
-  async function withLogging<T>({
-    sqlQuery,
-    methodName,
-    cb,
-  }: {
-    sqlQuery: Sql
-    methodName: string
-    cb: () => Promise<T>
-  }): Promise<T> {
-    try {
-      const start = performance.now()
-      const result = await cb()
-      const durationMs = performance.now() - start
-      logger.custom(
-        {
-          text: `.${methodName} executed in ${durationMs.toFixed(1)}ms:\n%c${formatSqlWithValues(sqlQuery)}\n`,
-          level: 'info',
-        },
-        dim,
-        'Result:',
-        result,
-        `\n${NBSP}`
-      )
-
-      return result
-    } catch (err) {
-      logger.error(
-        `Error executing .${methodName}:\n`,
-        formatSqlWithValues(sqlQuery)
-      )
-      throw err
-    }
-  }
-
   async function find({
     connection,
     where,
@@ -181,7 +146,8 @@ export function makeUtils<
       ${limitSql}
     `
     const { one } = createDatabaseMethodsWithTransform({ connection, schema })
-    return await withLogging({
+    return await withSqlLogging({
+      logger,
       sqlQuery,
       methodName: 'find',
       cb: () => one(sqlQuery),
@@ -209,7 +175,8 @@ export function makeUtils<
       connection,
       schema,
     })
-    return await withLogging({
+    return await withSqlLogging({
+      logger,
       sqlQuery,
       methodName: 'maybeFind',
       cb: () => maybeOne(sqlQuery),
@@ -236,7 +203,8 @@ export function makeUtils<
       ${limitSql}
     `
     const { many } = createDatabaseMethodsWithTransform({ connection, schema })
-    return await withLogging({
+    return await withSqlLogging({
+      logger,
       sqlQuery,
       methodName: 'findMany',
       cb: () => many(sqlQuery),
@@ -251,7 +219,8 @@ export function makeUtils<
   > {
     const sqlQuery = insertAsSql(object)
     const { one } = createDatabaseMethodsWithTransform({ connection, schema })
-    return await withLogging({
+    return await withSqlLogging({
+      logger,
       sqlQuery,
       methodName: 'insert',
       cb: () => one(sqlQuery),
@@ -275,7 +244,8 @@ export function makeUtils<
   }): Promise<z.infer<SchemaT>> {
     const sqlQuery = upsertAsSql({ object, onConflict })
     const { one } = createDatabaseMethodsWithTransform({ connection, schema })
-    return await withLogging({
+    return await withSqlLogging({
+      logger,
       sqlQuery,
       methodName: 'upsert',
       cb: () => one(sqlQuery),
@@ -358,7 +328,8 @@ export function makeUtils<
       RETURNING *
     `
     const { one } = createDatabaseMethodsWithTransform({ connection, schema })
-    return await withLogging({
+    return await withSqlLogging({
+      logger,
       sqlQuery,
       methodName: 'update',
       cb: () => one(sqlQuery),
@@ -374,7 +345,8 @@ export function makeUtils<
     const sqlQuery = sql`
       DELETE FROM ${table} WHERE ${whereAsSql(where)}
     `
-    return await withLogging({
+    return await withSqlLogging({
+      logger,
       sqlQuery,
       methodName: 'upsert',
       cb: () => connection.exec(sqlQuery.sql, sqlQuery.values),
@@ -383,7 +355,8 @@ export function makeUtils<
 
   async function removeAll({ connection }: Options): Promise<void> {
     const sqlQuery = sql`DELETE FROM ${table}`
-    return await withLogging({
+    return await withSqlLogging({
+      logger,
       sqlQuery,
       methodName: 'removeAll',
       cb: () => connection.exec(sqlQuery.sql, sqlQuery.values),

@@ -87,7 +87,7 @@ function generate() {
 
     code.push(`
       import { ${renamedImports.join(', ')} } from 'src/db/entities/${fileName}'
-      const ${fileName}Entity = createEntity({ ${entityOptions.join(', ')} })
+      const ${fileName}Entity = createEntity('${fileName}', { ${entityOptions.join(', ')} })
       export { ${fileName}Entity as ${fileName} }
     `)
     entityNames.push(fileName)
