@@ -3,7 +3,7 @@ import sql, { Sql, join, raw } from 'sql-template-tag'
 import { NBSP } from 'src/constants'
 import { createDatabaseMethods } from 'src/db/interface/databaseMethods'
 import { Options } from 'src/db/interface/entityInterface'
-import { getLogger } from 'src/utils/logger'
+import { dim, getLogger } from 'src/utils/logger'
 import { isNotUndefined } from 'src/utils/typeUtils'
 import { deepOmitBy } from 'src/utils/utils'
 import { ZodSchema, z } from 'zod'
@@ -140,13 +140,17 @@ export function makeUtils<
       const start = performance.now()
       const result = await cb()
       const durationMs = performance.now() - start
-      logger.debug(
-        `.${methodName} executed in ${durationMs.toFixed(1)}ms:\n`,
-        formatSqlWithValues(sqlQuery),
-        `\nResult:`,
+      logger.custom(
+        {
+          text: `.${methodName} executed in ${durationMs.toFixed(1)}ms:\n%c${formatSqlWithValues(sqlQuery)}\n`,
+          level: 'info',
+        },
+        dim,
+        'Result:',
         result,
         `\n${NBSP}`
       )
+
       return result
     } catch (err) {
       logger.error(

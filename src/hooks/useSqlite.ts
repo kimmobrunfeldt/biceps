@@ -9,6 +9,9 @@ import {
   useRef,
   useState,
 } from 'react'
+import { getLogger } from 'src/utils/logger'
+
+const logger = getLogger('hooks:useSqlite')
 
 export type DatabaseContext = {
   db: DB
@@ -34,8 +37,9 @@ export function useTableLastUpdatedAt(tableNames: string[]) {
   const [lastUpdatedAt, setLastUpdatedAt] = useState<Date | null>(null)
 
   const onUpdate = useCallback(() => {
+    logger.info('Table update:', tableNames)
     setLastUpdatedAt(new Date())
-  }, [setLastUpdatedAt])
+  }, [setLastUpdatedAt, tableNames])
 
   // In case DB connection or table names change, re-subscribe to table updates
   const disposer = useRef<(() => void) | null>(null)
