@@ -4,6 +4,7 @@ import {
   EntityRow,
   TypeToEntityRowMapping,
 } from 'src/db/resolvers/types'
+import { getLogger } from 'src/utils/logger'
 
 export type ResolverMapping = {
   [K in keyof TypeToEntityRowMapping]: K extends keyof typeof resolvers
@@ -24,7 +25,11 @@ export async function resolver<T extends EntityRow>({
   // We have a fallback later in case the resolver has not been implemented
   const maybeResolver = (resolvers as any)[row.__type]
   const resolverForEntity = maybeResolver ?? identityResolver
-  return await resolverForEntity({ row, connection, loaders })
+  const result = await resolverForEntity({ row, connection, loaders })
+
+  const logger = getLogger(`resolver:${row.__type ?? '<unknown entity>'}`)
+  logger.info('Resolved', row, '\n\n->\n\n', result)
+  return result
 }
 
 export async function identityResolver<T>({ row }: { row: T }): Promise<T> {
