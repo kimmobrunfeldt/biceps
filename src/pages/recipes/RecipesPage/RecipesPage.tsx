@@ -23,7 +23,7 @@ export function RecipesPage() {
         </Link>
       }
     >
-      <Blockquote my="lg" maw={900} p="lg" radius="md">
+      <Blockquote maw={900} p="lg" radius="md" mb="xl">
         <Text c="gray">
           Recipe can be a snack, single meal, or food prepping batch that serves
           multiple meals. Product search is powered by{' '}

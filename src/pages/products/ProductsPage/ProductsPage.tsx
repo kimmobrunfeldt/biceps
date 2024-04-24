@@ -84,7 +84,7 @@ export function ProductsPage() {
       }
     >
       <Box>
-        <Blockquote my="lg" maw={900} p="lg" radius="md">
+        <Blockquote maw={900} p="lg" radius="md">
           <Text>
             Product search is powered by{' '}
             <a
