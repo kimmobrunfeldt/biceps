@@ -1,4 +1,4 @@
-import { Blockquote, Box, Button, Flex, Text, Title } from '@mantine/core'
+import { Box, Button, Flex, Text, Title } from '@mantine/core'
 import { modals } from '@mantine/modals'
 import {
   IconAlertCircle,
@@ -82,26 +82,26 @@ export function ProductsPage() {
           <Button leftSection={<IconPlus size={14} />}>Add product</Button>
         </Link>
       }
+      description={
+        <>
+          {' '}
+          Product search is powered by{' '}
+          <a
+            href="https://world.openfoodfacts.org/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Open Food Facts{' '}
+            <IconExternalLink
+              size={16}
+              style={{ position: 'relative', top: '2px' }}
+            />
+          </a>{' '}
+          project. In addition, you can add custom products in this page.
+        </>
+      }
     >
       <Box>
-        <Blockquote maw={900} p="lg" radius="md">
-          <Text>
-            Product search is powered by{' '}
-            <a
-              href="https://world.openfoodfacts.org/"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Open Food Facts{' '}
-              <IconExternalLink
-                size={16}
-                style={{ position: 'relative', top: '2px' }}
-              />
-            </a>{' '}
-            project. In addition, you can add custom products in this page.
-          </Text>
-        </Blockquote>
-
         <Title order={2} size="md" mt="xl">
           Custom products
         </Title>

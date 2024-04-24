@@ -1,4 +1,4 @@
-import { Blockquote, Button, Text, Title } from '@mantine/core'
+import { Blockquote, Button, Text } from '@mantine/core'
 import { modals } from '@mantine/modals'
 import { IconAlertCircle, IconAlertTriangle } from '@tabler/icons-react'
 import { useDeleteAllData } from 'src/hooks/useDatabase'
@@ -39,10 +39,6 @@ export function DangerZone() {
 
   return (
     <>
-      <Title mb="lg" order={2} fz="xl">
-        Danger zone
-      </Title>
-
       <Blockquote
         color="red"
         icon={<IconAlertTriangle />}

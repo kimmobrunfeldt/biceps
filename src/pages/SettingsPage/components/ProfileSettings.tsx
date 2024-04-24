@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Button, TextInput, Title } from '@mantine/core'
+import { Button, TextInput } from '@mantine/core'
 import { useCallback, useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { PersonResolvedSchema } from 'src/db/schemas/PersonSchema'
@@ -59,9 +59,6 @@ export function ProfileSettings() {
 
   return (
     <>
-      <Title order={2} fz="xl" mb="md">
-        Profile
-      </Title>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Controller
           name="name"

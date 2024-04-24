@@ -1,4 +1,4 @@
-import { Blockquote, Button, Flex, Switch, Text } from '@mantine/core'
+import { Button, Flex, Switch } from '@mantine/core'
 import { IconExternalLink, IconPlus } from '@tabler/icons-react'
 import { useState } from 'react'
 import { PageTemplate } from 'src/components/PageTemplate'
@@ -22,9 +22,8 @@ export function RecipesPage() {
           <Button leftSection={<IconPlus size={14} />}>Add recipe</Button>
         </Link>
       }
-    >
-      <Blockquote maw={900} p="lg" radius="md" mb="xl">
-        <Text c="gray">
+      description={
+        <>
           Recipe can be a snack, single meal, or food prepping batch that serves
           multiple meals. Product search is powered by{' '}
           <a
@@ -40,10 +39,10 @@ export function RecipesPage() {
           </a>{' '}
           project. In addition, you can add your own products in{' '}
           <Link to={routes.products.index.path}>Products</Link> page.
-        </Text>
-      </Blockquote>
-
-      <Flex justify="flex-end" py="sm" px={4}>
+        </>
+      }
+    >
+      <Flex justify="flex-end" pb="sm" px={4}>
         <Switch
           label="Amounts per portion"
           checked={amountsPerPortion}

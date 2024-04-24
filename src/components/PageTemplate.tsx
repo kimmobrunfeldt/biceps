@@ -6,7 +6,7 @@ type Props = {
   title: string
   titleRightSection?: React.ReactNode
   children?: React.ReactNode
-  description?: string
+  description?: string | React.ReactNode
 } & BoxProps
 
 export function PageTemplate({
@@ -21,7 +21,7 @@ export function PageTemplate({
       <Box pb="md">
         <PageTitleBar title={title} rightSection={titleRightSection} mb="sm" />
         {description ? (
-          <Text c="gray" mb="xl" maw={600}>
+          <Text mb="xl" maw={700} className={classes.description}>
             {description}
           </Text>
         ) : null}
