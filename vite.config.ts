@@ -5,6 +5,7 @@ import { configDefaults, defineConfig } from 'vitest/config'
 export default defineConfig({
   build: {
     target: 'esnext',
+    sourcemap: true,
   },
   optimizeDeps: {
     exclude: ['@vite/client', '@vite/env', '@vlcn.io/crsqlite-wasm'],

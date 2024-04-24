@@ -101,7 +101,7 @@ export function returnManyByReferenceIds<T extends { [key: string]: any }>(
   picker: (val: T) => T[keyof T] = (item) => item.id as T[keyof T]
 ): (T[] | Error)[] {
   const grouped = _.groupBy(collection, picker)
-
+  console.error('returnManyByReferenceIds:', collection, grouped)
   const results = referenceIds.map((id) => {
     return grouped[id]
       ? grouped[id]
