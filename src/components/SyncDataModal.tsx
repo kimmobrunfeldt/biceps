@@ -63,7 +63,7 @@ export function useSyncDataModalOpener() {
             fn: async () => {
               ctx.rtc.connectTo(peerId)
             },
-            success: { message: 'Data sync enabled', color: 'green' },
+            success: { message: 'Data sync enabled', color: 'blue' },
             error: (error) => {
               console.error(error)
               setModalOpened(false)

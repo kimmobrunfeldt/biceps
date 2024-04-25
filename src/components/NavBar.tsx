@@ -16,6 +16,7 @@ import {
   IconCalendarWeek,
   IconHome2,
   IconNetwork,
+  IconNetworkOff,
   IconSalad,
   IconShoppingBag,
   IconUser,
@@ -88,7 +89,7 @@ const menuItems = [
 ]
 
 export function NavBar() {
-  const { established } = useRtc()
+  const { established, pending } = useRtc()
   const appStateResult = useGetAppState()
   const [opened, { toggle }] = useDisclosure()
   const links = menuItems.map((link) => (
@@ -97,14 +98,27 @@ export function NavBar() {
 
   const [settingsRouteActive] = useRoute(routes.settings.path)
 
-  const syncIcon =
-    established.length > 0 ? (
-      <Tooltip label={`Syncing data with ${established[0]}`}>
-        <Box c="green">
-          <IconNetwork />
-        </Box>
-      </Tooltip>
-    ) : null
+  function getSyncIcon() {
+    if (established.length > 0) {
+      return (
+        <Tooltip label={`Syncing data with ${established[0]}`}>
+          <Box c="green">
+            <IconNetwork />
+          </Box>
+        </Tooltip>
+      )
+    } else if (pending.length > 0) {
+      return (
+        <Tooltip label={`Connection pending to ${established[0]}`}>
+          <Box c="gray">
+            <IconNetworkOff />
+          </Box>
+        </Tooltip>
+      )
+    } else {
+      return null
+    }
+  }
 
   return (
     <>
@@ -121,7 +135,7 @@ export function NavBar() {
         </Box>
 
         <Stack justify="center" align="center" gap="sm">
-          {syncIcon}
+          {getSyncIcon()}
 
           <NavBarLink to={routes.settings.path} label="Profile & Settings">
             <Query
@@ -161,7 +175,7 @@ export function NavBar() {
         align="center"
         gap={6}
       >
-        {syncIcon}
+        {getSyncIcon()}
         <Menu opened={opened} onChange={toggle} shadow="md" width={200}>
           <Menu.Target>
             <Flex
