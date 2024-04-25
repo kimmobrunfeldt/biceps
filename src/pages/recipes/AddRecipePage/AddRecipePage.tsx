@@ -1,6 +1,7 @@
 import { Flex } from '@mantine/core'
 import { IconAlertCircle, IconChevronLeft } from '@tabler/icons-react'
 import { useCallback, useState } from 'react'
+import { Link } from 'src/components/Link'
 import { PageTemplate } from 'src/components/PageTemplate'
 import { useCreateRecipe } from 'src/hooks/useDatabase'
 import { useNotifications } from 'src/hooks/useNotification'
@@ -9,7 +10,7 @@ import {
   RecipeFormFields,
 } from 'src/pages/recipes/AddRecipePage/components/RecipeForm'
 import { routes } from 'src/routes'
-import { Link, useLocation } from 'wouter'
+import { useLocation } from 'wouter'
 
 export function AddRecipePage() {
   const [isSubmitting, setIsSubmitting] = useState(false)

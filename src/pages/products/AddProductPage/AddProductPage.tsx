@@ -1,6 +1,7 @@
 import { Flex, Text } from '@mantine/core'
 import { IconAlertCircle, IconChevronLeft } from '@tabler/icons-react'
 import { useCallback, useState } from 'react'
+import { Link } from 'src/components/Link'
 import { NutritionCircle } from 'src/components/NutritionCircle'
 import { PageTemplate } from 'src/components/PageTemplate'
 import { Nutrition } from 'src/db/schemas/common'
@@ -11,8 +12,7 @@ import {
   ProductFormFields,
 } from 'src/pages/products/AddProductPage/components/ProductForm'
 import { routes } from 'src/routes'
-
-import { Link, useLocation } from 'wouter'
+import { useLocation } from 'wouter'
 
 export function AddProductPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)

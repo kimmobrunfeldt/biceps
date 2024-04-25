@@ -8,6 +8,7 @@ import {
 } from '@tabler/icons-react'
 import pluralize from 'pluralize'
 import { useCallback } from 'react'
+import { Link } from 'src/components/Link'
 import { PageTemplate } from 'src/components/PageTemplate'
 import { PaperContainer } from 'src/components/PaperContainer'
 import { Query } from 'src/components/Query'
@@ -22,7 +23,6 @@ import {
 import { useNotifications } from 'src/hooks/useNotification'
 import { ProductsTable } from 'src/pages/products/ProductsPage/components/ProductsTable'
 import { routes } from 'src/routes'
-import { Link } from 'wouter'
 
 export function ProductsPage() {
   const { withNotifications } = useNotifications()

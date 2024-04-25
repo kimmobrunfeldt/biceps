@@ -1,6 +1,7 @@
 import { Flex } from '@mantine/core'
 import { IconAlertCircle, IconChevronLeft } from '@tabler/icons-react'
 import { useCallback, useState } from 'react'
+import { Link } from 'src/components/Link'
 import { PageTemplate } from 'src/components/PageTemplate'
 import { NBSP } from 'src/constants'
 import { useUpsertRecurringEvent } from 'src/hooks/useDatabase'
@@ -11,7 +12,7 @@ import {
 } from 'src/pages/weeklySchedules/AddRecurringEventPage/components/RecurringEventForm'
 import { routes } from 'src/routes'
 import { weekdayNumberToLongName } from 'src/utils/time'
-import { Link, useLocation } from 'wouter'
+import { useLocation } from 'wouter'
 
 export function AddRecurringEventPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)

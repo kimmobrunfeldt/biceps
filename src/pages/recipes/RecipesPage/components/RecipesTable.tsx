@@ -1,11 +1,11 @@
 import { BoxProps, Flex, Table, Text } from '@mantine/core'
+import { Link } from 'src/components/Link'
 import { NutritionCircle } from 'src/components/NutritionCircle'
 import { ProductImage } from 'src/components/ProductImage'
 import { RecipeResolved } from 'src/db/schemas/RecipeSchema'
 import { calculateTotals } from 'src/pages/recipes/AddRecipePage/components/RecipeItemsTable'
 import { formatRoute, routes } from 'src/routes'
 import { formatGrams, formatKcal } from 'src/utils/format'
-import { Link } from 'wouter'
 
 type Props = {
   recipes: RecipeResolved[]

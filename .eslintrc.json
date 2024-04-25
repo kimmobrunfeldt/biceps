@@ -42,7 +42,8 @@
     ],
     "no-loop-func": "off",
     "@typescript-eslint/no-explicit-any": "off",
-    "react/jsx-curly-brace-presence": "error"
+    "react/jsx-curly-brace-presence": "error",
+    "react/prop-types": "off"
   },
   "ignorePatterns": [
     "postcss.config.js"

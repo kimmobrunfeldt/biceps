@@ -1,11 +1,11 @@
 import { ActionIcon, BoxProps, Flex, Table, Text, Tooltip } from '@mantine/core'
 import { IconX } from '@tabler/icons-react'
+import { Link } from 'src/components/Link'
 import { NutritionCircle } from 'src/components/NutritionCircle'
 import { ProductImage } from 'src/components/ProductImage'
 import { ProductResolved } from 'src/db/schemas/ProductSchema'
 import { formatRoute, routes } from 'src/routes'
 import { formatGrams, formatKcal } from 'src/utils/format'
-import { Link } from 'wouter'
 
 type Props = {
   products: ProductResolved[]

@@ -1,12 +1,12 @@
 import { Box, Button } from '@mantine/core'
 import { IconPlus } from '@tabler/icons-react'
+import { Link } from 'src/components/Link'
 import { PageTemplate } from 'src/components/PageTemplate'
 import { Query } from 'src/components/Query'
 import { useGetAllRecurringEvents } from 'src/hooks/useDatabase'
 import { DaySchedule } from 'src/pages/weeklySchedules/WeeklySchedulePage/components/DaySchedule'
 import { routes } from 'src/routes'
 import { getWeekdays } from 'src/utils/time'
-import { Link } from 'wouter'
 
 export function WeeklySchedulePage() {
   const recurringEventsResult = useGetAllRecurringEvents()

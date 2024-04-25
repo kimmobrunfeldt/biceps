@@ -22,11 +22,12 @@ import {
   IconUser,
 } from '@tabler/icons-react'
 import logo from 'src/assets/biceps-logo.svg'
+import { Link } from 'src/components/Link'
 import { Query } from 'src/components/Query'
 import { useGetAppState } from 'src/hooks/useDatabase'
 import { useRtc } from 'src/hooks/useSqlite'
 import { routes } from 'src/routes'
-import { Link, useRoute } from 'wouter'
+import { useRoute } from 'wouter'
 import classes from './NavBar.module.css'
 
 interface NavBarLinkProps {
@@ -200,7 +201,7 @@ export function NavBar() {
             <Menu.Label>Application</Menu.Label>
             {menuItems.map(({ icon: Icon, label, to }) => {
               return (
-                <Link key={to} href={to} className={classes.burgerMenuLink}>
+                <Link key={to} to={to} className={classes.burgerMenuLink}>
                   <Menu.Item
                     leftSection={
                       <Icon style={{ width: rem(14), height: rem(14) }} />
@@ -215,10 +216,7 @@ export function NavBar() {
             <Menu.Divider />
 
             <Menu.Label>Settings</Menu.Label>
-            <Link
-              href={routes.settings.path}
-              className={classes.burgerMenuLink}
-            >
+            <Link to={routes.settings.path} className={classes.burgerMenuLink}>
               <Menu.Item
                 leftSection={
                   <IconUser style={{ width: rem(14), height: rem(14) }} />

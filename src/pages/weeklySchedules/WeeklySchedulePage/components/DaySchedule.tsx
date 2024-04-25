@@ -1,5 +1,6 @@
 import { Box, Flex, Text, Title } from '@mantine/core'
 import pluralize from 'pluralize'
+import { Link } from 'src/components/Link'
 import { NutritionCircle } from 'src/components/NutritionCircle'
 import {
   RecurringEventResolved,
@@ -10,7 +11,6 @@ import { calculateTotals } from 'src/pages/recipes/AddRecipePage/components/Reci
 import { formatRoute, routes } from 'src/routes'
 import { formatGrams, formatKcal, formatPortions } from 'src/utils/format'
 import { formatTime, weekdayNumberToLongName } from 'src/utils/time'
-import { Link } from 'wouter'
 
 type Props = {
   weekday: RecurringEventRow['weekday']

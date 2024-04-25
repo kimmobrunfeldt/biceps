@@ -1,6 +1,7 @@
 import { Button, Flex, Switch } from '@mantine/core'
-import { IconExternalLink, IconPlus } from '@tabler/icons-react'
+import { IconPlus } from '@tabler/icons-react'
 import { useState } from 'react'
+import { Link } from 'src/components/Link'
 import { PageTemplate } from 'src/components/PageTemplate'
 import { PaperContainer } from 'src/components/PaperContainer'
 import { Query } from 'src/components/Query'
@@ -8,7 +9,6 @@ import { TableSkeleton } from 'src/components/TableSkeleton'
 import { useGetAllRecipes } from 'src/hooks/useDatabase'
 import { RecipesTable } from 'src/pages/recipes/RecipesPage/components/RecipesTable'
 import { routes } from 'src/routes'
-import { Link } from 'wouter'
 
 export function RecipesPage() {
   const recipesResult = useGetAllRecipes()
@@ -25,20 +25,7 @@ export function RecipesPage() {
       description={
         <>
           Recipe can be a snack, single meal, or food prepping batch that serves
-          multiple meals. Product search is powered by{' '}
-          <a
-            href="https://world.openfoodfacts.org/"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Open Food Facts{' '}
-            <IconExternalLink
-              size={16}
-              style={{ position: 'relative', top: '2px' }}
-            />
-          </a>{' '}
-          project. In addition, you can add your own products in{' '}
-          <Link to={routes.products.index.path}>Products</Link> page.
+          multiple meals.
         </>
       }
     >

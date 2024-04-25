@@ -2,6 +2,7 @@ import { Box, Flex, Text } from '@mantine/core'
 import { IconAlertCircle, IconChevronLeft } from '@tabler/icons-react'
 import { useCallback, useState } from 'react'
 import { EditProductSkeleton } from 'src/components/EditProductSkeleton'
+import { Link } from 'src/components/Link'
 import { NutritionCircle } from 'src/components/NutritionCircle'
 import { PageTemplate } from 'src/components/PageTemplate'
 import { Query } from 'src/components/Query'
@@ -13,7 +14,6 @@ import {
   ProductFormFields,
 } from 'src/pages/products/AddProductPage/components/ProductForm'
 import { routes } from 'src/routes'
-import { Link } from 'wouter'
 
 type Props = {
   id: string
