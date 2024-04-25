@@ -72,6 +72,7 @@ export function useGetAllRecipes() {
   const lastUpdatedAt = useTableLastUpdatedAt(['products'])
 
   return useQuery({
+    placeholderData: keepPreviousData,
     queryKey: [...getCacheKey(ctx, queryNames.getAllRecipes), lastUpdatedAt],
     queryFn: withQueryErrorHandling(queryNames.getAllRecipes, async () => {
       const recipeRows = await Recipe.findMany({ connection: ctx.db })
@@ -89,6 +90,7 @@ export function useGetRecipe(id: string) {
   const lastUpdatedAt = useTableLastUpdatedAt(['recipes'])
 
   return useQuery({
+    placeholderData: keepPreviousData,
     queryKey: [...getCacheKey(ctx, queryNames.getRecipe(id)), lastUpdatedAt],
     queryFn: withQueryErrorHandling(queryNames.getRecipe(id), async () => {
       const recipe = await Recipe.maybeFind({
@@ -199,6 +201,7 @@ export function useGetAllExternalProducts() {
   const lastUpdatedAt = useTableLastUpdatedAt(['products'])
 
   return useQuery({
+    placeholderData: keepPreviousData,
     queryKey: [
       ...getCacheKey(ctx, queryNames.getAllExternalProducts),
       lastUpdatedAt,
@@ -239,6 +242,7 @@ export function useGetProduct(id: string) {
   const lastUpdatedAt = useTableLastUpdatedAt(['products'])
 
   return useQuery({
+    placeholderData: keepPreviousData,
     queryKey: [...getCacheKey(ctx, queryNames.getProduct(id)), lastUpdatedAt],
     queryFn: withQueryErrorHandling(queryNames.getProduct(id), async () => {
       const product = await Product.maybeFind({
@@ -340,6 +344,7 @@ export function useGetAllRecurringEvents() {
   const lastUpdatedAt = useTableLastUpdatedAt(['recurring_events'])
 
   return useQuery({
+    placeholderData: keepPreviousData,
     queryKey: [
       ...getCacheKey(ctx, queryNames.getAllRecurringEvents),
       lastUpdatedAt,
@@ -376,6 +381,7 @@ export function useGetAppState() {
   const lastUpdatedAt = useTableLastUpdatedAt(['app_state'])
 
   return useQuery({
+    placeholderData: keepPreviousData,
     queryKey: [...getCacheKey(ctx, queryNames.getAppState), lastUpdatedAt],
     queryFn: withQueryErrorHandling(queryNames.getAppState, async () => {
       const appState = await AppState.find({
