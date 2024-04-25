@@ -24,7 +24,7 @@ export function useNotifications() {
 
   async function withNotifications<T>({
     fn,
-    minLoadingNotificationMs = 1000,
+    minLoadingNotificationMs = 0,
     loading,
     success,
     error,

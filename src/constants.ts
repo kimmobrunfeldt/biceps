@@ -7,3 +7,5 @@ export const APP_BASE_URL =
   import.meta.env.MODE === 'production'
     ? 'https://biceps.app'
     : 'http://localhost:5173'
+
+export const SYNC_QUERY_PARAM = 'syncWithPeerId'

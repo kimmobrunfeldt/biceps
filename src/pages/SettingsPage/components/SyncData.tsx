@@ -1,5 +1,6 @@
 import {
   ActionIcon,
+  Blockquote,
   Box,
   CopyButton,
   Flex,
@@ -9,25 +10,31 @@ import {
   rem,
 } from '@mantine/core'
 import { IconCheck, IconCopy } from '@tabler/icons-react'
-import { APP_BASE_URL } from 'src/constants'
+import { GrayText } from 'src/components/GrayText'
+import { APP_BASE_URL, SYNC_QUERY_PARAM } from 'src/constants'
 import { useSqlite } from 'src/hooks/useSqlite'
 import Peers from 'src/pages/SettingsPage/components/Peers'
-import classes from './SyncData.module.css'
 
 export function SyncData() {
   const ctx = useSqlite()
+  const syncUrl = `${APP_BASE_URL}?${SYNC_QUERY_PARAM}=${ctx.siteid}`
 
   return (
     <Box>
-      <Text c="gray">
-        All data is stored locally in your browser. To sync data between
-        devices, you need open the following link in another device. Remember to
-        keep this browser open.
+      <Blockquote p="md" color="yellow" mb="sm" maw={650}>
+        Syncing data between another device might overwrite your current data.
+        The most recently updated information will be used in case both devices
+        have edited the same fields.
+      </Blockquote>
+
+      <Text c="gray" maw={650}>
+        Open the following link in another device to sync data between devices.
+        Anyone with the link can start syncing. Remember to keep this browser
+        open.
       </Text>
-      <Text py={6} className={classes.description}>
-        {APP_BASE_URL}?peerId={ctx.siteid}
-      </Text>
-      <CopyButton value={`${APP_BASE_URL}?peerId=${ctx.siteid}`} timeout={2000}>
+
+      <GrayText py={6}>{syncUrl}</GrayText>
+      <CopyButton value={syncUrl} timeout={2000}>
         {({ copied, copy }) => (
           <Flex
             align="center"
@@ -58,7 +65,7 @@ export function SyncData() {
       </CopyButton>
 
       <Box pt="lg">
-        <Title order={3} fz="md" mb="md">
+        <Title order={3} fz="md" mb="xs">
           Connections
         </Title>
         <Peers />

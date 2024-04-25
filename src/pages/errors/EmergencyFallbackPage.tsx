@@ -1,6 +1,6 @@
 import { Blockquote, Button, Text } from '@mantine/core'
 import { modals } from '@mantine/modals'
-import { IconAlertCircle } from '@tabler/icons-react'
+import { IconX } from '@tabler/icons-react'
 import { PageTemplate } from 'src/components/PageTemplate'
 import { INDEXEDDB_NAME } from 'src/constants'
 import { useNotifications } from 'src/hooks/useNotification'
@@ -24,7 +24,7 @@ export function EmergencyFallbackPage() {
           error: {
             message: 'Failed to reset database!',
             color: 'red',
-            icon: <IconAlertCircle />,
+            icon: <IconX />,
           },
         })
         // Refresh at browser level. This should cause a new bootstrap for the app.

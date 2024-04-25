@@ -15,6 +15,7 @@ import { useDisclosure } from '@mantine/hooks'
 import {
   IconCalendarWeek,
   IconHome2,
+  IconNetwork,
   IconSalad,
   IconShoppingBag,
   IconUser,
@@ -22,6 +23,7 @@ import {
 import logo from 'src/assets/biceps-logo.svg'
 import { Query } from 'src/components/Query'
 import { useGetAppState } from 'src/hooks/useDatabase'
+import { useRtc } from 'src/hooks/useSqlite'
 import { routes } from 'src/routes'
 import { Link, useRoute } from 'wouter'
 import classes from './NavBar.module.css'
@@ -86,6 +88,7 @@ const menuItems = [
 ]
 
 export function NavBar() {
+  const { established } = useRtc()
   const appStateResult = useGetAppState()
   const [opened, { toggle }] = useDisclosure()
   const links = menuItems.map((link) => (
@@ -93,6 +96,15 @@ export function NavBar() {
   ))
 
   const [settingsRouteActive] = useRoute(routes.settings.path)
+
+  const syncIcon =
+    established.length > 0 ? (
+      <Tooltip label={`Syncing data with ${established[0]}`}>
+        <Box c="green">
+          <IconNetwork />
+        </Box>
+      </Tooltip>
+    ) : null
 
   return (
     <>
@@ -108,7 +120,9 @@ export function NavBar() {
           </Stack>
         </Box>
 
-        <Stack justify="center" align="center" gap={0}>
+        <Stack justify="center" align="center" gap="sm">
+          {syncIcon}
+
           <NavBarLink to={routes.settings.path} label="Profile & Settings">
             <Query
               result={appStateResult}
@@ -136,14 +150,18 @@ export function NavBar() {
       </Box>
 
       {/* Burger menu */}
-      <Box
+      <Flex
         pos="fixed"
         right={20}
         bottom={20}
         hiddenFrom="sm"
         style={{ zIndex: 100 }}
         className={classes.burgerMenuContainer}
+        direction="column"
+        align="center"
+        gap={6}
       >
+        {syncIcon}
         <Menu opened={opened} onChange={toggle} shadow="md" width={200}>
           <Menu.Target>
             <Flex
@@ -197,7 +215,7 @@ export function NavBar() {
             </Link>
           </Menu.Dropdown>
         </Menu>
-      </Box>
+      </Flex>
     </>
   )
 }

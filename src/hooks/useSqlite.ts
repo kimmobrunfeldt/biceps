@@ -28,6 +28,18 @@ export function useSqlite() {
   return context
 }
 
+export type RtcContext = {
+  established: string[]
+  pending: string[]
+}
+
+export const RtcContext = createContext<RtcContext | null>(null)
+export function useRtc() {
+  const context = useContext(RtcContext)
+  if (!context) throw new Error('RtcContext not available in this context')
+  return context
+}
+
 /**
  * Provides a convenient hook to know when a table has been updated. The returned
  * Date can be used as a react query cache key to trigger new data fetch.

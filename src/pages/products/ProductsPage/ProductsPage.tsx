@@ -1,10 +1,10 @@
 import { Box, Button, Flex, Text, Title } from '@mantine/core'
 import { modals } from '@mantine/modals'
 import {
-  IconAlertCircle,
   IconExternalLink,
   IconInfoCircle,
   IconPlus,
+  IconX,
 } from '@tabler/icons-react'
 import pluralize from 'pluralize'
 import { useCallback } from 'react'
@@ -45,7 +45,7 @@ export function ProductsPage() {
           error: {
             message: 'Failed to delete product!',
             color: 'red',
-            icon: <IconAlertCircle />,
+            icon: <IconX />,
           },
         })
       }

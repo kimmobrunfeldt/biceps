@@ -1,6 +1,6 @@
 import { Blockquote, Button, Text } from '@mantine/core'
 import { modals } from '@mantine/modals'
-import { IconAlertCircle, IconAlertTriangle } from '@tabler/icons-react'
+import { IconAlertTriangle, IconX } from '@tabler/icons-react'
 import { useDeleteAllData } from 'src/hooks/useDatabase'
 import { useNotifications } from 'src/hooks/useNotification'
 import { sleep } from 'src/utils/utils'
@@ -28,7 +28,7 @@ export function DangerZone() {
             message: 'Failed to delete data!',
             color: 'red',
             autoClose: 5000,
-            icon: <IconAlertCircle />,
+            icon: <IconX />,
           },
         })
         await sleep(1000)
