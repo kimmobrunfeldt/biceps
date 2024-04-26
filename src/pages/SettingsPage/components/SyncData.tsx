@@ -27,7 +27,7 @@ export function SyncData() {
         have edited the same fields.
       </Blockquote>
 
-      <Text c="gray" maw={650}>
+      <Text maw={650}>
         Open the following link in another device to sync data between devices.
         Anyone with the link can start syncing. Remember to keep this browser
         open.

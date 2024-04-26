@@ -40,7 +40,7 @@ export function DailyStats() {
       <div className={classes.controls}>
         <UnstyledButton
           className={classes.control}
-          onClick={() => setDate((current) => current.add({ days: 1 }))}
+          onClick={() => setDate((current) => current.subtract({ days: 1 }))}
         >
           <IconChevronUp
             style={{ width: rem(16), height: rem(16) }}
@@ -60,7 +60,7 @@ export function DailyStats() {
 
         <UnstyledButton
           className={classes.control}
-          onClick={() => setDate((current) => current.subtract({ days: 1 }))}
+          onClick={() => setDate((current) => current.add({ days: 1 }))}
         >
           <IconChevronDown
             style={{ width: rem(16), height: rem(16) }}
