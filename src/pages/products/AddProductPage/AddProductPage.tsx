@@ -1,4 +1,4 @@
-import { Flex, Text } from '@mantine/core'
+import { Box, Flex, Text } from '@mantine/core'
 import { IconAlertCircle, IconChevronLeft } from '@tabler/icons-react'
 import { useCallback, useState } from 'react'
 import { Link } from 'src/components/Link'
@@ -74,7 +74,9 @@ export function AddProductPage() {
       }
     >
       <Flex direction="row" gap="xl">
-        <ProductForm onSubmit={onSubmit} onChange={onChange} />
+        <Box miw={200}>
+          <ProductForm onSubmit={onSubmit} onChange={onChange} />
+        </Box>
         <Flex direction="column" align="center">
           <Text mb={-5} c="gray">
             Macros

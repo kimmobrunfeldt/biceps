@@ -198,7 +198,7 @@ export function NavBar() {
           </Menu.Target>
 
           <Menu.Dropdown>
-            <Menu.Label>Application</Menu.Label>
+            <Menu.Label>Pages</Menu.Label>
             {menuItems.map(({ icon: Icon, label, to }) => {
               return (
                 <Link key={to} to={to} className={classes.burgerMenuLink}>

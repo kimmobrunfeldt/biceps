@@ -1,12 +1,10 @@
 import { Box, Stack, Title } from '@mantine/core'
 import { PageTemplate } from 'src/components/PageTemplate'
-import { useSqlite } from 'src/hooks/useSqlite'
 import { DangerZone } from 'src/pages/SettingsPage/components/DangerZone'
 import { ProfileSettings } from 'src/pages/SettingsPage/components/ProfileSettings'
 import { SyncData } from 'src/pages/SettingsPage/components/SyncData'
 
 export function SettingsPage() {
-  const ctx = useSqlite()
   return (
     <PageTemplate title="Settings">
       <Stack gap="xl" mt="md">

@@ -99,6 +99,7 @@ type Migration = {
 }
 
 // Array index defines the version number
+// See this before adding migrations https://vlcn.io/docs/cr-sqlite/migrations
 const migrations: Migration[] = [
   /*
   {

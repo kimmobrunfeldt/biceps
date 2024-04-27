@@ -148,7 +148,7 @@ export function ProductForm({
               decimalScale={1}
               error={errors.kcal?.message}
               disabled={isSubmitting}
-              maw={200}
+              maw={160}
             />
           )}
         />
@@ -168,7 +168,7 @@ export function ProductForm({
                   decimalScale={3}
                   error={errors[key]?.message}
                   disabled={isSubmitting}
-                  maw={200}
+                  maw={160}
                 />
               )}
             />

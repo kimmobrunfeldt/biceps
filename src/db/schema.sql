@@ -62,6 +62,9 @@ CREATE TABLE recurring_events (
   weekday INTEGER,
   hour INTEGER,
   minute INTEGER,
+  event_type TEXT,
+  product_to_eat_id TEXT,
+  weight_grams_to_eat REAL,
   recipe_to_eat_id TEXT,
   portions_to_eat REAL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP

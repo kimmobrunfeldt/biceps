@@ -12,7 +12,7 @@ export function formatRoute(
 export const routes = {
   index: {
     path: '/',
-    title: 'Home',
+    title: 'Today',
   },
   recipes: {
     index: {

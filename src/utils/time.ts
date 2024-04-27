@@ -1,9 +1,14 @@
+import { Temporal } from '@js-temporal/polyfill'
 import {
   RecurringEventResolved,
   RecurringEventRow,
 } from 'src/db/schemas/RecurringEventSchema'
 
-export function weekdayNumberToLongName(weekday: RecurringEventRow['weekday']) {
+export const calendar = new Intl.DateTimeFormat().resolvedOptions().calendar
+
+export type Weekday = RecurringEventRow['weekday']
+
+export function weekdayNumberToLongName(weekday: Weekday) {
   switch (weekday) {
     case 1:
       return 'Monday'
@@ -69,4 +74,11 @@ export function parseTime(value: string) {
     hour: parseInt(value.split(':')[0], 10),
     minute: parseInt(value.split(':')[1], 10),
   }
+}
+
+export function isBeforeNow(time: RecurringEventResolved['time']) {
+  const now = Temporal.Now.plainDateTime(calendar)
+  return (
+    time.hour < now.hour || (time.hour === now.hour && time.minute < now.minute)
+  )
 }

@@ -98,18 +98,38 @@ export async function recurringEventResolver({
 }: {
   row: RecurringEventRow
 } & CommonResolverOptions): Promise<RecurringEventResolved> {
-  const recipeRow = await loaders.recipesById.load(row.recipeToEatId)
   const { hour, minute, ...rest } = row
-  return {
+  const common = {
     ...rest,
     time: {
       hour,
       minute,
     },
-    recipeToEat: await recipeResolver({
-      row: recipeRow,
-      loaders,
-      connection,
-    }),
+  }
+
+  switch (common.eventType) {
+    case 'EatRecipe': {
+      const recipeRow = await loaders.recipesById.load(common.recipeToEatId)
+      return {
+        ...common,
+        recipeToEat: await recipeResolver({
+          row: recipeRow,
+          loaders,
+          connection,
+        }),
+      }
+    }
+
+    case 'EatProduct': {
+      const productRow = await loaders.productsById.load(common.productToEatId)
+      return {
+        ...common,
+        productToEat: await productResolver({
+          row: productRow,
+          loaders,
+          connection,
+        }),
+      }
+    }
   }
 }

@@ -1,54 +1,25 @@
 import { Temporal } from '@js-temporal/polyfill'
-import { Group, Paper, Text, UnstyledButton, rem } from '@mantine/core'
-import { IconChevronDown, IconChevronUp, IconSalad } from '@tabler/icons-react'
+import { Box, Group, Paper, Text, rem } from '@mantine/core'
+import { IconCheese, IconMeat, IconSalad } from '@tabler/icons-react'
 import { useState } from 'react'
+import { Nutrition } from 'src/db/schemas/common'
+import { formatGrams } from 'src/utils/format'
 import classes from './DailyStats.module.css'
-
-const data = [{ icon: IconSalad, label: 'Calories' }]
 
 const calendar = new Intl.DateTimeFormat().resolvedOptions().calendar
 
-export function DailyStats() {
-  const today = Temporal.Now.plainDate(calendar)
-  const [date, setDate] = useState(today)
+type Props = {
+  dayConsumed: Nutrition
+  dayTotals: Nutrition
+}
 
-  const stats = data.map((stat) => (
-    <Paper
-      className={classes.stat}
-      radius="md"
-      shadow="md"
-      p="xs"
-      key={stat.label}
-      maw={200}
-    >
-      <stat.icon
-        style={{ width: rem(32), height: rem(32) }}
-        className={classes.icon}
-        stroke={1.5}
-      />
-      <div>
-        <Text className={classes.label}>{stat.label}</Text>
-        <Text fz="xs" className={classes.count}>
-          <span className={classes.value}>1200 kcal</span> / 3000
-        </Text>
-      </div>
-    </Paper>
-  ))
+export function DailyStats({ dayConsumed, dayTotals }: Props) {
+  const today = Temporal.Now.plainDate(calendar)
+  const [date, _setDate] = useState(today)
 
   return (
     <div className={classes.root}>
       <div className={classes.controls}>
-        <UnstyledButton
-          className={classes.control}
-          onClick={() => setDate((current) => current.subtract({ days: 1 }))}
-        >
-          <IconChevronUp
-            style={{ width: rem(16), height: rem(16) }}
-            className={classes.controlIcon}
-            stroke={1.5}
-          />
-        </UnstyledButton>
-
         <div className={classes.date}>
           <Text className={classes.day}>
             {date.toLocaleString('en-US', { calendar, day: 'numeric' })}
@@ -57,19 +28,64 @@ export function DailyStats() {
             {date.toLocaleString('en-US', { calendar, month: 'long' })}
           </Text>
         </div>
-
-        <UnstyledButton
-          className={classes.control}
-          onClick={() => setDate((current) => current.add({ days: 1 }))}
-        >
-          <IconChevronDown
-            style={{ width: rem(16), height: rem(16) }}
-            className={classes.controlIcon}
-            stroke={1.5}
-          />
-        </UnstyledButton>
       </div>
-      <Group style={{ flex: 1 }}>{stats}</Group>
+      <Group miw={200}>
+        <Stat
+          label="Protein"
+          number={`${formatGrams(dayConsumed.protein)}g`}
+          numberTotal={dayTotals.protein}
+          icon={IconMeat}
+        />
+
+        <Stat
+          label="Fat"
+          number={`${formatGrams(dayConsumed.fatTotal)}g`}
+          numberTotal={dayTotals.fatTotal}
+          icon={IconCheese}
+        />
+
+        <Stat
+          label="Calories"
+          number={`${dayConsumed.kcal} kcal`}
+          numberTotal={dayTotals.kcal}
+          icon={IconSalad}
+        />
+      </Group>
     </div>
+  )
+}
+
+function Stat({
+  label,
+  number,
+  numberTotal,
+  icon: Icon,
+}: {
+  label: string
+  number: string
+  numberTotal: string | number
+  icon: typeof IconSalad
+}) {
+  return (
+    <Paper
+      className={classes.stat}
+      radius="md"
+      shadow="md"
+      p="xs"
+      key={label}
+      maw={200}
+    >
+      <Icon
+        style={{ width: rem(36), height: rem(36) }}
+        className={classes.icon}
+        stroke={1.5}
+      />
+      <Box>
+        <Text className={classes.label}>{label}</Text>
+        <Text fz="xs" className={classes.count}>
+          <span className={classes.value}>{number}</span> / {numberTotal}
+        </Text>
+      </Box>
+    </Paper>
   )
 }

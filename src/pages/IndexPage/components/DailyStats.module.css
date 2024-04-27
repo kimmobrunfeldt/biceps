@@ -7,6 +7,8 @@
   padding: var(--mantine-spacing-xl);
   border-radius: var(--mantine-radius-md);
   display: flex;
+  justify-content: space-between;
+  min-width: 260px;
 
   /* TODO: Use mobile first */
   @media (max-width: $mantine-breakpoint-xs) {

@@ -1,5 +1,7 @@
-import { Box, Flex, Text, Title } from '@mantine/core'
+import { Box, Flex, Stack, Text, Title } from '@mantine/core'
+import _ from 'lodash'
 import pluralize from 'pluralize'
+import { GrayText } from 'src/components/GrayText'
 import { Link } from 'src/components/Link'
 import { NutritionCircle } from 'src/components/NutritionCircle'
 import {
@@ -7,31 +9,50 @@ import {
   RecurringEventRow,
 } from 'src/db/schemas/RecurringEventSchema'
 import { Nutrition } from 'src/db/schemas/common'
-import { calculateTotals } from 'src/pages/recipes/AddRecipePage/components/RecipeItemsTable'
+import { calculateValuesForEvent } from 'src/pages/IndexPage/IndexPage'
 import { formatRoute, routes } from 'src/routes'
 import { formatGrams, formatKcal, formatPortions } from 'src/utils/format'
-import { formatTime, weekdayNumberToLongName } from 'src/utils/time'
+import {
+  formatTime,
+  isBeforeNow,
+  weekdayNumberToLongName,
+} from 'src/utils/time'
+import { assertUnreachable } from 'src/utils/utils'
 
 type Props = {
   weekday: RecurringEventRow['weekday']
   recurringEvents: RecurringEventResolved[]
+  fadeEventsBeforeNow?: boolean
+  hideNutritionHeader?: boolean
 }
 
-export function DaySchedule({ weekday, recurringEvents }: Props) {
+export function DaySchedule({
+  weekday,
+  recurringEvents,
+  fadeEventsBeforeNow = false,
+  hideNutritionHeader = false,
+}: Props) {
+  const eventsGroupedByTime = _.groupBy(
+    recurringEvents,
+    (event) => `${event.time.hour}-${event.time.minute}`
+  )
+  const sortedTimes = _.chain(recurringEvents)
+    .orderBy([(e) => e.time.hour, (e) => e.time.minute])
+    .map((e) => `${e.time.hour}-${e.time.minute}`)
+    .uniq()
+    .value()
+
   const nutritionsPerDay = recurringEvents.reduce(
     (acc, event) => {
-      const portionTotals = calculateTotals(event.recipeToEat.recipeItems, {
-        amountsPerPortion: true,
-        portions: event.portionsToEat,
-      })
+      const eventTotals = calculateValuesForEvent(event)
       return {
-        kcal: acc.kcal + portionTotals.kcal,
-        protein: acc.protein + portionTotals.protein,
-        fatTotal: acc.fatTotal + portionTotals.fatTotal,
-        fatSaturated: acc.fatSaturated + portionTotals.fatSaturated,
-        carbsTotal: acc.carbsTotal + portionTotals.carbsTotal,
-        carbsSugar: acc.carbsSugar + portionTotals.carbsSugar,
-        salt: acc.salt + portionTotals.salt,
+        kcal: acc.kcal + eventTotals.kcal,
+        protein: acc.protein + eventTotals.protein,
+        fatTotal: acc.fatTotal + eventTotals.fatTotal,
+        fatSaturated: acc.fatSaturated + eventTotals.fatSaturated,
+        carbsTotal: acc.carbsTotal + eventTotals.carbsTotal,
+        carbsSugar: acc.carbsSugar + eventTotals.carbsSugar,
+        salt: acc.salt + eventTotals.salt,
       }
     },
     {
@@ -51,36 +72,80 @@ export function DaySchedule({ weekday, recurringEvents }: Props) {
         <NutritionCircle nutrition={nutritionsPerDay} variant="icon" />
 
         <Title order={2}>{weekdayNumberToLongName(weekday)}</Title>
-        <Text style={{ position: 'relative', top: '2px' }}>
-          {formatKcal(nutritionsPerDay.kcal)} kcal,{' '}
-          {formatGrams(nutritionsPerDay.protein)}g protein
-        </Text>
+        {!hideNutritionHeader ? (
+          <GrayText style={{ position: 'relative', top: '2px' }}>
+            {formatKcal(nutritionsPerDay.kcal)} kcal,{' '}
+            {formatGrams(nutritionsPerDay.protein)}g protein
+          </GrayText>
+        ) : null}
       </Flex>
 
-      <Box pb="xl" pl={55}>
+      <Stack pb="xl" pl={55} gap="xs">
         {recurringEvents.length === 0 && <Text c="gray">No events</Text>}
-        {recurringEvents.map((recurringEvent, i) => {
-          const time = formatTime(recurringEvent.time)
+        {sortedTimes.map((timeKey, i) => {
+          const recurringEvents = eventsGroupedByTime[timeKey]
+          const first = recurringEvents[0] // This should always exist
+          const shouldFade = fadeEventsBeforeNow && isBeforeNow(first.time)
+          const formattedTime = formatTime(first.time)
           return (
-            <Flex key={i} align="center" gap={6}>
-              <Text c="gray" fw="bold">
-                {time}
+            <Flex
+              key={i}
+              align="flex-start"
+              gap={6}
+              opacity={shouldFade ? 0.7 : 1}
+            >
+              <Text c="gray" fw="bold" miw={60}>
+                {formattedTime}
               </Text>
-              <Text>
-                {formatPortions(recurringEvent.portionsToEat)}{' '}
-                {pluralize('portion', recurringEvent.portionsToEat)} of{' '}
-                <Link
-                  to={formatRoute(routes.recipes.edit.path, {
-                    id: recurringEvent.recipeToEatId,
-                  })}
-                >
-                  {recurringEvent.recipeToEat.name}
-                </Link>
-              </Text>
+              <Stack gap={4}>
+                {recurringEvents.map((event, i) => {
+                  return <EventRow key={i} event={event} />
+                })}
+              </Stack>
             </Flex>
           )
         })}
-      </Box>
+      </Stack>
     </Box>
   )
+}
+
+function EventRow({ event }: { event: RecurringEventResolved }) {
+  switch (event.eventType) {
+    case 'EatRecipe':
+      return (
+        <>
+          <Text>
+            {formatPortions(event.portionsToEat)}{' '}
+            {pluralize('portion', event.portionsToEat)} of{' '}
+            <Link
+              to={formatRoute(routes.recipes.edit.path, {
+                id: event.recipeToEatId,
+              })}
+            >
+              {event.recipeToEat.name}
+            </Link>
+          </Text>
+        </>
+      )
+    case 'EatProduct': {
+      return (
+        <>
+          <Text>
+            {formatGrams(event.weightGrams)}g of{' '}
+            <Link
+              to={formatRoute(routes.products.edit.path, {
+                id: event.productToEatId,
+              })}
+            >
+              {event.productToEat.name}
+            </Link>
+          </Text>
+        </>
+      )
+    }
+
+    default:
+      assertUnreachable(event)
+  }
 }

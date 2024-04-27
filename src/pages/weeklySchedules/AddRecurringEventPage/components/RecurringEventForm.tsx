@@ -19,7 +19,10 @@ import {
 import { z } from 'zod'
 
 const RecurringEventFormSchema = RecurringEventResolvedBeforeSavingSchema
-export type RecurringEventFormFields = z.infer<typeof RecurringEventFormSchema>
+export type RecurringEventFormFields = Extract<
+  z.infer<typeof RecurringEventFormSchema>,
+  { eventType: 'EatRecipe' }
+>
 
 type Props = {
   initialData?: RecurringEventFormFields
@@ -34,17 +37,22 @@ export function RecurringEventForm({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const recipesResult = useGetAllRecipes()
 
+  const commonInitialData = {
+    weekday: initialData?.weekday ?? 1,
+    time: initialData?.time ?? { hour: 12, minute: 0 },
+  }
   const {
     control,
     handleSubmit,
     formState: { isDirty, errors },
   } = useForm<RecurringEventFormFields>({
     defaultValues: {
-      weekday: initialData?.weekday ?? 1,
-      time: initialData?.time ?? { hour: 12, minute: 0 },
+      ...commonInitialData,
+      eventType: 'EatRecipe',
       recipeToEatId: initialData?.recipeToEatId ?? '',
       portionsToEat: initialData?.portionsToEat ?? 1,
     },
+
     resolver: zodResolver(RecurringEventFormSchema),
   })
 
