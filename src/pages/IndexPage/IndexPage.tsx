@@ -80,14 +80,14 @@ export function calculateValuesForEvent(event: RecurringEventResolved) {
       })
     case 'EatProduct': {
       return {
-        weightGrams: event.weightGrams,
-        kcal: event.productToEat.kcal * event.weightGrams,
-        protein: event.productToEat.protein * event.weightGrams,
-        fatTotal: event.productToEat.fatTotal * event.weightGrams,
-        fatSaturated: event.productToEat.fatSaturated * event.weightGrams,
-        carbsTotal: event.productToEat.carbsTotal * event.weightGrams,
-        carbsSugar: event.productToEat.carbsSugar * event.weightGrams,
-        salt: event.productToEat.salt * event.weightGrams,
+        weightGrams: event.weightGramsToEat,
+        kcal: event.productToEat.kcal * event.weightGramsToEat,
+        protein: event.productToEat.protein * event.weightGramsToEat,
+        fatTotal: event.productToEat.fatTotal * event.weightGramsToEat,
+        fatSaturated: event.productToEat.fatSaturated * event.weightGramsToEat,
+        carbsTotal: event.productToEat.carbsTotal * event.weightGramsToEat,
+        carbsSugar: event.productToEat.carbsSugar * event.weightGramsToEat,
+        salt: event.productToEat.salt * event.weightGramsToEat,
       }
     }
   }

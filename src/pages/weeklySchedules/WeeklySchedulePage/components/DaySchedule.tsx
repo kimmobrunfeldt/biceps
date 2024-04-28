@@ -132,7 +132,7 @@ function EventRow({ event }: { event: RecurringEventResolved }) {
       return (
         <>
           <Text>
-            {formatGrams(event.weightGrams)}g of{' '}
+            {formatGrams(event.weightGramsToEat)}g of{' '}
             <Link
               to={formatRoute(routes.products.edit.path, {
                 id: event.productToEatId,
