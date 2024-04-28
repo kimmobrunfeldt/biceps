@@ -1,5 +1,5 @@
 import { CommonResolverOptions } from 'src/db/resolvers/types'
-import { AppStateResolved, AppStateRow } from 'src/db/schemas/AppState'
+import { AppStateResolved, AppStateRow } from 'src/db/schemas/AppStateSchema'
 import { PersonResolved, PersonRow } from 'src/db/schemas/PersonSchema'
 import { ProductResolved, ProductRow } from 'src/db/schemas/ProductSchema'
 import {

@@ -19,14 +19,14 @@ export async function upsertSeedData(connection: TXAsync) {
   const person = await Person.clientUpsert({
     connection,
     object: {
-      id: 'demo-user',
+      id: 'biceps-demo-user',
       name: 'John Doe',
     },
     onConflict: ['name'],
   })
   const { recipeId } = await upsertRecipe(connection, {
     name: 'My recipe',
-    id: 'demo-recipe',
+    id: 'biceps-demo-recipe',
     portions: 1,
     recipeItems: [
       {
@@ -34,7 +34,7 @@ export async function upsertSeedData(connection: TXAsync) {
         weightGrams: 100,
         product: {
           __type: 'Product',
-          id: 'demo-recipe-item-1',
+          id: 'biceps-demo-recipe-item-1',
           name: 'Pirkka Parhaat Tomato',
           kcal: 10,
           fatTotal: 0,
@@ -50,7 +50,7 @@ export async function upsertSeedData(connection: TXAsync) {
         weightGrams: 100,
         product: {
           __type: 'Product',
-          id: 'demo-recipe-item-2',
+          id: 'biceps-demo-recipe-item-2',
           name: 'Pirkka Parhaat Pasta',
           kcal: 10,
           fatTotal: 0,
@@ -81,6 +81,7 @@ export async function upsertSeedData(connection: TXAsync) {
       object: {
         key: APP_STATE_KEY,
         selectedPersonId: person.id,
+        onboardingState: 'NewUser',
       },
     })
   }

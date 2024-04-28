@@ -2,7 +2,7 @@ import { makeUtils } from 'src/db/interface/entityMethods'
 import {
   AppStateBeforeDatabaseSchema,
   AppStateRowSchema,
-} from 'src/db/schemas/AppState'
+} from 'src/db/schemas/AppStateSchema'
 
 const {
   find,
@@ -30,5 +30,6 @@ export {
   remove,
   removeAll,
   update,
-  upsert,
+  upsert
 }
+

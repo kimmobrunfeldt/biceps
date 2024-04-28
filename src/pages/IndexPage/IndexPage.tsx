@@ -3,20 +3,28 @@ import { Stack } from '@mantine/core'
 import { PageTemplate } from 'src/components/PageTemplate'
 import { Query } from 'src/components/Query'
 import { RecurringEventResolved } from 'src/db/schemas/RecurringEventSchema'
-import { useGetAllRecurringEvents } from 'src/hooks/useDatabase'
+import { useGetAllRecurringEvents, useGetAppState } from 'src/hooks/useDatabase'
 import { DailyStats } from 'src/pages/IndexPage/components/DailyStats'
+import { Introduction } from 'src/pages/IndexPage/components/Introduction'
 import { calculateTotals } from 'src/pages/recipes/AddRecipePage/components/RecipeItemsTable'
 import { DaySchedule } from 'src/pages/weeklySchedules/WeeklySchedulePage/components/DaySchedule'
 import { Weekday, calendar, isBeforeNow } from 'src/utils/time'
 
 export function IndexPage() {
+  const appStateResult = useGetAppState()
   const recurringEventsResult = useGetAllRecurringEvents()
   const today = Temporal.Now.plainDate(calendar)
   const dayOfWeek = today.dayOfWeek as Weekday
 
+  function getTitle() {
+    if (appStateResult.isLoading) return ''
+    if (appStateResult.data?.onboardingState !== 'Completed') return `Welcome`
+    return 'Today'
+  }
+
   return (
-    <PageTemplate title="Today">
-      <Query result={recurringEventsResult}>
+    <PageTemplate title={getTitle()}>
+      <Query result={recurringEventsResult} whenEmpty={() => <Introduction />}>
         {(data) => {
           const eventsToday = data.filter((event) => {
             return event.weekday === dayOfWeek

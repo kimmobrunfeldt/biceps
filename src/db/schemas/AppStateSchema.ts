@@ -10,6 +10,7 @@ export const AppStateRowSchema = z
     __type: addTypeName('AppState'),
     key: z.string(),
     selectedPersonId: IdSchema,
+    onboardingState: z.union([z.literal('NewUser'), z.literal('Completed')]),
     createdAt: DateSchema,
   })
   .strict()
@@ -19,6 +20,7 @@ export const AppStateBeforeDatabaseSchema = z
   .object({
     key: z.string(),
     selectedPersonId: IdSchema,
+    onboardingState: AppStateRowSchema.shape.onboardingState,
     createdAt: AppStateRowSchema.shape.createdAt.optional(),
   })
   .strict()
