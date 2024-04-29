@@ -1,5 +1,4 @@
-import { Box, Flex, Text } from '@mantine/core'
-import { IconInfoCircle } from '@tabler/icons-react'
+import { Box, Flex } from '@mantine/core'
 import {
   Control,
   UseFormSetValue,
@@ -54,12 +53,6 @@ export function RecipeItemsForm({ control, setValue }: Props) {
             onRecipeItemRemove={remove}
             onRecipeItemChange={onRecipeItemChange}
           />
-          {fields.length === 0 ? (
-            <Flex px="sm" direction="row" align="center" gap={4} opacity={0.7}>
-              <IconInfoCircle width={20} color="gray" />
-              <Text c="gray">Add items by searching products</Text>
-            </Flex>
-          ) : null}
         </Box>
       </Flex>
     </PaperContainer>

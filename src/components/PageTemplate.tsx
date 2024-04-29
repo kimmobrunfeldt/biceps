@@ -1,4 +1,4 @@
-import { Box, BoxProps, Text } from '@mantine/core'
+import { Box, BoxProps } from '@mantine/core'
 import { PageTitleBar } from 'src/components/PageTitleBar'
 import classes from './PageTemplate.module.css'
 
@@ -19,12 +19,11 @@ export function PageTemplate({
   return (
     <Box className={classes.container} {...rest}>
       <Box pb="md">
-        <PageTitleBar title={title} rightSection={titleRightSection} mb="sm" />
-        {description ? (
-          <Text mb="xl" maw={700} className={classes.description}>
-            {description}
-          </Text>
-        ) : null}
+        <PageTitleBar
+          title={title}
+          rightSection={titleRightSection}
+          description={description}
+        />
       </Box>
       {children}
     </Box>

@@ -3,8 +3,11 @@ import classes from './GrayText.module.css'
 
 type Props = {
   children: React.ReactNode
+  strong?: boolean
 } & TextProps
 
-export function GrayText(props: Props) {
-  return <Text className={classes.text} {...props} />
+export function GrayText({ strong, ...props }: Props) {
+  return (
+    <Text className={strong ? classes.textStrong : classes.text} {...props} />
+  )
 }

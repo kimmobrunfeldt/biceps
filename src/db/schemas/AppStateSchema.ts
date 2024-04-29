@@ -10,7 +10,13 @@ export const AppStateRowSchema = z
     __type: addTypeName('AppState'),
     key: z.string(),
     selectedPersonId: IdSchema,
-    onboardingState: z.union([z.literal('NewUser'), z.literal('Completed')]),
+    onboardingState: z.union([
+      z.literal('NewUser'),
+      z.literal('ProfileCreated'),
+      z.literal('RecipeAdded'),
+      z.literal('WeeklyScheduleAdded'),
+      z.literal('Completed'),
+    ]),
     createdAt: DateSchema,
   })
   .strict()

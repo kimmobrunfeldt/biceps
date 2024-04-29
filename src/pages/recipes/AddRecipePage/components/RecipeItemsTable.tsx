@@ -1,16 +1,17 @@
 import {
   ActionIcon,
   Box,
-  BoxProps,
   Flex,
   NumberInput,
   Table,
   Text,
   Tooltip,
 } from '@mantine/core'
-import { IconX } from '@tabler/icons-react'
+import { IconInfoCircle, IconX } from '@tabler/icons-react'
 import _ from 'lodash'
 import { ProductImage } from 'src/components/ProductImage'
+import classes from 'src/components/Table.module.css'
+import { TableHeader } from 'src/components/TableHeader'
 import { RecipeItemResolvedBeforeSaving } from 'src/db/schemas/RecipeItemSchema'
 import { formatGrams, formatKcal } from 'src/utils/format'
 
@@ -52,10 +53,7 @@ export function RecipeItemsTable({
       <Table.Tr key={index} opacity={hasItem ? 1 : 0.7}>
         <Table.Td>
           <Flex align="center" gap="sm">
-            <ProductImage
-              product={hasItem ? row.product : undefined}
-              style={{ opacity: hasItem ? 1 : 0 }}
-            />
+            {hasItem ? <ProductImage product={row.product} /> : null}
             <Text>{name}</Text>
           </Flex>
         </Table.Td>
@@ -101,29 +99,53 @@ export function RecipeItemsTable({
     )
   })
 
-  const style: BoxProps['style'] = {
-    whiteSpace: 'nowrap',
-  }
+  const emptyRow = (
+    <Table.Tr>
+      <Table.Td miw={290}>
+        <Flex direction="row" align="center" gap={8} opacity={0.7} py="sm">
+          <IconInfoCircle width={20} color="gray" />
+          <Text c="gray">Add items by searching products</Text>
+        </Flex>
+      </Table.Td>
+    </Table.Tr>
+  )
+
   return (
-    <Table.ScrollContainer minWidth={360}>
+    <Box className={classes.tableContainer}>
       <Table>
         <Table.Thead>
           <Table.Tr>
             <Table.Th miw={200}>Item</Table.Th>
-            <Table.Th style={style}>Quantity (g)</Table.Th>
-            <Table.Th style={style}>Kcal</Table.Th>
-            <Table.Th style={style}>Protein (g)</Table.Th>
-            <Table.Th style={style}>Fat (g)</Table.Th>
-            <Table.Th>Saturated fat&nbsp;(g)</Table.Th>
-            <Table.Th style={style}>Carbs (g)</Table.Th>
-            <Table.Th style={style}>Sugar (g)</Table.Th>
-            <Table.Th style={style}>Salt (g)</Table.Th>
-            <Table.Th style={style}></Table.Th>
+            <Table.Th>
+              <TableHeader unitInSameRow text="Quantity" unit="(g)" />
+            </Table.Th>
+            <Table.Th>
+              <TableHeader unitInSameRow text="Kcal" />
+            </Table.Th>
+            <Table.Th>
+              <TableHeader unitInSameRow text="Protein" unit="(g)" />
+            </Table.Th>
+            <Table.Th>
+              <TableHeader unitInSameRow text="Fat" unit="(g)" />
+            </Table.Th>
+            <Table.Th>
+              <TableHeader unitInSameRow text="Saturated" unit="(g)" />
+            </Table.Th>
+            <Table.Th>
+              <TableHeader unitInSameRow text="Carbs" unit="(g)" />
+            </Table.Th>
+            <Table.Th>
+              <TableHeader unitInSameRow text="Sugar" unit="(g)" />
+            </Table.Th>
+            <Table.Th>
+              <TableHeader unitInSameRow text="Salt" unit="(g)" />
+            </Table.Th>
+            <Table.Th></Table.Th>
           </Table.Tr>
         </Table.Thead>
-        <Table.Tbody>{rows}</Table.Tbody>
+        <Table.Tbody>{rows.length > 0 ? rows : emptyRow}</Table.Tbody>
       </Table>
-    </Table.ScrollContainer>
+    </Box>
   )
 }
 

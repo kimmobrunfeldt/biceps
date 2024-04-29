@@ -9,14 +9,14 @@ export function SettingsPage() {
     <PageTemplate title="Settings">
       <Stack gap="xl" mt="md">
         <Box>
-          <Title order={2} fz="xl" mb="md">
+          <Title order={2} fz="h3" mb="md">
             Profile
           </Title>
           <ProfileSettings />
         </Box>
 
         <Box pt="xl">
-          <Title order={2} fz="xl" mb="md">
+          <Title order={2} fz="h3" mb="md">
             Sync data
           </Title>
 
@@ -24,7 +24,7 @@ export function SettingsPage() {
         </Box>
 
         <Box pt="xl">
-          <Title mb="lg" order={2} fz="xl">
+          <Title mb="lg" order={2} fz="h3">
             Danger zone
           </Title>
           <DangerZone />

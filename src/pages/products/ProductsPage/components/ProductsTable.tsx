@@ -1,8 +1,9 @@
-import { ActionIcon, BoxProps, Flex, Table, Text, Tooltip } from '@mantine/core'
-import { IconX } from '@tabler/icons-react'
+import { ActionIcon, Box, Flex, Table, Text, Tooltip } from '@mantine/core'
+import { IconInfoCircle, IconX } from '@tabler/icons-react'
 import { Link } from 'src/components/Link'
-import { NutritionCircle } from 'src/components/NutritionCircle'
 import { ProductImage } from 'src/components/ProductImage'
+import classes from 'src/components/Table.module.css'
+import { TableHeader } from 'src/components/TableHeader'
 import { ProductResolved } from 'src/db/schemas/ProductSchema'
 import { formatRoute, routes } from 'src/routes'
 import { formatGrams, formatKcal } from 'src/utils/format'
@@ -11,22 +12,22 @@ type Props = {
   products: ProductResolved[]
   showRemove?: boolean
   onRemove?: (product: ProductResolved) => void
+  empty?: boolean
 }
 
 export function ProductsTable({
   products,
-  showRemove = false,
   onRemove,
+  showRemove = false,
+  empty = false,
 }: Props) {
   const rows = products.map((product, index) => {
     return (
       <Table.Tr key={index}>
         <Table.Td>
-          <Flex align="center" gap="sm">
-            <Flex gap={4}>
-              <NutritionCircle nutrition={product} variant="icon" />
-              <ProductImage product={product} />
-            </Flex>
+          <Flex align="center" gap={12}>
+            <ProductImage product={product} />
+
             <Link
               to={formatRoute(routes.products.edit.path, { id: product.id })}
             >
@@ -61,27 +62,49 @@ export function ProductsTable({
     )
   })
 
-  const style: BoxProps['style'] = {
-    whiteSpace: 'nowrap',
-  }
+  const emptyRow = (
+    <Table.Tr>
+      <Table.Td>
+        <Flex direction="row" align="center" gap={4} opacity={0.7} py="sm">
+          <IconInfoCircle width={20} color="gray" />
+          <Text c="gray">No products</Text>
+        </Flex>
+      </Table.Td>
+    </Table.Tr>
+  )
+
   return (
-    <Table.ScrollContainer minWidth={360}>
+    <Box className={classes.tableContainer}>
       <Table>
         <Table.Thead>
           <Table.Tr>
-            <Table.Th miw={260}>Item</Table.Th>
-            <Table.Th style={style}>Kcal (per 100g)</Table.Th>
-            <Table.Th style={style}>Protein (per 100g)</Table.Th>
-            <Table.Th style={style}>Fat (per 100g)</Table.Th>
-            <Table.Th>Saturated fat&nbsp;(per 100g)</Table.Th>
-            <Table.Th style={style}>Carbs (per 100g)</Table.Th>
-            <Table.Th style={style}>Sugar (per 100g)</Table.Th>
-            <Table.Th style={style}>Salt (per 100g)</Table.Th>
-            <Table.Th style={style}></Table.Th>
+            <Table.Th miw={260}>Product</Table.Th>
+            <Table.Th>
+              <TableHeader text="Kcal" unit="(per 100g)" />
+            </Table.Th>
+            <Table.Th>
+              <TableHeader text="Protein" unit="(per 100g)" />
+            </Table.Th>
+            <Table.Th>
+              <TableHeader text="Fat" unit="(per 100g)" />
+            </Table.Th>
+            <Table.Th>
+              <TableHeader text="Saturated fat" unit="(per 100g)" />
+            </Table.Th>
+            <Table.Th>
+              <TableHeader text="Carbs" unit="(per 100g)" />
+            </Table.Th>
+            <Table.Th>
+              <TableHeader text="Sugar" unit="(per 100g)" />
+            </Table.Th>
+            <Table.Th>
+              <TableHeader text="Salt" unit="(per 100g)" />
+            </Table.Th>
+            <Table.Th></Table.Th>
           </Table.Tr>
         </Table.Thead>
-        <Table.Tbody>{rows}</Table.Tbody>
+        <Table.Tbody>{empty ? emptyRow : rows}</Table.Tbody>
       </Table>
-    </Table.ScrollContainer>
+    </Box>
   )
 }

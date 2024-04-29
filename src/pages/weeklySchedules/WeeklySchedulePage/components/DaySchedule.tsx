@@ -68,10 +68,12 @@ export function DaySchedule({
 
   return (
     <Box>
-      <Flex align="center" gap="md" pb="sm">
+      <Flex align="center" gap="md">
         <NutritionCircle nutrition={nutritionsPerDay} variant="icon" />
 
-        <Title order={2}>{weekdayNumberToLongName(weekday)}</Title>
+        <Title order={2} size="h3">
+          {weekdayNumberToLongName(weekday)}
+        </Title>
         {!hideNutritionHeader ? (
           <GrayText style={{ position: 'relative', top: '2px' }}>
             {formatKcal(nutritionsPerDay.kcal)} kcal,{' '}
@@ -80,8 +82,8 @@ export function DaySchedule({
         ) : null}
       </Flex>
 
-      <Stack pb="xl" pl={55} gap="xs">
-        {recurringEvents.length === 0 && <Text c="gray">No events</Text>}
+      <Stack pb="xl" pl={54} gap="xs">
+        {recurringEvents.length === 0 && <GrayText>No events</GrayText>}
         {sortedTimes.map((timeKey, i) => {
           const recurringEvents = eventsGroupedByTime[timeKey]
           const first = recurringEvents[0] // This should always exist

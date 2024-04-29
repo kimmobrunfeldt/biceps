@@ -7,14 +7,7 @@ type Props = {
 
 export function PaperContainer({ children, ...rest }: Props) {
   return (
-    <Paper
-      px="md"
-      pt="lg"
-      pb="xl"
-      radius="md"
-      className={classes.container}
-      {...rest}
-    >
+    <Paper px="sm" py="lg" radius="sm" className={classes.container} {...rest}>
       {children}
     </Paper>
   )

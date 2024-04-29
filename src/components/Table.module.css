@@ -1,0 +1,24 @@
+.tableContainer {
+  overflow-x: auto;
+  width: 100%;
+
+  @media (min-width: $mantine-breakpoint-md) {
+    thead {
+      position: sticky;
+      z-index: 2;
+      background-color: light-dark(
+        var(--mantine-color-gray-0),
+        var(--mantine-color-dark-8)
+      );
+      box-shadow: inset 0 -1px 0 light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+    }
+  }
+
+  @media (min-width: $mantine-breakpoint-lg) {
+    overflow-x: initial;
+  }
+
+  th {
+    white-space: nowrap;
+  }
+}

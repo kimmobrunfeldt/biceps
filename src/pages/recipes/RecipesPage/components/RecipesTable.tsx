@@ -1,7 +1,8 @@
-import { BoxProps, Flex, Table, Text } from '@mantine/core'
+import { Box, Flex, Table, Text } from '@mantine/core'
 import { Link } from 'src/components/Link'
 import { NutritionCircle } from 'src/components/NutritionCircle'
-import { ProductImage } from 'src/components/ProductImage'
+import classes from 'src/components/Table.module.css'
+import { TableHeader } from 'src/components/TableHeader'
 import { RecipeResolved } from 'src/db/schemas/RecipeSchema'
 import { calculateTotals } from 'src/pages/recipes/AddRecipePage/components/RecipeItemsTable'
 import { formatRoute, routes } from 'src/routes'
@@ -22,14 +23,13 @@ export function RecipesTable({ recipes, amountsPerPortion = true }: Props) {
     return (
       <Table.Tr key={index}>
         <Table.Td>
-          <Flex align="center" gap="sm">
+          <Flex align="center" gap={4}>
             <Flex gap={4}>
               <NutritionCircle
                 nutrition={values}
                 variant="icon"
                 weightGrams={values.weightGrams}
               />
-              <ProductImage product={recipe.recipeItems[0]?.product} />
             </Flex>
             <Link to={formatRoute(routes.recipes.edit.path, { id: recipe.id })}>
               <Text>{recipe.name}</Text>
@@ -49,28 +49,41 @@ export function RecipesTable({ recipes, amountsPerPortion = true }: Props) {
     )
   })
 
-  const style: BoxProps['style'] = {
-    whiteSpace: 'nowrap',
-  }
   return (
-    <Table.ScrollContainer minWidth={360} w="100%">
+    <Box className={classes.tableContainer}>
       <Table>
         <Table.Thead>
           <Table.Tr>
-            <Table.Th miw={200}>Item</Table.Th>
-            <Table.Th style={style}>Portions</Table.Th>
-            <Table.Th style={style}>Quantity (g)</Table.Th>
-            <Table.Th style={style}>Kcal</Table.Th>
-            <Table.Th style={style}>Protein (g)</Table.Th>
-            <Table.Th style={style}>Fat (g)</Table.Th>
-            <Table.Th>Saturated fat&nbsp;(g)</Table.Th>
-            <Table.Th style={style}>Carbs (g)</Table.Th>
-            <Table.Th style={style}>Sugar (g)</Table.Th>
-            <Table.Th style={style}>Salt (g)</Table.Th>
+            <Table.Th miw={200}>Recipe</Table.Th>
+            <Table.Th>Portions</Table.Th>
+            <Table.Th>
+              <TableHeader unitInSameRow text="Quantity" unit="(g)" />
+            </Table.Th>
+            <Table.Th>
+              <TableHeader unitInSameRow text="Kcal" />
+            </Table.Th>
+            <Table.Th>
+              <TableHeader unitInSameRow text="Protein" unit="(g)" />
+            </Table.Th>
+            <Table.Th>
+              <TableHeader unitInSameRow text="Fat" unit="(g)" />
+            </Table.Th>
+            <Table.Th>
+              <TableHeader unitInSameRow text="Saturated" unit="(g)" />
+            </Table.Th>
+            <Table.Th>
+              <TableHeader unitInSameRow text="Carbs" unit="(g)" />
+            </Table.Th>
+            <Table.Th>
+              <TableHeader unitInSameRow text="Sugar" unit="(g)" />
+            </Table.Th>
+            <Table.Th>
+              <TableHeader unitInSameRow text="Salt" unit="(g)" />
+            </Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>{rows}</Table.Tbody>
       </Table>
-    </Table.ScrollContainer>
+    </Box>
   )
 }

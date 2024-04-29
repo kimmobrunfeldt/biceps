@@ -1,17 +1,33 @@
-import { Box, Button, Group, Stack, Stepper, Text, Title } from '@mantine/core'
-import { useState } from 'react'
+import {
+  Box,
+  BoxProps,
+  Button,
+  Stack,
+  Stepper,
+  Text,
+  Title,
+} from '@mantine/core'
+import { useMediaQuery } from '@uidotdev/usehooks'
+import { Link } from 'src/components/Link'
 import { Query } from 'src/components/Query'
+import { AppStateResolved } from 'src/db/schemas/AppStateSchema'
 import { useGetAppState } from 'src/hooks/useDatabase'
+import { useNotifications } from 'src/hooks/useNotification'
+import { routes } from 'src/routes'
+import { theme } from 'src/theme'
 import classes from './Introduction.module.css'
 
 export function Introduction() {
   const appStateResult = useGetAppState()
+  const { notification } = useNotifications()
+  const isWide = useMediaQuery(`(min-width: ${theme.breakpoints!.xl})`)
 
-  const [active, setActive] = useState(0)
-  const nextStep = () =>
-    setActive((current) => (current < 3 ? current + 1 : current))
-  const prevStep = () =>
-    setActive((current) => (current > 0 ? current - 1 : current))
+  async function onClick() {
+    notification({
+      message: 'Onboarding completed!',
+      color: 'green',
+    })
+  }
 
   return (
     <Box>
@@ -19,55 +35,102 @@ export function Introduction() {
         {(data) => {
           if (data.onboardingState === 'Completed') return null
 
+          const stepIndex = onboardingStateToIndex(data.onboardingState)
+
+          const stepWrapperProps = {
+            py: { base: 0, xl: 'md' },
+            px: 'xs',
+          } satisfies BoxProps
+
           return (
             <Stack gap="xl">
               <Box className={classes.root}>
-                <Title c="white" order={1} fz={28} mb="md" ff="heading">
+                <Title c="white" order={2} fz="h3" mb="md" ff="heading">
                   Ready to get gains?
                 </Title>
                 <Text c="white" maw={700}>
-                  Biceps helps with nutrition planning ensuring you will crush
-                  your fitness goals. All data is securely stored locally in the
+                  Biceps helps with nutrition planning so you can crush your
+                  fitness goals. All data is securely stored locally in the
                   browser and won&apos;t be sent to a server.
                 </Text>
               </Box>
 
-              <Box p="md">
+              <Box>
+                <Title order={2} fz="h3" mb="xl">
+                  Let&rsquo;s get you started
+                </Title>
                 <Stepper
-                  active={active}
-                  onStepClick={setActive}
-                  orientation="vertical"
+                  active={stepIndex}
+                  orientation={isWide ? 'horizontal' : 'vertical'}
                 >
                   <Stepper.Step
                     label="Add your details"
                     description="Used to personalise the app"
                   >
-                    Step 1 content: Create a new person
+                    <Box {...stepWrapperProps}>
+                      <Title order={3} fw="bold" fz="h4" mb="sm">
+                        Step 1
+                      </Title>
+                      <Box>
+                        Go to{' '}
+                        <Link to={routes.settings.path}>
+                          {routes.settings.title}
+                        </Link>{' '}
+                        page and save your name.
+                      </Box>
+                    </Box>
                   </Stepper.Step>
                   <Stepper.Step
-                    label="Create recipes"
-                    description="Hitting macro goals is a breeze with recipes"
+                    label="Create a recipe"
+                    description="Precise macros will be calculated for each recipe"
                   >
-                    Step 2 content: Verify email
+                    <Box {...stepWrapperProps}>
+                      <Title order={3} fw="bold" fz="h4" mb="sm">
+                        Step 2
+                      </Title>
+                      <Box>
+                        Go to{' '}
+                        <Link to={routes.recipes.index.path}>
+                          {routes.recipes.index.title}
+                        </Link>{' '}
+                        page and add a recipe.
+                      </Box>
+                    </Box>
                   </Stepper.Step>
                   <Stepper.Step
-                    label="Plan weekly schedule"
-                    description="Well planned is half done"
+                    label="Add meal plan"
+                    description="When eating according to plan, you'll know the exact nutrition intake"
                   >
-                    Step 3 content: Get full access
+                    <Box {...stepWrapperProps}>
+                      <Title order={3} fw="bold" fz="h4" mb="sm">
+                        Step 3
+                      </Title>
+                      <Box>
+                        Go to{' '}
+                        <Link to={routes.weeklySchedule.index.path}>
+                          {routes.weeklySchedule.index.title}
+                        </Link>{' '}
+                        page and add a meal plan.
+                      </Box>
+                    </Box>
                   </Stepper.Step>
                   <Stepper.Completed>
-                    Completed, click back button to get to previous step
+                    <Box {...stepWrapperProps}>
+                      <Title order={3} fw="bold" fz="h4" mb="sm">
+                        Onboarding done
+                      </Title>
+
+                      <Box>
+                        Next, edit your full weekly schedule and start following
+                        the plan.
+                      </Box>
+
+                      <Button mt="xl" onClick={onClick}>
+                        Get gains
+                      </Button>
+                    </Box>
                   </Stepper.Completed>
                 </Stepper>
-
-                <Group justify="center" mt="xl">
-                  <Button variant="default" onClick={prevStep}>
-                    Back
-                  </Button>
-                  <Button onClick={nextStep}>Next step</Button>
-                </Group>
-                <Text>... or take a look at John Doe's example plan.</Text>
               </Box>
             </Stack>
           )
@@ -75,4 +138,21 @@ export function Introduction() {
       </Query>
     </Box>
   )
+}
+
+function onboardingStateToIndex(
+  onboardingState: AppStateResolved['onboardingState']
+): number {
+  switch (onboardingState) {
+    case 'NewUser':
+      return 0
+    case 'ProfileCreated':
+      return 1
+    case 'RecipeAdded':
+      return 2
+    case 'WeeklyScheduleAdded':
+      return 3
+    case 'Completed':
+      return 4
+  }
 }

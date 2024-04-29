@@ -23,7 +23,7 @@ export function ProductImage({ product, ...rest }: Props) {
       onMouseLeave={close}
       src={product ? product.imageThumbUrl : null}
       alt=""
-      size="md"
+      size="sm"
       radius="sm"
       className={classes.itemImage}
       {...rest}

@@ -3,6 +3,7 @@ import { IconPlus } from '@tabler/icons-react'
 import { Link } from 'src/components/Link'
 import { PageTemplate } from 'src/components/PageTemplate'
 import { Query } from 'src/components/Query'
+import { TableSkeleton } from 'src/components/TableSkeleton'
 import { useGetAllRecurringEvents } from 'src/hooks/useDatabase'
 import { DaySchedule } from 'src/pages/weeklySchedules/WeeklySchedulePage/components/DaySchedule'
 import { routes } from 'src/routes'
@@ -24,6 +25,7 @@ export function WeeklySchedulePage() {
     >
       <Query
         result={recurringEventsResult}
+        whenLoading={<TableSkeleton />}
         whenEmpty={() => (
           <Box>
             {weekdays.map((weekday) => {

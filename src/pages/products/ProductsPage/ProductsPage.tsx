@@ -1,13 +1,9 @@
-import { Box, Button, Flex, Text, Title } from '@mantine/core'
+import { Box, Button, Text, Title } from '@mantine/core'
 import { modals } from '@mantine/modals'
-import {
-  IconExternalLink,
-  IconInfoCircle,
-  IconPlus,
-  IconX,
-} from '@tabler/icons-react'
+import { IconExternalLink, IconPlus, IconX } from '@tabler/icons-react'
 import pluralize from 'pluralize'
 import { useCallback } from 'react'
+import { GrayText } from 'src/components/GrayText'
 import { Link } from 'src/components/Link'
 import { PageTemplate } from 'src/components/PageTemplate'
 import { PaperContainer } from 'src/components/PaperContainer'
@@ -102,12 +98,12 @@ export function ProductsPage() {
       }
     >
       <Box>
-        <Title order={2} size="md" mt="xl">
+        <Title order={2} size="h3" mt="md">
           Custom products
         </Title>
-        <Text py="sm" c="gray" opacity={0.7}>
-          Products added automatically by Biceps app or manually by you.
-        </Text>
+        <GrayText py="sm">
+          Products added automatically by Biceps app or manually by you
+        </GrayText>
         <PaperContainer>
           <Query
             result={customProductsResult}
@@ -126,12 +122,10 @@ export function ProductsPage() {
           </Query>
         </PaperContainer>
 
-        <Title order={2} size="md" mt={80}>
+        <Title order={2} size="h3" mt={80}>
           Open Food Facts
         </Title>
-        <Text py="sm" c="gray" opacity={0.7}>
-          Products added from Open Food Facts
-        </Text>
+        <GrayText py="sm">Products added from Open Food Facts</GrayText>
         <PaperContainer>
           <Query
             result={externalProductsResult}
@@ -151,11 +145,7 @@ export function ProductsPage() {
 const NoProducts = () => {
   return (
     <Box>
-      <ProductsTable products={[]} />
-      <Flex px="sm" direction="row" align="center" gap={4} opacity={0.7}>
-        <IconInfoCircle width={20} color="gray" />
-        <Text c="gray">No products</Text>
-      </Flex>
+      <ProductsTable products={[]} empty />
     </Box>
   )
 }

@@ -2,6 +2,7 @@ import { Temporal } from '@js-temporal/polyfill'
 import { Stack } from '@mantine/core'
 import { PageTemplate } from 'src/components/PageTemplate'
 import { Query } from 'src/components/Query'
+import { TableSkeleton } from 'src/components/TableSkeleton'
 import { RecurringEventResolved } from 'src/db/schemas/RecurringEventSchema'
 import { useGetAllRecurringEvents, useGetAppState } from 'src/hooks/useDatabase'
 import { DailyStats } from 'src/pages/IndexPage/components/DailyStats'
@@ -24,7 +25,11 @@ export function IndexPage() {
 
   return (
     <PageTemplate title={getTitle()}>
-      <Query result={recurringEventsResult} whenEmpty={() => <Introduction />}>
+      <Query
+        result={recurringEventsResult}
+        whenEmpty={() => <Introduction />}
+        whenLoading={<TableSkeleton />}
+      >
         {(data) => {
           const eventsToday = data.filter((event) => {
             return event.weekday === dayOfWeek
