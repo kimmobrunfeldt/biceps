@@ -33,8 +33,6 @@ export function Introduction() {
     <Box>
       <Query result={appStateResult}>
         {(data) => {
-          if (data.onboardingState === 'Completed') return null
-
           const stepIndex = onboardingStateToIndex(data.onboardingState)
 
           const stepWrapperProps = {

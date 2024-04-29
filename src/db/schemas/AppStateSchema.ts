@@ -10,13 +10,7 @@ export const AppStateRowSchema = z
     __type: addTypeName('AppState'),
     key: z.string(),
     selectedPersonId: IdSchema,
-    onboardingState: z.union([
-      z.literal('NewUser'),
-      z.literal('ProfileCreated'),
-      z.literal('RecipeAdded'),
-      z.literal('WeeklyScheduleAdded'),
-      z.literal('Completed'),
-    ]),
+    onboardingCompletedAt: z.union([DateSchema, z.null()]),
     createdAt: DateSchema,
   })
   .strict()
@@ -26,7 +20,8 @@ export const AppStateBeforeDatabaseSchema = z
   .object({
     key: z.string(),
     selectedPersonId: IdSchema,
-    onboardingState: AppStateRowSchema.shape.onboardingState,
+    onboardingCompletedAt:
+      AppStateRowSchema.shape.onboardingCompletedAt.optional(),
     createdAt: AppStateRowSchema.shape.createdAt.optional(),
   })
   .strict()
@@ -36,6 +31,13 @@ export type AppStateBeforeDatabase = z.infer<
 
 export const AppStateResolvedSchema = AppStateRowSchema.merge(
   z.object({
+    onboardingState: z.union([
+      z.literal('NewUser'),
+      z.literal('ProfileCreated'),
+      z.literal('RecipeAdded'),
+      z.literal('WeeklyScheduleAdded'),
+      z.literal('Completed'),
+    ]),
     selectedPerson: PersonResolvedSchema,
   })
 ).strict()
@@ -44,6 +46,13 @@ export type AppStateResolved = z.infer<typeof AppStateResolvedSchema>
 export const AppStateResolvedBeforeSavingSchema =
   AppStateBeforeDatabaseSchema.merge(
     z.object({
+      onboardingState: z.union([
+        z.literal('NewUser'),
+        z.literal('ProfileCreated'),
+        z.literal('RecipeAdded'),
+        z.literal('WeeklyScheduleAdded'),
+        z.literal('Completed'),
+      ]),
       selectedPerson: z.array(PersonResolvedBeforeSavingSchema),
     })
   ).strict()

@@ -53,7 +53,7 @@ SELECT crsql_as_crr('person_recipes');
 CREATE TABLE app_state (
   key TEXT PRIMARY KEY NOT NULL,
   selected_person_id TEXT,
-  onboarding_state TEXT,
+  onboarding_completed_at DATETIME,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 SELECT crsql_as_crr('app_state');

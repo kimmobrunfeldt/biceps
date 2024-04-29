@@ -81,7 +81,7 @@ export async function upsertSeedData(connection: TXAsync) {
       object: {
         key: APP_STATE_KEY,
         selectedPersonId: person.id,
-        onboardingState: 'NewUser',
+        onboardingCompletedAt: new Date(),
       },
     })
   }
