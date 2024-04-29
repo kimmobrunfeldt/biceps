@@ -17,7 +17,7 @@ export function PageTemplate({
   ...rest
 }: Props) {
   return (
-    <Box className={classes.container} {...rest}>
+    <Box maw={1700} mx="auto" className={classes.container} {...rest}>
       <Box pb="md">
         <PageTitleBar
           title={title}
