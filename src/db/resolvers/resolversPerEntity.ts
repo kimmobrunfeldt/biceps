@@ -1,4 +1,4 @@
-import { Recipe, RecurringEvent } from 'src/db/entities'
+import { RecurringEvent } from 'src/db/entities'
 import { CommonResolverOptions } from 'src/db/resolvers/types'
 import { AppStateResolved, AppStateRow } from 'src/db/schemas/AppStateSchema'
 import { PersonResolved, PersonRow } from 'src/db/schemas/PersonSchema'
@@ -75,10 +75,10 @@ export async function appStateResolver({
   const selectedPersonRow = await loaders.personById.load(row.selectedPersonId)
 
   // TODO: Use data loader
-  const recipes = await Recipe.findMany({ connection, limit: 2 })
-  const recurringEvents = await RecurringEvent.findMany({
+  const recipeCount = await loaders.recipeTotalCount.load({})
+  const { count: recurringEventsCount } = await RecurringEvent.count({
     connection,
-    limit: 2,
+    limit: 1, // We are only interested if there are more than 0
   })
 
   function getOnboardingState(): AppStateResolved['onboardingState'] {
@@ -86,15 +86,11 @@ export async function appStateResolver({
       return 'Completed'
     }
 
-    if (
-      row.selectedPersonId &&
-      recipes.length > 0 &&
-      recurringEvents.length > 0
-    ) {
+    if (row.selectedPersonId && recipeCount > 0 && recurringEventsCount > 0) {
       return 'WeeklyScheduleAdded'
-    } else if (row.selectedPersonId && recipes.length > 0) {
+    } else if (row.selectedPersonId && recipeCount > 0) {
       return 'RecipeAdded'
-    } else if (row.selectedPersonId && recipes.length === 0) {
+    } else if (row.selectedPersonId && recipeCount === 0) {
       return 'ProfileCreated'
     }
 

@@ -103,6 +103,7 @@ export { ProductEntity as Product }
 import {
   findManyByProductIds as findManyByProductIdsRecipe,
   clientUpsert as clientUpsertRecipe,
+  count as countRecipe,
   find as findRecipe,
   findMany as findManyRecipe,
   insert as insertRecipe,
@@ -115,6 +116,7 @@ import {
 const RecipeEntity = createEntity('Recipe', {
   findManyByProductIds: findManyByProductIdsRecipe,
   clientUpsert: clientUpsertRecipe,
+  count: countRecipe,
   find: findRecipe,
   findMany: findManyRecipe,
   insert: insertRecipe,
@@ -150,6 +152,7 @@ export { RecipeItemEntity as RecipeItem }
 
 import {
   clientUpsert as clientUpsertRecurringEvent,
+  count as countRecurringEvent,
   find as findRecurringEvent,
   findMany as findManyRecurringEvent,
   insert as insertRecurringEvent,
@@ -161,6 +164,7 @@ import {
 } from 'src/db/entities/RecurringEvent'
 const RecurringEventEntity = createEntity('RecurringEvent', {
   clientUpsert: clientUpsertRecurringEvent,
+  count: countRecurringEvent,
   find: findRecurringEvent,
   findMany: findManyRecurringEvent,
   insert: insertRecurringEvent,

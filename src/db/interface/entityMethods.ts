@@ -183,6 +183,37 @@ export function makeUtils<
     })
   }
 
+  const countSchema = z.object({ count: z.number() }).strict()
+
+  async function count({
+    connection,
+    where,
+    limit,
+  }: Options & FindOptions<z.infer<SchemaT>>): Promise<
+    z.infer<typeof countSchema>
+  > {
+    const { whereSql, limitSql } = findOptionsAsSql({
+      where,
+      limit,
+    })
+
+    const sqlQuery = sql`
+      SELECT COUNT(*) as count FROM ${table}
+      ${whereSql}
+      ${limitSql}
+    `
+    const { one } = createDatabaseMethodsWithTransform({
+      connection,
+      schema: countSchema,
+    })
+    return await withSqlLogging({
+      logger,
+      sqlQuery,
+      methodName: 'count',
+      cb: () => one(sqlQuery),
+    })
+  }
+
   async function findMany({
     connection,
     where,
@@ -365,6 +396,7 @@ export function makeUtils<
 
   return {
     find,
+    count,
     maybeFind,
     findMany,
     insert,

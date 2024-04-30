@@ -9,6 +9,7 @@ import { z } from 'zod'
 
 const {
   find,
+  count,
   findMany,
   maybeFind,
   insert,
@@ -27,6 +28,7 @@ const {
 
 export {
   clientUpsert,
+  count,
   find,
   findMany,
   insert,

@@ -1,5 +1,6 @@
 import { TXAsync } from '@vlcn.io/xplat-api'
 import DataLoader from 'dataloader'
+import stringify from 'json-stable-stringify'
 import _ from 'lodash'
 import {
   AnyDatabaseEntity,
@@ -9,7 +10,8 @@ import {
   RecipeItem,
   allEntities,
 } from 'src/db/entities'
-import { is } from 'src/db/interface/entityMethods'
+import { WhereConditions, is } from 'src/db/interface/entityMethods'
+import { RecipeRow } from 'src/db/schemas/RecipeSchema'
 
 export type DataLoaders = ReturnType<typeof createLoaders>
 
@@ -22,6 +24,7 @@ export function createLoaders(connection: TXAsync) {
     recipesById: createSimpleLoader({ connection, entity: Recipe }),
     productsById: createSimpleLoader({ connection, entity: Product }),
     personById: createSimpleLoader({ connection, entity: Person }),
+    recipeItemsById: createSimpleLoader({ connection, entity: RecipeItem }),
     recipeItemsByRecipeIds: new DataLoader(
       async (recipeIds: readonly string[]) => {
         const recipeItems = await RecipeItem.findManyByRecipeIds({
@@ -36,8 +39,40 @@ export function createLoaders(connection: TXAsync) {
       },
       DEFAULT_DATALOADER_OPTIONS
     ),
+    // Dedupes same where conditions
+    recipeTotalCount: new DataLoader(
+      async (
+        whereConditions: readonly WhereConditions<RecipeRow>[]
+      ): Promise<number[]> => {
+        const withIndex = whereConditions.map((where, index) => ({
+          where,
+          index,
+        }))
+        const grouped = _.groupBy(withIndex, ({ where }) => stringify(where))
+        const conditionsToQuery = Object.values(grouped).map((conditions) => {
+          // All conditions are the same, we can just pick the first
+          return conditions[0].where
+        })
+        const responses = await Promise.all(
+          conditionsToQuery.map(async (where) => {
+            const { count } = await Recipe.count({ connection, where })
+            return { where, count }
+          })
+        )
 
-    recipeItemsById: createSimpleLoader({ connection, entity: RecipeItem }),
+        // TODO: Bad algorithm
+        return withIndex.map(({ where }) => {
+          const response = responses.find(
+            (r) => stringify(r.where) === stringify(where)
+          )
+          if (!response) {
+            throw new Error('Response not found!')
+          }
+          return response.count
+        })
+      },
+      DEFAULT_DATALOADER_OPTIONS
+    ),
   }
 }
 
