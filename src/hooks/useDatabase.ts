@@ -3,7 +3,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query'
-import { APP_STATE_KEY, INDEXEDDB_NAME } from 'src/constants'
+import { APP_STATE_KEY } from 'src/constants'
 import { createRecipe, upsertRecipe } from 'src/core/recipeCore'
 import {
   AppState,
@@ -389,19 +389,6 @@ export function useGetAllRecurringEvents() {
       }
     ),
   })
-}
-
-export function useDeleteAllData() {
-  const ctx = useSqlite()
-  const queryClient = useQueryClient()
-
-  return {
-    deleteAllData: async () => {
-      await ctx.db.close()
-      await indexedDB.deleteDatabase(INDEXEDDB_NAME)
-      queryClient.invalidateQueries()
-    },
-  }
 }
 
 export function useGetAppState() {

@@ -16,12 +16,14 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { ErrorBoundary } from 'react-error-boundary'
 import { Router } from 'src/Router'
+import { DELETE_ALL_DATA_QUERY_PARAM } from 'src/components/DeleteAllDataLink'
 import { DATABASE_NAME } from 'src/constants'
 import { createLoaders } from 'src/db/dataLoaders'
 import { upsertSeedData } from 'src/db/seedData'
 import { DataLoaderContext } from 'src/hooks/useDataLoaders'
 import { DatabaseContext } from 'src/hooks/useSqlite'
 import { runMigrations } from 'src/migrations'
+import { DeleteAllDataRequestedPage } from 'src/pages/errors/DataAllDataRequestedPage'
 import { EmergencyFallbackPage } from 'src/pages/errors/EmergencyFallbackPage'
 import { theme } from 'src/theme'
 import { getLogger } from 'src/utils/logger'
@@ -56,6 +58,16 @@ const logger = getLogger('main')
 
 // TODO: This setup doesn't seem to work correctly with vite refreshing
 async function main() {
+  if (window.location.search === `?${DELETE_ALL_DATA_QUERY_PARAM}=true`) {
+    // Render data deletion page before connecting to database
+    ReactDOM.createRoot(ROOT_ELEMENT).render(
+      <UiProviders>
+        <DeleteAllDataRequestedPage />
+      </UiProviders>
+    )
+    return
+  }
+
   const crsqlite = await initWasm(() => wasmUrl)
 
   // In case the initialization fails, we'll close the DB connection.
