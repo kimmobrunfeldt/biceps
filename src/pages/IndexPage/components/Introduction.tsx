@@ -30,16 +30,20 @@ export function Introduction() {
     modals.openConfirmModal({
       title: 'Data storage warning',
       children: (
-        <>
+        <Stack gap="xs">
           <Text size="sm">
             All data is stored locally in your browser. If you clear site data
             from the browser settings, your nutrition plans will be gone!
           </Text>
-          <Text size="sm" fw="bold" mt="xs">
-            Remember to sync your data to another device via{' '}
+          <Text size="sm">
+            <b>If you are using Safari</b>, you need to add the website on your
+            home screen to prevent automatic data deletion.
+          </Text>
+          <Text size="sm">
+            <b>Remember to sync your data to another device</b> via{' '}
             {routes.settings.title} page before clearing site data.
           </Text>
-        </>
+        </Stack>
       ),
       labels: { confirm: 'I understand', cancel: 'Cancel' },
       closeOnConfirm: true,
