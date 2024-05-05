@@ -118,15 +118,26 @@ export function RecurringEventForm({
           )}
         />
 
-        <Query
-          result={recipesResult}
-          whenLoading={<InputSkeleton label="Recipe to eat" maw={340} />}
-        >
-          {(recipes) => (
-            <Controller
-              name="recipeToEatId"
-              control={control}
-              render={({ field }) => (
+        <Controller
+          name="recipeToEatId"
+          control={control}
+          render={({ field }) => (
+            <Query
+              result={recipesResult}
+              whenEmpty={() => (
+                <Select
+                  {...field}
+                  label="Recipe to eat"
+                  placeholder="Select recipe"
+                  error={errors.recipeToEatId?.message}
+                  disabled={isSubmitting}
+                  maw={340}
+                  data={[]}
+                />
+              )}
+              whenLoading={<InputSkeleton label="Recipe to eat" maw={340} />}
+            >
+              {(recipes) => (
                 <Select
                   {...field}
                   label="Recipe to eat"
@@ -137,9 +148,9 @@ export function RecurringEventForm({
                   data={recipes.map((r) => ({ value: r.id, label: r.name }))}
                 />
               )}
-            />
+            </Query>
           )}
-        </Query>
+        />
 
         <Controller
           name="portionsToEat"
