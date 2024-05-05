@@ -94,3 +94,7 @@ Settled on [cr-sqlite](https://github.com/vlcn-io/cr-sqlite) for the following r
 - CRDT implemented at database level
 - Data can be exported easily as IndexedDB export if needed
 - Data can be later synced to other devices via relay server
+
+## Acknowledgements
+
+- [food-nutrients](https://github.com/food-nutrients/food-nutrients) project and their nutrition data _(MIT License Copyright (c) 2019 Food Nutrients)_

@@ -1,5 +1,6 @@
 import { Temporal } from '@js-temporal/polyfill'
 import { Stack } from '@mantine/core'
+import { GrayText } from 'src/components/GrayText'
 import { PageTemplate } from 'src/components/PageTemplate'
 import { Query } from 'src/components/Query'
 import { TableSkeleton } from 'src/components/TableSkeleton'
@@ -25,30 +26,43 @@ export function IndexPage() {
 
   return (
     <PageTemplate title={getTitle()}>
-      <Query
-        result={recurringEventsResult}
-        whenEmpty={() => <Introduction />}
-        whenLoading={<TableSkeleton />}
-      >
-        {(data) => {
-          const eventsToday = data.filter((event) => {
-            return event.weekday === dayOfWeek
-          })
-          const eventsBeforeNow = eventsToday.filter((event) => {
-            return isBeforeNow(event.time)
-          })
-          const dayConsumed = calculateEventTotals(eventsBeforeNow)
-          const dayTotals = calculateEventTotals(eventsToday)
+      <Query result={appStateResult}>
+        {(appState) => {
+          if (appState.onboardingState !== 'Completed') return <Introduction />
 
           return (
-            <Stack gap="xl">
-              <DailyStats dayConsumed={dayConsumed} dayTotals={dayTotals} />
-              <DaySchedule
-                weekday={dayOfWeek}
-                recurringEvents={eventsToday}
-                hideNutritionHeader
-              />
-            </Stack>
+            <Query
+              result={recurringEventsResult}
+              whenEmpty={() => (
+                <GrayText>No recurring events scheduled</GrayText>
+              )}
+              whenLoading={<TableSkeleton />}
+            >
+              {(data) => {
+                const eventsToday = data.filter((event) => {
+                  return event.weekday === dayOfWeek
+                })
+                const eventsBeforeNow = eventsToday.filter((event) => {
+                  return isBeforeNow(event.time)
+                })
+                const dayConsumed = calculateEventTotals(eventsBeforeNow)
+                const dayTotals = calculateEventTotals(eventsToday)
+
+                return (
+                  <Stack gap="xl">
+                    <DailyStats
+                      dayConsumed={dayConsumed}
+                      dayTotals={dayTotals}
+                    />
+                    <DaySchedule
+                      weekday={dayOfWeek}
+                      recurringEvents={eventsToday}
+                      hideNutritionHeader
+                    />
+                  </Stack>
+                )
+              }}
+            </Query>
           )
         }}
       </Query>

@@ -46,6 +46,6 @@
     "react/prop-types": "off"
   },
   "ignorePatterns": [
-    "postcss.config.js"
+    "postcss.config.cjs"
   ]
 }

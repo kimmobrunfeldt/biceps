@@ -1,4 +1,5 @@
 import { Box, Flex, Table, Text } from '@mantine/core'
+import { IconInfoCircle } from '@tabler/icons-react'
 import { Link } from 'src/components/Link'
 import { NutritionCircle } from 'src/components/NutritionCircle'
 import classes from 'src/components/Table.module.css'
@@ -10,7 +11,6 @@ import { formatGrams, formatKcal } from 'src/utils/format'
 
 type Props = {
   recipes: RecipeResolved[]
-  onRemove: (index: number) => void
   amountsPerPortion?: boolean
 }
 
@@ -49,6 +49,17 @@ export function RecipesTable({ recipes, amountsPerPortion = true }: Props) {
     )
   })
 
+  const emptyRow = (
+    <Table.Tr>
+      <Table.Td>
+        <Flex direction="row" align="center" gap={4} opacity={0.7} py="sm">
+          <IconInfoCircle width={20} color="gray" />
+          <Text c="gray">No recipes</Text>
+        </Flex>
+      </Table.Td>
+    </Table.Tr>
+  )
+
   return (
     <Box className={classes.tableContainer}>
       <Table>
@@ -82,7 +93,7 @@ export function RecipesTable({ recipes, amountsPerPortion = true }: Props) {
             </Table.Th>
           </Table.Tr>
         </Table.Thead>
-        <Table.Tbody>{rows}</Table.Tbody>
+        <Table.Tbody>{rows.length === 0 ? emptyRow : rows}</Table.Tbody>
       </Table>
     </Box>
   )

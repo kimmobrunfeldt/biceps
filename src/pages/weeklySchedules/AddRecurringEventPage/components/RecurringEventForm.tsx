@@ -25,12 +25,14 @@ export type RecurringEventFormFields = Extract<
 >
 
 type Props = {
+  selectedPersonId: string
   initialData?: RecurringEventFormFields
   onSubmit: (data: RecurringEventFormFields) => void
   onChange?: (data: Nutrition) => void
 }
 
 export function RecurringEventForm({
+  selectedPersonId,
   initialData,
   onSubmit: inputOnSubmit,
 }: Props) {
@@ -38,6 +40,7 @@ export function RecurringEventForm({
   const recipesResult = useGetAllRecipes()
 
   const commonInitialData = {
+    personId: selectedPersonId,
     weekday: initialData?.weekday ?? 1,
     time: initialData?.time ?? { hour: 12, minute: 0 },
   }

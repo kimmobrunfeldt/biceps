@@ -41,12 +41,15 @@ export function RecipesPage() {
       </Flex>
 
       <PaperContainer>
-        <Query result={recipesResult} whenLoading={<TableSkeleton />}>
+        <Query
+          result={recipesResult}
+          whenEmpty={() => <RecipesTable recipes={[]} />}
+          whenLoading={<TableSkeleton />}
+        >
           {(recipes) => {
             return (
               <RecipesTable
                 recipes={recipes}
-                onRemove={() => undefined}
                 amountsPerPortion={amountsPerPortion}
               />
             )

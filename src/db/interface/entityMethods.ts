@@ -31,6 +31,7 @@ type WhereObject<FullObjT extends Record<string, any>> = {
 export type FindOptions<T extends Record<string, any>> = {
   where?: WhereConditions<T>
   limit?: number
+  offset?: number
   orderBy?: OrderBy<T>
 }
 
@@ -60,31 +61,38 @@ export function makeUtils<
 
   const table = identifier([inputTableName])
 
-  function baseInsertAsSql(object: z.infer<BeforeDatabaseSchemaT>) {
-    const validObject = beforeDatabaseSchema.parse(object)
+  function baseInsertAsSql(objects: z.infer<BeforeDatabaseSchemaT>[]) {
+    const first = objects[0]
+    const validObject = beforeDatabaseSchema.parse(first)
     const keys = Object.keys(validObject)
     const filteredKeys = keys.filter(
       (key) => !_.isUndefined(validObject[key]) && key !== '__type'
     )
 
+    const values = objects.map((object) => {
+      const valid = beforeDatabaseSchema.parse(object)
+      return sql`
+        (
+          ${join(
+            filteredKeys.map((key) => valueToSqlSuitable(valid[key])),
+            ', '
+          )}
+        )
+      `
+    })
     return sql`
       INSERT INTO ${table} (
         ${join(
           filteredKeys.map((key) => entityKeyToColumn(key)),
           ', '
         )}
-      ) VALUES (
-        ${join(
-          filteredKeys.map((key) => valueToSqlSuitable(validObject[key])),
-          ', '
-        )}
-      )
+      ) VALUES ${join(values, ', ')}
     `
   }
 
-  function insertAsSql(object: z.infer<BeforeDatabaseSchemaT>) {
+  function insertAsSql(objects: z.infer<BeforeDatabaseSchemaT>[]) {
     return sql`
-      ${baseInsertAsSql(object)}
+      ${baseInsertAsSql(objects)}
       RETURNING *
     `
   }
@@ -106,7 +114,7 @@ export function makeUtils<
     const filteredKeys = keys.filter((key) => !_.isUndefined(object[key]))
 
     return sql`
-      ${baseInsertAsSql(object)}
+      ${baseInsertAsSql([object])}
       ON CONFLICT ${
         _.isArray(onConflict)
           ? sql`(${join(
@@ -130,6 +138,7 @@ export function makeUtils<
     connection,
     where,
     orderBy,
+    offset,
     // Default limit to 2 to prevent accidental large queries but still allow to throw
     // when the where criteria returns more than one row.
     limit = 2,
@@ -138,6 +147,7 @@ export function makeUtils<
       where,
       orderBy,
       limit,
+      offset,
     })
     const sqlQuery = sql`
       SELECT * FROM ${table}
@@ -158,12 +168,14 @@ export function makeUtils<
     connection,
     where,
     orderBy,
+    offset,
     limit = 2,
   }: Options & FindOptions<z.infer<SchemaT>>): Promise<z.infer<SchemaT>> {
     const { limitSql, orderBySql, whereSql } = findOptionsAsSql({
       where,
       orderBy,
       limit,
+      offset,
     })
     const sqlQuery = sql`
       SELECT * FROM ${table}
@@ -189,12 +201,14 @@ export function makeUtils<
     connection,
     where,
     limit,
+    offset,
   }: Options & FindOptions<z.infer<SchemaT>>): Promise<
     z.infer<typeof countSchema>
   > {
     const { whereSql, limitSql } = findOptionsAsSql({
       where,
       limit,
+      offset,
     })
 
     const sqlQuery = sql`
@@ -218,6 +232,7 @@ export function makeUtils<
     connection,
     where,
     limit,
+    offset,
     orderBy,
   }: Options & FindOptions<z.infer<SchemaT>>): Promise<
     readonly z.infer<SchemaT>[]
@@ -225,6 +240,7 @@ export function makeUtils<
     const { limitSql, orderBySql, whereSql } = findOptionsAsSql({
       where,
       orderBy,
+      offset,
       limit,
     })
     const sqlQuery = sql`
@@ -248,13 +264,29 @@ export function makeUtils<
   }: Options & { object: z.infer<BeforeDatabaseSchemaT> }): Promise<
     z.infer<SchemaT>
   > {
-    const sqlQuery = insertAsSql(object)
+    const sqlQuery = insertAsSql([object])
     const { one } = createDatabaseMethodsWithTransform({ connection, schema })
     return await withSqlLogging({
       logger,
       sqlQuery,
       methodName: 'insert',
       cb: () => one(sqlQuery),
+    })
+  }
+
+  async function insertMany({
+    objects,
+    connection,
+  }: Options & { objects: z.infer<BeforeDatabaseSchemaT>[] }): Promise<
+    z.infer<SchemaT>[]
+  > {
+    const sqlQuery = insertAsSql(objects)
+    const { many } = createDatabaseMethodsWithTransform({ connection, schema })
+    return await withSqlLogging({
+      logger,
+      sqlQuery,
+      methodName: 'insertMany',
+      cb: () => many(sqlQuery),
     })
   }
 
@@ -400,6 +432,7 @@ export function makeUtils<
     maybeFind,
     findMany,
     insert,
+    insertMany,
     upsert,
     clientUpsert,
     update,
@@ -412,12 +445,14 @@ export function makeUtils<
 export function findOptionsAsSql<T extends Record<string, any>>({
   where = {},
   orderBy,
+  offset,
   limit,
 }: FindOptions<T>) {
+  const offsetSql = offset ? sql` OFFSET ${offset}` : sql``
   return {
     whereSql:
       Object.keys(where).length > 0 ? sql`WHERE ${whereAsSql(where)}` : sql``,
-    limitSql: limit ? sql`LIMIT ${limit}` : sql``,
+    limitSql: limit ? sql`LIMIT ${limit}${offsetSql}` : sql``,
     orderBySql: orderBy ? orderByAsSql(orderBy) : sql``,
   }
 }

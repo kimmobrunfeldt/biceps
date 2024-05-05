@@ -6,9 +6,6 @@ import { useCallback } from 'react'
 import { GrayText } from 'src/components/GrayText'
 import { Link } from 'src/components/Link'
 import { PageTemplate } from 'src/components/PageTemplate'
-import { PaperContainer } from 'src/components/PaperContainer'
-import { Query } from 'src/components/Query'
-import { TableSkeleton } from 'src/components/TableSkeleton'
 import { ProductResolved } from 'src/db/schemas/ProductSchema'
 import {
   useDeleteProduct,
@@ -22,8 +19,6 @@ import { routes } from 'src/routes'
 
 export function ProductsPage() {
   const { withNotifications } = useNotifications()
-  const customProductsResult = useGetAllCustomProducts()
-  const externalProductsResult = useGetAllExternalProducts()
   const { deleteProduct } = useDeleteProduct()
   const { getRecipesByProductId } = useLazyGetRecipesByProductId()
 
@@ -104,48 +99,22 @@ export function ProductsPage() {
         <GrayText py="sm">
           Products added automatically by Biceps app or manually by you
         </GrayText>
-        <PaperContainer>
-          <Query
-            result={customProductsResult}
-            whenEmpty={() => <NoProducts />}
-            whenLoading={<TableSkeleton />}
-          >
-            {(products) => {
-              return (
-                <ProductsTable
-                  products={products}
-                  showRemove
-                  onRemove={onProductRemove}
-                />
-              )
-            }}
-          </Query>
-        </PaperContainer>
+        <ProductsTable
+          useData={useGetAllCustomProducts}
+          showRemove
+          onRemove={onProductRemove}
+        />
 
         <Title order={2} size="h3" mt={80}>
           Open Food Facts
         </Title>
         <GrayText py="sm">Products added from Open Food Facts</GrayText>
-        <PaperContainer>
-          <Query
-            result={externalProductsResult}
-            whenEmpty={() => <NoProducts />}
-            whenLoading={<TableSkeleton />}
-          >
-            {(products) => {
-              return <ProductsTable products={products} />
-            }}
-          </Query>
-        </PaperContainer>
+        <ProductsTable
+          useData={useGetAllExternalProducts}
+          showRemove
+          onRemove={onProductRemove}
+        />
       </Box>
     </PageTemplate>
-  )
-}
-
-const NoProducts = () => {
-  return (
-    <Box>
-      <ProductsTable products={[]} empty />
-    </Box>
   )
 }

@@ -2,7 +2,6 @@ import {
   AddIdSchema,
   DateSchema,
   IdSchema,
-  NameSchema,
   addTypeName,
 } from 'src/db/schemas/common'
 import { z } from 'zod'
@@ -11,7 +10,7 @@ export const PersonRowSchema = z
   .object({
     __type: addTypeName('Person'),
     id: IdSchema,
-    name: NameSchema,
+    name: z.string(),
     createdAt: DateSchema,
   })
   .strict()
@@ -20,7 +19,7 @@ export type PersonRow = z.infer<typeof PersonRowSchema>
 export const PersonBeforeDatabaseSchema = z
   .object({
     id: AddIdSchema,
-    name: PersonRowSchema.shape.name,
+    name: z.string(),
     createdAt: PersonRowSchema.shape.createdAt.optional(),
   })
   .strict()

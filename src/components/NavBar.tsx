@@ -153,9 +153,9 @@ export function NavBar() {
                   <Avatar
                     color={settingsRouteActive ? 'blue' : 'gray'}
                     radius="xl"
-                    alt={data.selectedPerson.name}
+                    alt={data.selectedPerson?.name}
                   >
-                    {data.selectedPerson.initials}
+                    {data.selectedPerson?.initials}
                   </Avatar>
                 )
               }}

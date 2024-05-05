@@ -43,13 +43,6 @@ CREATE TABLE persons (
 );
 SELECT crsql_as_crr('persons');
 
-CREATE TABLE person_recipes (
-  person_id TEXT NOT NULL,
-  recipe_id TEXT NOT NULL,
-  PRIMARY KEY (person_id, recipe_id)
-);
-SELECT crsql_as_crr('person_recipes');
-
 CREATE TABLE app_state (
   key TEXT PRIMARY KEY NOT NULL,
   selected_person_id TEXT,
@@ -60,6 +53,7 @@ SELECT crsql_as_crr('app_state');
 
 CREATE TABLE recurring_events (
   id TEXT PRIMARY KEY NOT NULL,
+  person_id TEXT,
   weekday INTEGER,
   hour INTEGER,
   minute INTEGER,

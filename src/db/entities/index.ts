@@ -53,31 +53,17 @@ const PersonEntity = createEntity('Person', {
 export { PersonEntity as Person }
 
 import {
-  clientUpsert as clientUpsertPersonRecipe,
-  find as findPersonRecipe,
-  findMany as findManyPersonRecipe,
-  insert as insertPersonRecipe,
-  removeAll as removeAllPersonRecipe,
-  upsert as upsertPersonRecipe,
-} from 'src/db/entities/PersonRecipe'
-const PersonRecipeEntity = createEntity('PersonRecipe', {
-  clientUpsert: clientUpsertPersonRecipe,
-  find: findPersonRecipe,
-  findMany: findManyPersonRecipe,
-  insert: insertPersonRecipe,
-  removeAll: removeAllPersonRecipe,
-  upsert: upsertPersonRecipe,
-})
-export { PersonRecipeEntity as PersonRecipe }
-
-import {
   findManyByRecipeIds as findManyByRecipeIdsProduct,
   findManyCustom as findManyCustomProduct,
+  customCount as customCountProduct,
   findManyExternal as findManyExternalProduct,
+  externalCount as externalCountProduct,
   clientUpsert as clientUpsertProduct,
+  count as countProduct,
   find as findProduct,
   findMany as findManyProduct,
   insert as insertProduct,
+  insertMany as insertManyProduct,
   maybeFind as maybeFindProduct,
   remove as removeProduct,
   removeAll as removeAllProduct,
@@ -87,11 +73,15 @@ import {
 const ProductEntity = createEntity('Product', {
   findManyByRecipeIds: findManyByRecipeIdsProduct,
   findManyCustom: findManyCustomProduct,
+  customCount: customCountProduct,
   findManyExternal: findManyExternalProduct,
+  externalCount: externalCountProduct,
   clientUpsert: clientUpsertProduct,
+  count: countProduct,
   find: findProduct,
   findMany: findManyProduct,
   insert: insertProduct,
+  insertMany: insertManyProduct,
   maybeFind: maybeFindProduct,
   remove: removeProduct,
   removeAll: removeAllProduct,
@@ -179,7 +169,6 @@ export { RecurringEventEntity as RecurringEvent }
 export const allEntities = {
   AppState: AppStateEntity,
   Person: PersonEntity,
-  PersonRecipe: PersonRecipeEntity,
   Product: ProductEntity,
   Recipe: RecipeEntity,
   RecipeItem: RecipeItemEntity,

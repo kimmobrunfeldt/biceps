@@ -28,7 +28,7 @@ export async function resolver<T extends EntityRow>({
   const result = await resolverForEntity({ row, connection, loaders })
 
   const logger = getLogger(`resolver:${row.__type ?? '<unknown entity>'}`)
-  logger.info('Resolved', row, '\n\n->\n\n', result)
+  logger.debug('Resolved', row, '\n\n->\n\n', result)
   return result
 }
 

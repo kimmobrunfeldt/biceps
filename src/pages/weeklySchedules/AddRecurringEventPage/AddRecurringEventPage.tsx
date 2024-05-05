@@ -3,8 +3,9 @@ import { IconAlertCircle, IconChevronLeft } from '@tabler/icons-react'
 import { useCallback, useState } from 'react'
 import { Link } from 'src/components/Link'
 import { PageTemplate } from 'src/components/PageTemplate'
+import { Query } from 'src/components/Query'
 import { NBSP } from 'src/constants'
-import { useUpsertRecurringEvent } from 'src/hooks/useDatabase'
+import { useGetAppState, useUpsertRecurringEvent } from 'src/hooks/useDatabase'
 import { useNotifications } from 'src/hooks/useNotification'
 import {
   RecurringEventForm,
@@ -15,6 +16,7 @@ import { weekdayNumberToLongName } from 'src/utils/time'
 import { useLocation } from 'wouter'
 
 export function AddRecurringEventPage() {
+  const appStateResult = useGetAppState()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { withNotifications } = useNotifications()
   const [_location, setLocation] = useLocation()
@@ -22,13 +24,19 @@ export function AddRecurringEventPage() {
 
   const onSubmit = useCallback(
     async (data: RecurringEventFormFields) => {
+      if (!appStateResult.data) {
+        return
+      }
       if (isSubmitting) return
 
       setIsSubmitting(true)
       try {
         await withNotifications({
           fn: async () => {
-            await upsertRecurringEvent(data)
+            await upsertRecurringEvent({
+              ...data,
+              personId: appStateResult.data.selectedPersonId,
+            })
             setLocation(routes.weeklySchedule.index.path)
           },
           success: {
@@ -46,7 +54,13 @@ export function AddRecurringEventPage() {
         setIsSubmitting(false)
       }
     },
-    [withNotifications, isSubmitting, setLocation, upsertRecurringEvent]
+    [
+      withNotifications,
+      isSubmitting,
+      setLocation,
+      upsertRecurringEvent,
+      appStateResult.data,
+    ]
   )
 
   return (
@@ -61,7 +75,14 @@ export function AddRecurringEventPage() {
         </Link>
       }
     >
-      <RecurringEventForm onSubmit={onSubmit} />
+      <Query result={appStateResult}>
+        {(appState) => (
+          <RecurringEventForm
+            selectedPersonId={appState.selectedPersonId}
+            onSubmit={onSubmit}
+          />
+        )}
+      </Query>
     </PageTemplate>
   )
 }

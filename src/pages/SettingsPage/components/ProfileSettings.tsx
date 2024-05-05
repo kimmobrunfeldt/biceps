@@ -30,12 +30,12 @@ export function ProfileSettings() {
   })
 
   useEffect(() => {
-    if (!appStateResult.data?.selectedPerson.name) return
+    if (!appStateResult.data?.selectedPerson?.name) return
     // Use reset to clear dirty status
     resetField('name', {
       defaultValue: appStateResult.data.selectedPerson.name,
     })
-  }, [setValue, resetField, appStateResult.data?.selectedPerson.name])
+  }, [setValue, resetField, appStateResult.data?.selectedPerson?.name])
 
   const onSubmit = useCallback(
     async (data: FormData) => {
@@ -45,7 +45,7 @@ export function ProfileSettings() {
       try {
         await withNotifications({
           fn: async () => {
-            await updatePerson(appStateResult.data.selectedPerson.id, {
+            await updatePerson(appStateResult.data.selectedPerson?.id, {
               name: data.name,
             })
           },

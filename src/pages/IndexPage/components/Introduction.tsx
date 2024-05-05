@@ -7,11 +7,13 @@ import {
   Text,
   Title,
 } from '@mantine/core'
+import { useModals } from '@mantine/modals'
+import { IconX } from '@tabler/icons-react'
 import { useMediaQuery } from '@uidotdev/usehooks'
 import { Link } from 'src/components/Link'
 import { Query } from 'src/components/Query'
 import { AppStateResolved } from 'src/db/schemas/AppStateSchema'
-import { useGetAppState } from 'src/hooks/useDatabase'
+import { useGetAppState, useUpdateAppState } from 'src/hooks/useDatabase'
 import { useNotifications } from 'src/hooks/useNotification'
 import { routes } from 'src/routes'
 import { theme } from 'src/theme'
@@ -19,13 +21,46 @@ import classes from './Introduction.module.css'
 
 export function Introduction() {
   const appStateResult = useGetAppState()
-  const { notification } = useNotifications()
+  const modals = useModals()
+  const { updateAppState } = useUpdateAppState()
+  const { withNotifications } = useNotifications()
   const isWide = useMediaQuery(`(min-width: ${theme.breakpoints!.xl})`)
 
   async function onClick() {
-    notification({
-      message: 'Onboarding completed!',
-      color: 'green',
+    modals.openConfirmModal({
+      title: 'Data storage warning',
+      children: (
+        <>
+          <Text size="sm">
+            All data is stored locally in your browser. If you clear site data
+            from the browser settings, your nutrition plans will be gone!
+          </Text>
+          <Text size="sm" fw="bold" mt="xs">
+            Remember to sync your data to another device via{' '}
+            {routes.settings.title} page before clearing site data.
+          </Text>
+        </>
+      ),
+      labels: { confirm: 'I understand', cancel: 'Cancel' },
+      closeOnConfirm: true,
+      onConfirm: async () => {
+        await withNotifications({
+          fn: async () => {
+            await updateAppState({
+              onboardingCompletedAt: new Date(),
+            })
+          },
+          success: {
+            message: 'Onboarding completed! 💪',
+            color: 'green',
+          },
+          error: {
+            message: 'Failed to mark onboarding complete!',
+            color: 'red',
+            icon: <IconX />,
+          },
+        })
+      },
     })
   }
 
@@ -47,7 +82,7 @@ export function Introduction() {
                   Ready to get gains?
                 </Title>
                 <Text c="white" maw={700}>
-                  Biceps helps with nutrition planning so you can crush your
+                  Biceps app helps with nutrition planning so you can crush your
                   fitness goals. All data is securely stored locally in the
                   browser and won&apos;t be sent to a server.
                 </Text>
@@ -96,7 +131,7 @@ export function Introduction() {
                     </Box>
                   </Stepper.Step>
                   <Stepper.Step
-                    label="Add meal plan"
+                    label="Add a meal plan"
                     description="When eating according to plan, you'll know the exact nutrition intake"
                   >
                     <Box {...stepWrapperProps}>
@@ -115,16 +150,16 @@ export function Introduction() {
                   <Stepper.Completed>
                     <Box {...stepWrapperProps}>
                       <Title order={3} fw="bold" fz="h4" mb="sm">
-                        Onboarding done
+                        Onboarding completed
                       </Title>
 
                       <Box>
                         Next, edit your full weekly schedule and start following
-                        the plan.
+                        the plan!
                       </Box>
 
                       <Button mt="xl" onClick={onClick}>
-                        Get gains
+                        Close onboarding
                       </Button>
                     </Box>
                   </Stepper.Completed>

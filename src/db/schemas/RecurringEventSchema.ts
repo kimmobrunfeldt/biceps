@@ -13,6 +13,7 @@ const BaseSchema = z
   .object({
     __type: addTypeName('RecurringEvent'),
     id: IdSchema,
+    personId: IdSchema,
     weekday: z.union([
       z.literal(1),
       z.literal(2),

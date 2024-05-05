@@ -81,16 +81,25 @@ export async function appStateResolver({
     limit: 1, // We are only interested if there are more than 0
   })
 
+  const selectedPerson = await personResolver({
+    row: selectedPersonRow,
+    loaders,
+    connection,
+  })
+
   function getOnboardingState(): AppStateResolved['onboardingState'] {
     if (row.onboardingCompletedAt) {
       return 'Completed'
     }
 
-    if (row.selectedPersonId && recipeCount > 0 && recurringEventsCount > 0) {
+    const personOnboarded =
+      selectedPerson && selectedPerson.name && selectedPerson.name.length > 0
+
+    if (personOnboarded && recipeCount > 0 && recurringEventsCount > 0) {
       return 'WeeklyScheduleAdded'
-    } else if (row.selectedPersonId && recipeCount > 0) {
+    } else if (personOnboarded && recipeCount > 0) {
       return 'RecipeAdded'
-    } else if (row.selectedPersonId && recipeCount === 0) {
+    } else if (personOnboarded && recipeCount === 0) {
       return 'ProfileCreated'
     }
 
@@ -100,11 +109,7 @@ export async function appStateResolver({
   return {
     ...row,
     onboardingState: getOnboardingState(),
-    selectedPerson: await personResolver({
-      row: selectedPersonRow,
-      loaders,
-      connection,
-    }),
+    selectedPerson,
   }
 }
 
@@ -114,7 +119,10 @@ export async function personResolver({
   row: PersonRow
 } & CommonResolverOptions): Promise<PersonResolved> {
   const [first, second] = row.name.split(' ')
-  return { ...row, initials: `${first[0]}${second[0]}`.toLocaleUpperCase() }
+  return {
+    ...row,
+    initials: `${first?.[0] ?? ''}${second?.[0] ?? ''}`.toLocaleUpperCase(),
+  }
 }
 
 export async function recurringEventResolver({

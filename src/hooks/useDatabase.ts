@@ -15,6 +15,7 @@ import {
 } from 'src/db/entities'
 import { is } from 'src/db/interface/entityMethods'
 import { resolver } from 'src/db/resolvers/resolver'
+import { AppStateBeforeDatabase } from 'src/db/schemas/AppStateSchema'
 import { PersonBeforeDatabase } from 'src/db/schemas/PersonSchema'
 import { ProductResolvedBeforeSaving } from 'src/db/schemas/ProductSchema'
 import { RecipeResolvedBeforeSaving } from 'src/db/schemas/RecipeSchema'
@@ -36,6 +37,11 @@ const queryNames = {
   getProduct: (id: string) => `getProduct-${id}`,
   getRecurringEvent: (id: string) => `getRecurringEvent-${id}`,
   getAllRecurringEvents: 'getAllRecurringEvents',
+}
+
+type PaginationOpts = {
+  limit: number
+  offset: number
 }
 
 /**
@@ -134,11 +140,14 @@ export function useCreateRecipe() {
       queryClient.invalidateQueries({
         queryKey: getCacheKeyToInvalidate(queryNames.getAllRecipes),
       })
+      queryClient.invalidateQueries({
+        queryKey: getCacheKeyToInvalidate(queryNames.getAppState),
+      })
     },
   }
 }
 
-export function useGetAllCustomProducts() {
+export function useGetAllCustomProducts({ limit, offset }: PaginationOpts) {
   const ctx = useSqlite()
   const loaders = useDataLoaders()
   const lastUpdatedAt = useTableLastUpdatedAt(['products'])
@@ -147,6 +156,8 @@ export function useGetAllCustomProducts() {
     placeholderData: keepPreviousData,
     queryKey: [
       ...getCacheKey(ctx, queryNames.getAllCustomProducts),
+      limit,
+      offset,
       lastUpdatedAt,
     ],
     queryFn: withQueryErrorHandling(
@@ -154,12 +165,17 @@ export function useGetAllCustomProducts() {
       async () => {
         const rows = await Product.findManyCustom({
           connection: ctx.db,
+          limit,
+          offset,
           orderBy: ['createdAt', 'desc'],
         })
         const products = await Promise.all(
           rows.map((row) => resolver({ row, connection: ctx.db, loaders }))
         )
-        return products
+        const count = await Product.customCount({
+          connection: ctx.db,
+        })
+        return { products, totalCount: count }
       }
     ),
   })
@@ -185,6 +201,7 @@ export function useCustomProductSearch({
         const rows = await Product.findManyCustom({
           connection: ctx.db,
           where: { name: is('LIKE', `%${searchTerms}%`) },
+          limit: 10,
         })
         const products = await Promise.all(
           rows.map((row) => resolver({ row, connection: ctx.db, loaders }))
@@ -195,7 +212,7 @@ export function useCustomProductSearch({
   })
 }
 
-export function useGetAllExternalProducts() {
+export function useGetAllExternalProducts({ limit, offset }: PaginationOpts) {
   const ctx = useSqlite()
   const loaders = useDataLoaders()
   const lastUpdatedAt = useTableLastUpdatedAt(['products'])
@@ -204,16 +221,25 @@ export function useGetAllExternalProducts() {
     placeholderData: keepPreviousData,
     queryKey: [
       ...getCacheKey(ctx, queryNames.getAllExternalProducts),
+      limit,
+      offset,
       lastUpdatedAt,
     ],
     queryFn: withQueryErrorHandling(
       queryNames.getAllExternalProducts,
       async () => {
-        const rows = await Product.findManyExternal({ connection: ctx.db })
+        const rows = await Product.findManyExternal({
+          connection: ctx.db,
+          limit,
+          offset,
+        })
         const products = await Promise.all(
           rows.map((row) => resolver({ row, connection: ctx.db, loaders }))
         )
-        return products
+        const count = await Product.externalCount({
+          connection: ctx.db,
+        })
+        return { products, totalCount: count }
       }
     ),
   })
@@ -326,6 +352,9 @@ export function useUpsertRecurringEvent() {
       queryClient.invalidateQueries({
         queryKey: getCacheKeyToInvalidate(queryNames.getAllRecurringEvents),
       })
+      queryClient.invalidateQueries({
+        queryKey: getCacheKeyToInvalidate(queryNames.getAppState),
+      })
 
       if (recurringEvent.id) {
         queryClient.invalidateQueries({
@@ -396,6 +425,24 @@ export function useGetAppState() {
       return resolved
     }),
   })
+}
+
+export function useUpdateAppState() {
+  const ctx = useSqlite()
+  const queryClient = useQueryClient()
+
+  return {
+    updateAppState: async (newValues: Partial<AppStateBeforeDatabase>) => {
+      await AppState.update({
+        connection: ctx.db,
+        where: { key: APP_STATE_KEY },
+        set: newValues,
+      })
+      queryClient.invalidateQueries({
+        queryKey: getCacheKeyToInvalidate(queryNames.getAppState),
+      })
+    },
+  }
 }
 
 export function useUpdatePerson() {

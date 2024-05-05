@@ -22,6 +22,8 @@ const {
   insert,
   update,
   remove,
+  insertMany,
+  count,
   upsert,
   clientUpsert,
   createDatabaseMethodsWithTransform,
@@ -35,9 +37,11 @@ const {
 
 export {
   clientUpsert,
+  count,
   find,
   findMany,
   insert,
+  insertMany,
   maybeFind,
   remove,
   removeAll,
@@ -81,12 +85,14 @@ export async function findManyCustom({
   connection,
   where,
   limit,
+  offset,
   orderBy,
 }: Options & FindOptions<ProductRow>): Promise<ProductRow[]> {
   const { whereSql, limitSql, orderBySql } =
     findOptionsAsSql<ProductRowWithRecipeId>({
       where: { ...where, id: is('LIKE', `${DATABASE_ID_PREFIX}-%`) },
       limit,
+      offset,
       orderBy,
     })
   const { many } = createDatabaseMethodsWithTransform({
@@ -104,16 +110,38 @@ export async function findManyCustom({
   return await many(sqlQuery)
 }
 
+export async function customCount({
+  connection,
+  where,
+}: Options & FindOptions<ProductRow>): Promise<number> {
+  const { whereSql } = findOptionsAsSql<ProductRowWithRecipeId>({
+    where: { ...where, id: is('LIKE', `${DATABASE_ID_PREFIX}-%`) },
+  })
+  const { one } = createDatabaseMethodsWithTransform({
+    connection,
+    schema: z.object({ count: z.number() }).strict(),
+  })
+  const sqlQuery = sql`
+    SELECT
+      COUNT(*) as count
+    FROM products
+    ${whereSql}
+  `
+  return (await one(sqlQuery)).count
+}
+
 export async function findManyExternal({
   connection,
   where = {},
   limit,
+  offset,
   orderBy,
 }: Options & FindOptions<ProductRow>): Promise<ProductRow[]> {
   const { whereSql, limitSql, orderBySql } =
     findOptionsAsSql<ProductRowWithRecipeId>({
       where,
       limit,
+      offset,
       orderBy,
     })
   const { many } = createDatabaseMethodsWithTransform({
@@ -133,4 +161,28 @@ export async function findManyExternal({
     ${limitSql}
   `
   return await many(sqlQuery)
+}
+
+export async function externalCount({
+  connection,
+  where = {},
+}: Options & FindOptions<ProductRow>): Promise<number> {
+  const { whereSql } = findOptionsAsSql<ProductRowWithRecipeId>({
+    where,
+  })
+  const { one } = createDatabaseMethodsWithTransform({
+    connection,
+    schema: z.object({ count: z.number() }).strict(),
+  })
+  const sqlQuery = sql`
+    SELECT
+      COUNT(*) as count
+    FROM products
+    ${
+      Object.keys(where).length > 0
+        ? sql`${whereSql} AND id NOT LIKE ${`${DATABASE_ID_PREFIX}-%`}`
+        : sql`WHERE id NOT LIKE ${`${DATABASE_ID_PREFIX}-%`}`
+    }
+  `
+  return (await one(sqlQuery)).count
 }
