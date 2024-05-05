@@ -207,20 +207,3 @@ export function calculateValuesForItem(
     salt: calculateNutrition(weightGrams, item.salt),
   }
 }
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function createNewRecipeItem() {
-  return {
-    weightGrams: 0,
-    item: {
-      name: '',
-      kcal: 0,
-      fatTotal: 0,
-      fatSaturated: 0,
-      carbsTotal: 0,
-      carbsSugar: 0,
-      protein: 0,
-      salt: 0,
-    },
-  }
-}

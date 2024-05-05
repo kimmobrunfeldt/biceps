@@ -64,7 +64,7 @@ export function ProductSearch({ onSelect }: Props) {
       key={product.id}
       onClick={onOptionClick.bind(null, {
         __type: 'RecipeItem',
-        weightGrams: 0,
+        weightGrams: 100,
         product,
       })}
     >
