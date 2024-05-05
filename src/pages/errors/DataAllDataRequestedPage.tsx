@@ -40,7 +40,9 @@ export function DeleteAllDataRequestedPage() {
             await deleteDB(INDEXEDDB_NAME, {
               blocked: () => {
                 notification({
-                  message: 'Database deletion blocked. Waiting...',
+                  message:
+                    'Database deletion blocked. Close all other Biceps browser tabs. Waiting...',
+                  autoClose: false,
                   color: 'info',
                 })
               },
