@@ -1,8 +1,8 @@
-import { Blockquote, Box, Flex, Text } from '@mantine/core'
+import { Blockquote, Box, Flex, Stack, Text, Title } from '@mantine/core'
 import { modals } from '@mantine/modals'
 import { IconChevronLeft, IconX } from '@tabler/icons-react'
 import { deleteDB } from 'idb'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { PageTemplate } from 'src/components/PageTemplate'
 import { INDEXEDDB_NAME } from 'src/constants'
 import { useNotifications } from 'src/hooks/useNotification'
@@ -11,8 +11,16 @@ import { sleep } from 'src/utils/utils'
 
 export function DeleteAllDataRequestedPage() {
   const { notification, withNotifications } = useNotifications()
+  const [errors, setErrors] = useState<string[]>([])
 
   useEffect(() => {
+    window.onerror = (error) => {
+      setErrors((prev) => [...prev, String(error)])
+    }
+    console.error = (error) => {
+      setErrors((prev) => [...prev, String(error)])
+    }
+
     modals.openConfirmModal({
       id: 'delete-all-data',
       title: 'Confirm data deletion',
@@ -26,6 +34,7 @@ export function DeleteAllDataRequestedPage() {
       confirmProps: { color: 'red' },
       closeOnConfirm: true,
       onConfirm: async () => {
+        modals.close('delete-all-data')
         await withNotifications({
           fn: async () => {
             await deleteDB(INDEXEDDB_NAME, {
@@ -37,6 +46,8 @@ export function DeleteAllDataRequestedPage() {
               },
             })
           },
+          minLoadingNotificationMs: 800,
+          loading: { message: 'Deleting database...' },
           success: { message: 'Database deleted', color: 'green' },
           error: {
             message: 'Failed to reset database!',
@@ -58,6 +69,22 @@ export function DeleteAllDataRequestedPage() {
       <Blockquote color="yellow">
         Data deletion requested detected via URL parameters.
       </Blockquote>
+
+      {errors.length > 0 ? (
+        <Box mt="xl">
+          <Title order={3} mb="md">
+            Page errors
+          </Title>
+          <Stack mb="xl" gap="xs">
+            {errors.map((error, i) => (
+              <Text key={i} c="red">
+                {error}
+              </Text>
+            ))}
+          </Stack>
+        </Box>
+      ) : null}
+
       <Box mt="lg">
         <a href={routes.index.path}>
           <Flex direction="row" align="center">
