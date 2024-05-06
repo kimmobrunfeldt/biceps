@@ -40,8 +40,8 @@ export function Introduction() {
             home screen to prevent automatic data deletion.
           </Text>
           <Text size="sm">
-            <b>Remember to sync your data to another device</b> via{' '}
-            {routes.settings.title} page before clearing site data.
+            <b>Remember to export your data</b> via {routes.settings.title} page
+            before clearing site data.
           </Text>
         </Stack>
       ),
