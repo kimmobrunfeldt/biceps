@@ -18,18 +18,18 @@ export function SettingsPage() {
 
         <Box pt="xl">
           <Title order={2} fz="h3" mb="md">
-            Sync data
-          </Title>
-
-          <SyncData />
-        </Box>
-
-        <Box pt="xl">
-          <Title order={2} fz="h3" mb="md">
             Import or export data
           </Title>
 
           <ImportExportData />
+        </Box>
+
+        <Box pt="xl">
+          <Title order={2} fz="h3" mb="md">
+            Sync data (experimental)
+          </Title>
+
+          <SyncData />
         </Box>
 
         <Box pt="xl">
