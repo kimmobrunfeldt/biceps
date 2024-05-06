@@ -28,9 +28,9 @@ export function SyncData() {
       </Blockquote>
 
       <Text maw={650}>
-        Open the following link in another device to sync data between devices.
-        Anyone with the link can start syncing. Remember to keep this browser
-        open.
+        Open the following link in another device to sync data between devices
+        (peer-to-peer). Anyone with the link can start syncing. Remember to keep
+        this browser open.
       </Text>
 
       <GrayText py={6}>{syncUrl}</GrayText>

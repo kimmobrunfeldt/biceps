@@ -26,7 +26,7 @@ export function SettingsPage() {
 
         <Box pt="xl">
           <Title order={2} fz="h3" mb="md">
-            Sync data (experimental)
+            Live sync data (experimental)
           </Title>
 
           <SyncData />
