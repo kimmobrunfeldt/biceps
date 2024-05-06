@@ -9,8 +9,10 @@ import {
   Text,
   Tooltip,
 } from '@mantine/core'
+import { modals } from '@mantine/modals'
 import { IconInfoCircle, IconX } from '@tabler/icons-react'
-import { useState } from 'react'
+import pluralize from 'pluralize'
+import { useCallback } from 'react'
 import { GrayText } from 'src/components/GrayText'
 import { Link } from 'src/components/Link'
 import { PaperContainer } from 'src/components/PaperContainer'
@@ -20,25 +22,78 @@ import classes from 'src/components/Table.module.css'
 import { TableHeader } from 'src/components/TableHeader'
 import { TableSkeleton } from 'src/components/TableSkeleton'
 import { ProductResolved } from 'src/db/schemas/ProductSchema'
-import { useGetAllCustomProducts } from 'src/hooks/useDatabase'
+import {
+  useDeleteProduct,
+  useGetAllCustomProducts,
+  useLazyGetRecipesByProductId,
+} from 'src/hooks/useDatabase'
+import { useNotifications } from 'src/hooks/useNotification'
+import { usePaginatedQuery } from 'src/hooks/usePaginatedQuery'
 import { formatRoute, routes } from 'src/routes'
 import { formatGrams, formatKcal } from 'src/utils/format'
-
-const PAGE_SIZES = [10, 20, 50, 100, 200, 500]
 
 type Props = {
   useData: typeof useGetAllCustomProducts
   showRemove?: boolean
-  onRemove?: (product: ProductResolved) => void
 }
 
 export function ProductsTable(props: Props) {
-  const [pageSize, setPageSize] = useState<number>(20)
-  const [pageIndex, setPageIndex] = useState<number>(0)
-  const queryResult = props.useData({
-    limit: pageSize,
-    offset: pageIndex * pageSize,
-  })
+  const {
+    pageSize,
+    setPageSize,
+    pageIndex,
+    setPageIndex,
+    queryResult,
+    shouldShowPagination,
+    totalPages,
+    pageSizes,
+  } = usePaginatedQuery(props.useData)
+  const { withNotifications } = useNotifications()
+  const { deleteProduct } = useDeleteProduct()
+  const { getRecipesByProductId } = useLazyGetRecipesByProductId()
+
+  const onProductRemove = useCallback(
+    async (product: ProductResolved) => {
+      async function executeDelete() {
+        await withNotifications({
+          fn: async () => {
+            await deleteProduct(product.id)
+          },
+          success: {
+            message: `Product '${product.name}' deleted`,
+            color: 'green',
+          },
+          error: {
+            message: 'Failed to delete product!',
+            color: 'red',
+            icon: <IconX />,
+          },
+        })
+      }
+
+      const recipes = await getRecipesByProductId(product.id)
+      const text =
+        recipes.length > 0 ? (
+          <>
+            Deletion{' '}
+            <b>will affect {pluralize('recipe', recipes.length, true)}</b> where
+            the product is used.
+          </>
+        ) : (
+          <>The product is not used in any recipe at the moment.</>
+        )
+
+      modals.openConfirmModal({
+        title: `Delete '${product.name}'?`,
+        children: <Text size="sm">{text}</Text>,
+        labels: { confirm: 'Delete', cancel: 'Cancel' },
+        confirmProps: { color: 'red' },
+        closeOnConfirm: true,
+        onConfirm: executeDelete,
+      })
+    },
+    [getRecipesByProductId, withNotifications, deleteProduct]
+  )
 
   return (
     <Query
@@ -46,14 +101,18 @@ export function ProductsTable(props: Props) {
       whenEmpty={() => <PlainTable products={[]} />}
       whenLoading={<TableSkeleton />}
     >
-      {({ products, totalCount }) => {
+      {({ results, totalCount }) => {
         return (
           <Stack gap="md">
             <PaperContainer>
-              <PlainTable {...props} products={products} />
+              <PlainTable
+                {...props}
+                products={results}
+                onRemove={onProductRemove}
+              />
             </PaperContainer>
 
-            {products.length < totalCount ? (
+            {shouldShowPagination ? (
               <Flex justify="space-between" gap="md">
                 <Flex
                   gap="xs"
@@ -61,14 +120,14 @@ export function ProductsTable(props: Props) {
                   align={{ base: 'flex-start', md: 'center' }}
                 >
                   <Pagination
-                    total={Math.ceil(totalCount / pageSize)}
+                    total={totalPages}
                     value={pageIndex + 1}
                     onChange={(value) => setPageIndex(value - 1)}
                   />
                   <GrayText>{totalCount} products in total</GrayText>
                 </Flex>
                 <Select
-                  data={PAGE_SIZES.map((size) => ({
+                  data={pageSizes.map((size) => ({
                     value: String(size),
                     label: `${size} per page`,
                   }))}
@@ -84,7 +143,8 @@ export function ProductsTable(props: Props) {
   )
 }
 
-type PlainTableProps = Pick<Props, 'showRemove' | 'onRemove'> & {
+type PlainTableProps = Pick<Props, 'showRemove'> & {
+  onRemove?: (product: ProductResolved) => void
   products: ProductResolved[]
 }
 

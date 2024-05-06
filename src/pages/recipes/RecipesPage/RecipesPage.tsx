@@ -3,15 +3,10 @@ import { IconPlus } from '@tabler/icons-react'
 import { useState } from 'react'
 import { Link } from 'src/components/Link'
 import { PageTemplate } from 'src/components/PageTemplate'
-import { PaperContainer } from 'src/components/PaperContainer'
-import { Query } from 'src/components/Query'
-import { TableSkeleton } from 'src/components/TableSkeleton'
-import { useGetAllRecipes } from 'src/hooks/useDatabase'
 import { RecipesTable } from 'src/pages/recipes/RecipesPage/components/RecipesTable'
 import { routes } from 'src/routes'
 
 export function RecipesPage() {
-  const recipesResult = useGetAllRecipes()
   const [amountsPerPortion, setAmountsPerPortion] = useState(true)
 
   return (
@@ -40,22 +35,7 @@ export function RecipesPage() {
         />
       </Flex>
 
-      <PaperContainer>
-        <Query
-          result={recipesResult}
-          whenEmpty={() => <RecipesTable recipes={[]} />}
-          whenLoading={<TableSkeleton />}
-        >
-          {(recipes) => {
-            return (
-              <RecipesTable
-                recipes={recipes}
-                amountsPerPortion={amountsPerPortion}
-              />
-            )
-          }}
-        </Query>
-      </PaperContainer>
+      <RecipesTable amountsPerPortion={amountsPerPortion} showRemove />
     </PageTemplate>
   )
 }

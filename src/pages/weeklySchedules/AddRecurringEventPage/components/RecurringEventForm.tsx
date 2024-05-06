@@ -37,7 +37,7 @@ export function RecurringEventForm({
   onSubmit: inputOnSubmit,
 }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const recipesResult = useGetAllRecipes()
+  const recipesResult = useGetAllRecipes({ limit: 1000, offset: 0 })
 
   const commonInitialData = {
     personId: selectedPersonId,
@@ -137,7 +137,7 @@ export function RecurringEventForm({
               )}
               whenLoading={<InputSkeleton label="Recipe to eat" maw={340} />}
             >
-              {(recipes) => (
+              {({ results: recipes }) => (
                 <Select
                   {...field}
                   label="Recipe to eat"

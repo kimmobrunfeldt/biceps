@@ -21,6 +21,7 @@ import { ProductResolvedBeforeSaving } from 'src/db/schemas/ProductSchema'
 import { RecipeResolvedBeforeSaving } from 'src/db/schemas/RecipeSchema'
 import { RecurringEventResolvedBeforeSaving } from 'src/db/schemas/RecurringEventSchema'
 import { useDataLoaders } from 'src/hooks/useDataLoaders'
+import { PaginationOpts } from 'src/hooks/usePaginatedQuery'
 import {
   DatabaseContext,
   useSqlite,
@@ -37,11 +38,6 @@ const queryNames = {
   getProduct: (id: string) => `getProduct-${id}`,
   getRecurringEvent: (id: string) => `getRecurringEvent-${id}`,
   getAllRecurringEvents: 'getAllRecurringEvents',
-}
-
-type PaginationOpts = {
-  limit: number
-  offset: number
 }
 
 /**
@@ -72,20 +68,30 @@ function withQueryErrorHandling<T extends (...args: any[]) => Promise<any>>(
   return wrapped as T
 }
 
-export function useGetAllRecipes() {
+export function useGetAllRecipes({ limit, offset }: PaginationOpts) {
   const ctx = useSqlite()
   const loaders = useDataLoaders()
   const lastUpdatedAt = useTableLastUpdatedAt(['products'])
 
   return useQuery({
     placeholderData: keepPreviousData,
-    queryKey: [...getCacheKey(ctx, queryNames.getAllRecipes), lastUpdatedAt],
+    queryKey: [
+      ...getCacheKey(ctx, queryNames.getAllRecipes),
+      limit,
+      offset,
+      lastUpdatedAt,
+    ],
     queryFn: withQueryErrorHandling(queryNames.getAllRecipes, async () => {
-      const recipeRows = await Recipe.findMany({ connection: ctx.db })
+      const recipeRows = await Recipe.findMany({
+        connection: ctx.db,
+        limit,
+        offset,
+      })
       const recipes = await Promise.all(
         recipeRows.map((row) => resolver({ row, connection: ctx.db, loaders }))
       )
-      return recipes
+      const { count } = await Recipe.count({ connection: ctx.db })
+      return { results: recipes, totalCount: count }
     }),
   })
 }
@@ -147,6 +153,56 @@ export function useCreateRecipe() {
   }
 }
 
+export function useLazyGetRecurringEventsByRecipeId() {
+  const ctx = useSqlite()
+  const loaders = useDataLoaders()
+
+  return {
+    getRecurringEventsByRecipeId: async (recipeId: string) => {
+      const recurringEvents = await RecurringEvent.findMany({
+        connection: ctx.db,
+        where: { eventType: 'EatRecipe', recipeToEatId: recipeId },
+      })
+      return await Promise.all(
+        recurringEvents.map((row) =>
+          resolver({ row, connection: ctx.db, loaders })
+        )
+      )
+    },
+  }
+}
+
+export function useDeleteRecipe() {
+  const ctx = useSqlite()
+  const queryClient = useQueryClient()
+
+  return {
+    deleteRecipe: async (id: string) => {
+      await Recipe.remove({
+        connection: ctx.db,
+        where: { id: id },
+      })
+      await RecipeItem.remove({
+        connection: ctx.db,
+        where: { recipeId: id },
+      })
+      await RecurringEvent.remove({
+        connection: ctx.db,
+        where: { eventType: 'EatRecipe', recipeToEatId: id },
+      })
+      queryClient.invalidateQueries({
+        queryKey: getCacheKeyToInvalidate(queryNames.getAllRecurringEvents),
+      })
+      queryClient.invalidateQueries({
+        queryKey: getCacheKeyToInvalidate(queryNames.getAllRecipes),
+      })
+      queryClient.invalidateQueries({
+        queryKey: getCacheKeyToInvalidate(queryNames.getRecipe(id)),
+      })
+    },
+  }
+}
+
 export function useGetAllCustomProducts({ limit, offset }: PaginationOpts) {
   const ctx = useSqlite()
   const loaders = useDataLoaders()
@@ -175,7 +231,7 @@ export function useGetAllCustomProducts({ limit, offset }: PaginationOpts) {
         const count = await Product.customCount({
           connection: ctx.db,
         })
-        return { products, totalCount: count }
+        return { results: products, totalCount: count }
       }
     ),
   })
@@ -239,7 +295,7 @@ export function useGetAllExternalProducts({ limit, offset }: PaginationOpts) {
         const count = await Product.externalCount({
           connection: ctx.db,
         })
-        return { products, totalCount: count }
+        return { results: products, totalCount: count }
       }
     ),
   })
