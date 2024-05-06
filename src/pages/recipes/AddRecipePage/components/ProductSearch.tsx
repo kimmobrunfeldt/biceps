@@ -137,7 +137,7 @@ export function ProductSearch({ onSelect }: Props) {
           />
         </Combobox.Target>
 
-        <Combobox.Dropdown hidden={isLoading || value.length === 0}>
+        <Combobox.Dropdown hidden={value.length === 0}>
           <Combobox.Group label="Custom products">
             <Combobox.Options mah={280} style={{ overflowY: 'auto' }}>
               {customOptions}
