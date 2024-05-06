@@ -9,3 +9,4 @@ export const APP_BASE_URL =
     : 'http://localhost:5173'
 
 export const SYNC_QUERY_PARAM = 'syncWithPeerId'
+export const IMPORT_DATA_QUERY_PARAM = 'importData'

@@ -17,12 +17,13 @@ import ReactDOM from 'react-dom/client'
 import { ErrorBoundary } from 'react-error-boundary'
 import { Router } from 'src/Router'
 import { DELETE_ALL_DATA_QUERY_PARAM } from 'src/components/DeleteAllDataLink'
-import { DATABASE_NAME } from 'src/constants'
+import { DATABASE_NAME, IMPORT_DATA_QUERY_PARAM } from 'src/constants'
 import { createLoaders } from 'src/db/dataLoaders'
 import { upsertSeedData } from 'src/db/seedData'
 import { DataLoaderContext } from 'src/hooks/useDataLoaders'
 import { DatabaseContext } from 'src/hooks/useSqlite'
 import { runMigrations } from 'src/migrations'
+import { ImportDataPage } from 'src/pages/ImportDataPage'
 import { DeleteAllDataRequestedPage } from 'src/pages/errors/DataAllDataRequestedPage'
 import { EmergencyFallbackPage } from 'src/pages/errors/EmergencyFallbackPage'
 import { theme } from 'src/theme'
@@ -63,6 +64,14 @@ async function main() {
     ReactDOM.createRoot(ROOT_ELEMENT).render(
       <UiProviders>
         <DeleteAllDataRequestedPage />
+      </UiProviders>
+    )
+    return
+  } else if (window.location.search === `?${IMPORT_DATA_QUERY_PARAM}=true`) {
+    // Render data deletion page before connecting to database
+    ReactDOM.createRoot(ROOT_ELEMENT).render(
+      <UiProviders>
+        <ImportDataPage />
       </UiProviders>
     )
     return
