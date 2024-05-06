@@ -1,5 +1,6 @@
 import {
   Avatar,
+  Badge,
   Box,
   Burger,
   Center,
@@ -21,6 +22,7 @@ import {
   IconShoppingBag,
   IconUser,
 } from '@tabler/icons-react'
+import _ from 'lodash'
 import logo from 'src/assets/biceps-logo.svg'
 import { Link } from 'src/components/Link'
 import { Query } from 'src/components/Query'
@@ -35,13 +37,22 @@ interface NavBarLinkProps {
   to: string
   icon?: typeof IconHome2
   children?: React.ReactNode
+  showBadge?: boolean
 }
 
-function NavBarLink({ to, icon: Icon, label, children }: NavBarLinkProps) {
+function NavBarLink({
+  to,
+  icon: Icon,
+  label,
+  children,
+  showBadge = false,
+}: NavBarLinkProps) {
   const [active] = useRoute(to)
 
   const getContent = () => {
     if (children) {
+      if (showBadge) throw new Error('showBadge is not supported with children')
+
       return (
         <Box className={classes.linkAvatar} data-active={Boolean(active)}>
           {children}
@@ -49,12 +60,19 @@ function NavBarLink({ to, icon: Icon, label, children }: NavBarLinkProps) {
       )
     } else if (Icon) {
       return (
-        <UnstyledButton
-          className={classes.linkButton}
-          data-active={Boolean(active)}
-        >
-          <Icon style={{ width: rem(20), height: rem(20) }} stroke={1.5} />
-        </UnstyledButton>
+        <Box pos="relative">
+          {showBadge ? (
+            <Badge size="xs" circle pos="absolute" top={2} right={2}>
+              1
+            </Badge>
+          ) : null}
+          <UnstyledButton
+            className={classes.linkButton}
+            data-active={Boolean(active)}
+          >
+            <Icon style={{ width: rem(20), height: rem(20) }} stroke={1.5} />
+          </UnstyledButton>
+        </Box>
       )
     } else {
       throw new Error('Either icon or children must be provided')
@@ -93,9 +111,21 @@ export function NavBar() {
   const { established, pending } = useRtc()
   const appStateResult = useGetAppState()
   const [opened, { toggle }] = useDisclosure()
-  const links = menuItems.map((link) => (
-    <NavBarLink {...link} key={link.label} to={link.to} />
-  ))
+
+  const showOnboardingBadge =
+    !_.isUndefined(appStateResult.data?.onboardingState) &&
+    appStateResult.data.onboardingState !== 'Completed'
+  const links = menuItems.map((link) => {
+    const showBadge = link.to === routes.index.path && showOnboardingBadge
+    return (
+      <NavBarLink
+        {...link}
+        key={link.label}
+        to={link.to}
+        showBadge={showBadge}
+      />
+    )
+  })
 
   const [settingsRouteActive] = useRoute(routes.settings.path)
 
@@ -200,11 +230,19 @@ export function NavBar() {
           <Menu.Dropdown>
             <Menu.Label>Pages</Menu.Label>
             {menuItems.map(({ icon: Icon, label, to }) => {
+              const showBadge = to === routes.index.path && showOnboardingBadge
               return (
                 <Link key={to} to={to} className={classes.burgerMenuLink}>
                   <Menu.Item
                     leftSection={
                       <Icon style={{ width: rem(14), height: rem(14) }} />
+                    }
+                    rightSection={
+                      showBadge ? (
+                        <Badge size="xs" circle>
+                          1
+                        </Badge>
+                      ) : undefined
                     }
                   >
                     {label}
