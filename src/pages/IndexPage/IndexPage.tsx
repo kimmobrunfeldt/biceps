@@ -58,6 +58,7 @@ export function IndexPage() {
                       weekday={dayOfWeek}
                       recurringEvents={eventsToday}
                       hideNutritionHeader
+                      fadeEventsBeforeNow
                     />
                   </Stack>
                 )

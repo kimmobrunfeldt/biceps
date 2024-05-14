@@ -42,11 +42,13 @@ type Props = {
   recurringEvents: RecurringEventResolved[]
   fadeEventsBeforeNow?: boolean
   hideNutritionHeader?: boolean
+  editable?: boolean
 }
 
 export function DaySchedule({
   weekday,
   recurringEvents,
+  editable = false,
   fadeEventsBeforeNow = false,
   hideNutritionHeader = false,
 }: Props) {
@@ -64,6 +66,7 @@ export function DaySchedule({
     (acc, event) => {
       const eventTotals = calculateValuesForEvent(event)
       return {
+        weightGrams: eventTotals.weightGrams + acc.weightGrams,
         kcal: acc.kcal + eventTotals.kcal,
         protein: acc.protein + eventTotals.protein,
         fatTotal: acc.fatTotal + eventTotals.fatTotal,
@@ -74,6 +77,7 @@ export function DaySchedule({
       }
     },
     {
+      weightGrams: 0,
       kcal: 0,
       protein: 0,
       fatTotal: 0,
@@ -81,13 +85,17 @@ export function DaySchedule({
       carbsTotal: 0,
       carbsSugar: 0,
       salt: 0,
-    } as Nutrition
+    } as Nutrition & { weightGrams: number }
   )
 
   return (
     <Box>
-      <Flex align="center" gap="md">
-        <NutritionCircle nutrition={nutritionsPerDay} variant="icon" />
+      <Flex align="center" gap="md" mb="xs">
+        <NutritionCircle
+          nutrition={nutritionsPerDay}
+          weightGrams={nutritionsPerDay.weightGrams}
+          variant="icon"
+        />
 
         <Title order={2} size="h3">
           {weekdayNumberToLongName(weekday)}
@@ -98,9 +106,11 @@ export function DaySchedule({
             {formatGrams(nutritionsPerDay.protein)}g protein
           </GrayText>
         ) : null}
-        <Flex align="flex-end">
-          <CopyScheduleButton weekday={weekday} />
-        </Flex>
+        {editable ? (
+          <Flex align="flex-end">
+            <CopyScheduleButton weekday={weekday} />
+          </Flex>
+        ) : null}
       </Flex>
 
       <Stack pb="xl" pl={54} gap="xs">
@@ -115,14 +125,14 @@ export function DaySchedule({
               key={i}
               align="flex-start"
               gap={6}
-              opacity={shouldFade ? 0.7 : 1}
+              opacity={shouldFade ? 0.4 : 1}
             >
               <Text c="gray" fw="bold" miw={60}>
                 {formattedTime}
               </Text>
               <Stack gap={4}>
                 {recurringEvents.map((event, i) => {
-                  return <EventRow key={i} event={event} />
+                  return <EventRow key={i} event={event} editable={editable} />
                 })}
               </Stack>
             </Flex>
@@ -133,7 +143,13 @@ export function DaySchedule({
   )
 }
 
-function EventRow({ event }: { event: RecurringEventResolved }) {
+function EventRow({
+  event,
+  editable = false,
+}: {
+  event: RecurringEventResolved
+  editable?: boolean
+}) {
   const { deleteRecurringEvent } = useDeleteRecurringEvent()
   const { withNotifications } = useNotifications()
 
@@ -170,18 +186,20 @@ function EventRow({ event }: { event: RecurringEventResolved }) {
               {event.recipeToEat.name}
             </Link>
           </Text>
-          <Tooltip label="Remove scheduled event" position="right">
-            <ActionIcon
-              variant="light"
-              aria-label="Remove"
-              radius="lg"
-              size="xs"
-              onClick={onRemove}
-              color="red"
-            >
-              <IconX height="70%" />
-            </ActionIcon>
-          </Tooltip>
+          {editable ? (
+            <Tooltip label="Remove meal" position="right">
+              <ActionIcon
+                variant="light"
+                aria-label="Remove"
+                radius="lg"
+                size="xs"
+                onClick={onRemove}
+                color="red"
+              >
+                <IconX height="70%" />
+              </ActionIcon>
+            </Tooltip>
+          ) : null}
         </Flex>
       )
     case 'EatProduct': {
@@ -224,7 +242,7 @@ function CopyScheduleButton({
         minLoadingNotificationMs: 500,
         loading: { message: 'Copying ...' },
         success: (results) => ({
-          message: `Copied ${results.length} events`,
+          message: `Copied ${results.length} meals`,
           color: 'green',
         }),
         error: (err) => ({
@@ -240,11 +258,11 @@ function CopyScheduleButton({
   return (
     <Menu shadow="md" width={200}>
       <Menu.Target>
-        <Tooltip label="Copy schedule to another day">
+        <Tooltip label="Copy meals to another day">
           <ActionIcon
             size="sm"
             radius="lg"
-            aria-label="Copy schedule to another day"
+            aria-label="Copy meals to another day"
             pos="relative"
             top={2}
           >
@@ -254,7 +272,7 @@ function CopyScheduleButton({
       </Menu.Target>
 
       <Menu.Dropdown>
-        <Menu.Label>Copy schedule to</Menu.Label>
+        <Menu.Label>Copy meals to</Menu.Label>
         {getWeekdays().map((weekday) => {
           const disabled = weekday === selectedWeekday
           return (

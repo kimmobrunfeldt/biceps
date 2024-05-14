@@ -34,6 +34,7 @@ export function WeeklySchedulePage() {
                   key={weekday}
                   weekday={weekday}
                   recurringEvents={[]}
+                  editable
                 />
               )
             })}
@@ -53,6 +54,7 @@ export function WeeklySchedulePage() {
                     key={weekday}
                     weekday={weekday}
                     recurringEvents={recurringEventsByWeekday[index]}
+                    editable
                   />
                 )
               })}

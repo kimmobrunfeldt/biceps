@@ -3,7 +3,7 @@ import { Box, Group, Paper, Text, rem } from '@mantine/core'
 import { IconCheese, IconMeat, IconSalad } from '@tabler/icons-react'
 import { useState } from 'react'
 import { Nutrition } from 'src/db/schemas/common'
-import { formatGrams } from 'src/utils/format'
+import { formatGrams, formatKcal } from 'src/utils/format'
 import classes from './DailyStats.module.css'
 
 const calendar = new Intl.DateTimeFormat().resolvedOptions().calendar
@@ -33,21 +33,21 @@ export function DailyStats({ dayConsumed, dayTotals }: Props) {
         <Stat
           label="Protein"
           number={`${formatGrams(dayConsumed.protein)}g`}
-          numberTotal={dayTotals.protein}
+          numberTotal={formatGrams(dayTotals.protein)}
           icon={IconMeat}
         />
 
         <Stat
           label="Fat"
           number={`${formatGrams(dayConsumed.fatTotal)}g`}
-          numberTotal={dayTotals.fatTotal}
+          numberTotal={formatGrams(dayTotals.fatTotal)}
           icon={IconCheese}
         />
 
         <Stat
           label="Calories"
-          number={`${dayConsumed.kcal} kcal`}
-          numberTotal={dayTotals.kcal}
+          number={`${formatKcal(dayConsumed.kcal)} kcal`}
+          numberTotal={formatKcal(dayTotals.kcal)}
           icon={IconSalad}
         />
       </Group>

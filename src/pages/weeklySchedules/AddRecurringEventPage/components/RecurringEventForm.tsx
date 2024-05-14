@@ -113,7 +113,7 @@ export function RecurringEventForm({
               label="Time of day"
               error={errors.time?.message}
               disabled={isSubmitting}
-              maw={200}
+              maw={100}
             />
           )}
         />
@@ -146,6 +146,7 @@ export function RecurringEventForm({
                   disabled={isSubmitting}
                   maw={340}
                   data={recipes.map((r) => ({ value: r.id, label: r.name }))}
+                  searchable
                 />
               )}
             </Query>
