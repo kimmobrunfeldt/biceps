@@ -76,6 +76,7 @@ export function ImportProductsPage() {
   return (
     <PageTemplate
       title="Import products"
+      description="Products can be imported by copy pasting values from Google Sheets."
       titleRightSection={
         <Link to={routes.products.index.path}>
           <Flex direction="row" align="center">
