@@ -15,6 +15,7 @@ const {
   upsert,
   clientUpsert,
   removeAll,
+  insertMany,
 } = makeUtils({
   tableName: 'recurring_events',
   name: 'RecurringEvent',
@@ -28,6 +29,7 @@ export {
   find,
   findMany,
   insert,
+  insertMany,
   maybeFind,
   remove,
   removeAll,

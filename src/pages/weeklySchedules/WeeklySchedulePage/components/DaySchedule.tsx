@@ -1,6 +1,17 @@
-import { Box, Flex, Stack, Text, Title } from '@mantine/core'
+import {
+  ActionIcon,
+  Box,
+  Flex,
+  Menu,
+  Stack,
+  Text,
+  Title,
+  Tooltip,
+} from '@mantine/core'
+import { IconCopy, IconX } from '@tabler/icons-react'
 import _ from 'lodash'
 import pluralize from 'pluralize'
+import { useCallback } from 'react'
 import { GrayText } from 'src/components/GrayText'
 import { Link } from 'src/components/Link'
 import { NutritionCircle } from 'src/components/NutritionCircle'
@@ -9,11 +20,15 @@ import {
   RecurringEventRow,
 } from 'src/db/schemas/RecurringEventSchema'
 import { Nutrition } from 'src/db/schemas/common'
+import { useCopyDaySchedule } from 'src/hooks/useDatabase'
+import { useNotifications } from 'src/hooks/useNotification'
 import { calculateValuesForEvent } from 'src/pages/IndexPage/IndexPage'
 import { formatRoute, routes } from 'src/routes'
 import { formatGrams, formatKcal, formatPortions } from 'src/utils/format'
 import {
+  Weekday,
   formatTime,
+  getWeekdays,
   isBeforeNow,
   weekdayNumberToLongName,
 } from 'src/utils/time'
@@ -80,6 +95,9 @@ export function DaySchedule({
             {formatGrams(nutritionsPerDay.protein)}g protein
           </GrayText>
         ) : null}
+        <Flex align="flex-end">
+          <CopyScheduleButton weekday={weekday} />
+        </Flex>
       </Flex>
 
       <Stack pb="xl" pl={54} gap="xs">
@@ -150,4 +168,68 @@ function EventRow({ event }: { event: RecurringEventResolved }) {
     default:
       assertUnreachable(event)
   }
+}
+
+function CopyScheduleButton({
+  weekday: selectedWeekday,
+}: {
+  weekday: Weekday
+}) {
+  const { copySchedule } = useCopyDaySchedule()
+  const { withNotifications } = useNotifications()
+
+  const onClick = useCallback(
+    async (weekday: Weekday) => {
+      await withNotifications({
+        fn: async () => {
+          const results = await copySchedule(selectedWeekday, weekday)
+          return results
+        },
+        minLoadingNotificationMs: 800,
+        loading: { message: 'Copying ...' },
+        success: (results) => ({
+          message: `Copied ${results.length} events`,
+          color: 'green',
+        }),
+        error: (err) => ({
+          message: `Failed to copy: ${err.message}`,
+          color: 'red',
+          icon: <IconX />,
+        }),
+      })
+    },
+    [copySchedule, selectedWeekday, withNotifications]
+  )
+
+  return (
+    <Menu shadow="md" width={200}>
+      <Menu.Target>
+        <Tooltip label="Copy schedule to another day">
+          <ActionIcon
+            size="sm"
+            radius="lg"
+            aria-label="Copy schedule to another day"
+          >
+            <IconCopy size={14} />
+          </ActionIcon>
+        </Tooltip>
+      </Menu.Target>
+
+      <Menu.Dropdown>
+        <Menu.Label>Copy schedule to</Menu.Label>
+        {getWeekdays().map((weekday) => {
+          const disabled = weekday === selectedWeekday
+          return (
+            <Menu.Item
+              disabled={disabled}
+              key={weekday}
+              onClick={disabled ? undefined : onClick.bind(null, weekday)}
+            >
+              {weekdayNumberToLongName(weekday)}
+            </Menu.Item>
+          )
+        })}
+      </Menu.Dropdown>
+    </Menu>
+  )
 }

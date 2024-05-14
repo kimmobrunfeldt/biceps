@@ -13,6 +13,7 @@ import {
   RecipeItem,
   RecurringEvent,
 } from 'src/db/entities'
+import { withTransaction } from 'src/db/interface/databaseMethods'
 import { is } from 'src/db/interface/entityMethods'
 import { resolver } from 'src/db/resolvers/resolver'
 import { AppStateBeforeDatabase } from 'src/db/schemas/AppStateSchema'
@@ -27,6 +28,7 @@ import {
   useSqlite,
   useTableLastUpdatedAt,
 } from 'src/hooks/useSqlite'
+import { Weekday } from 'src/utils/time'
 
 const queryNames = {
   getAppState: 'getAppState',
@@ -525,6 +527,48 @@ export function useUpdatePerson() {
       queryClient.invalidateQueries({
         queryKey: getCacheKeyToInvalidate(queryNames.getAppState),
       })
+    },
+  }
+}
+
+export function useCopyDaySchedule() {
+  const ctx = useSqlite()
+  const queryClient = useQueryClient()
+
+  return {
+    copySchedule: async (fromWeekday: Weekday, toWeekday: Weekday) => {
+      const result = await withTransaction(ctx.db, async (tx) => {
+        const fromEvents = await RecurringEvent.findMany({
+          connection: tx,
+          where: {
+            weekday: fromWeekday,
+          },
+        })
+
+        if (fromEvents.length === 0) {
+          return []
+        }
+
+        await RecurringEvent.remove({
+          connection: tx,
+          where: {
+            weekday: toWeekday,
+          },
+        })
+
+        return await RecurringEvent.insertMany({
+          connection: tx,
+          objects: fromEvents.map((event) => ({
+            ...event,
+            weekday: toWeekday,
+          })),
+        })
+      })
+
+      queryClient.invalidateQueries({
+        queryKey: getCacheKeyToInvalidate(queryNames.getAllRecurringEvents),
+      })
+      return result
     },
   }
 }
