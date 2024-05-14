@@ -4,7 +4,7 @@ import '@mantine/core/styles.css'
 import '@mantine/dates/styles.css'
 import '@mantine/notifications/styles.css'
 
-import { MantineProvider } from '@mantine/core'
+import { Blockquote, Box, Loader, MantineProvider } from '@mantine/core'
 import { ModalsProvider } from '@mantine/modals'
 import { Notifications } from '@mantine/notifications'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -17,6 +17,7 @@ import ReactDOM from 'react-dom/client'
 import { ErrorBoundary } from 'react-error-boundary'
 import { Router } from 'src/Router'
 import { DELETE_ALL_DATA_QUERY_PARAM } from 'src/components/DeleteAllDataLink'
+import { PageTemplate } from 'src/components/PageTemplate'
 import { DATABASE_NAME, IMPORT_DATA_QUERY_PARAM } from 'src/constants'
 import { createLoaders } from 'src/db/dataLoaders'
 import { upsertSeedData } from 'src/db/seedData'
@@ -85,6 +86,17 @@ async function main() {
   await withConnectionCloseOnError(crsqlite, async (db) => {
     logger.info('Connected to database:', db)
 
+    ReactDOM.createRoot(ROOT_ELEMENT).render(
+      <UiProviders>
+        <PageTemplate title="Initializing app">
+          <Box mt="lg">
+            <Blockquote icon={<Loader size="sm" />}>
+              Prepping protein shakes ...
+            </Blockquote>
+          </Box>
+        </PageTemplate>
+      </UiProviders>
+    )
     await runMigrations(db)
     await upsertSeedData(db)
 

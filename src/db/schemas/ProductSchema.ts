@@ -29,7 +29,8 @@ export const BaseProductRowSchema = z
   .strict()
 
 export const ProductRowSchema = BaseProductRowSchema.refine(
-  isTotalLessOrEqualTo100Grams
+  isTotalLessOrEqualTo100Grams,
+  'isTotalLessOrEqualTo100Grams'
 )
 
 export type ProductRow = z.infer<typeof BaseProductRowSchema>
@@ -45,6 +46,7 @@ export const ProductBeforeDatabaseSchema = BaseProductRowSchema.omit({
     })
   )
   .strict()
+  .refine(isTotalLessOrEqualTo100Grams, 'isTotalLessOrEqualTo100Grams')
 
 export type ProductBeforeDatabase = z.infer<typeof ProductBeforeDatabaseSchema>
 

@@ -1,4 +1,4 @@
-import { Box, Button, Title } from '@mantine/core'
+import { Box, Button, Flex, Title } from '@mantine/core'
 import { IconExternalLink, IconPlus } from '@tabler/icons-react'
 import { GrayText } from 'src/components/GrayText'
 import { Link } from 'src/components/Link'
@@ -15,9 +15,14 @@ export function ProductsPage() {
     <PageTemplate
       title="Products"
       titleRightSection={
-        <Link to={routes.products.add.path}>
-          <Button leftSection={<IconPlus size={14} />}>Add product</Button>
-        </Link>
+        <Flex direction="column" align="center" gap={4}>
+          <Link to={routes.products.add.path}>
+            <Button leftSection={<IconPlus size={14} />}>Add product</Button>
+          </Link>
+          <Box fz="sm">
+            or <Link to={routes.products.import.path}>import products</Link>
+          </Box>
+        </Flex>
       }
       description={
         <>
@@ -42,15 +47,19 @@ export function ProductsPage() {
         <Title order={2} size="h3" mt="md">
           Custom products
         </Title>
-        <GrayText py="sm">
-          Products added automatically by Biceps app or manually by you
+        <GrayText py="sm" maw={650}>
+          Products added manually by you.
         </GrayText>
         <ProductsTable useData={useGetAllCustomProducts} showRemove />
 
         <Title order={2} size="h3" mt={80}>
-          Open Food Facts
+          Imported products
         </Title>
-        <GrayText py="sm">Products added from Open Food Facts</GrayText>
+        <GrayText py="sm" maw={650}>
+          Products added from Open Food Facts via product search or
+          automatically by Biceps app during initialization. Initially added
+          data is provided by Finnish Institute of Health and Welfare, Fineli.
+        </GrayText>
         <ProductsTable useData={useGetAllExternalProducts} showRemove />
       </Box>
     </PageTemplate>

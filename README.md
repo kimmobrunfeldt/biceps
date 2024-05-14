@@ -97,4 +97,5 @@ Settled on [cr-sqlite](https://github.com/vlcn-io/cr-sqlite) for the following r
 
 ## Acknowledgements
 
+- Nutrition data from https://fineli.fi/fineli/en/elintarvikkeet?
 - [food-nutrients](https://github.com/food-nutrients/food-nutrients) project and their nutrition data _(MIT License Copyright (c) 2019 Food Nutrients)_

@@ -4,6 +4,7 @@ import { SettingsPage } from 'src/pages/SettingsPage/SettingsPage'
 import { NotFoundPage } from 'src/pages/errors/NotFoundPage'
 import { AddProductPage } from 'src/pages/products/AddProductPage/AddProductPage'
 import { EditProductPage } from 'src/pages/products/EditProductPage/EditProductPage'
+import { ImportProductsPage } from 'src/pages/products/ImportProductsPage/ImportProductsPage'
 import { ProductsPage } from 'src/pages/products/ProductsPage/ProductsPage'
 import { AddRecipePage } from 'src/pages/recipes/AddRecipePage/AddRecipePage'
 import { EditRecipePage } from 'src/pages/recipes/EditRecipePage/EditRecipePage'
@@ -26,6 +27,10 @@ export function Router() {
 
         <Route path={routes.products.index.path} component={ProductsPage} />
         <Route path={routes.products.add.path} component={AddProductPage} />
+        <Route
+          path={routes.products.import.path}
+          component={ImportProductsPage}
+        />
         <Route<{ id: string }> path={routes.products.edit.path}>
           {(params) => <EditProductPage id={params.id} />}
         </Route>

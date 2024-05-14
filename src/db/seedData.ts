@@ -5,6 +5,7 @@ import products from 'src/data/products.json'
 import { AppState, Person, Product } from 'src/db/entities'
 import { ProductBeforeDatabase } from 'src/db/schemas/ProductSchema'
 import { getLogger } from 'src/utils/logger'
+import { nanoId } from 'src/utils/nanoid'
 
 const logger = getLogger('db:seedData')
 
@@ -31,7 +32,10 @@ export async function upsertSeedData(connection: TXAsync) {
   for (const chunk of _.chunk(products, 1000)) {
     await Product.insertMany({
       connection,
-      objects: chunk as ProductBeforeDatabase[],
+      objects: chunk.map((c) => ({
+        ...c,
+        id: `seed-${nanoId()}`,
+      })) as ProductBeforeDatabase[],
     })
   }
 

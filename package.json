@@ -14,7 +14,8 @@
     "preview": "vite preview",
     "generate": "vite-node src/scripts/autoGenerateEntitiesIndex.ts && eslint --fix src/db/entities/index.ts",
     "generate:watch": "chokidar 'src/db/**/*.ts' -i /index.ts/ --initial -c 'npm run generate'",
-    "generate:data": "vite-node src/scripts/foodCsvToJson.ts > src/data/products.json"
+    "generate:data": "rm src/data/products.ndjson && npm run generate:fineliProductsCsvToJson && jq --slurp '.' src/data/products.ndjson > src/data/products.json",
+    "generate:fineliProductsCsvToJson": "vite-node src/scripts/fineliProductsCsvToJson.ts >> src/data/products.ndjson"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",

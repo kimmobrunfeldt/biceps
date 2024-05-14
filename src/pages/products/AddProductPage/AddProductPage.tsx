@@ -55,13 +55,6 @@ export function AddProductPage() {
     [withNotifications, isSubmitting, setLocation, upsertProduct]
   )
 
-  const onChange = useCallback(
-    (nutrition: Nutrition) => {
-      setNutrition(nutrition)
-    },
-    [setNutrition]
-  )
-
   return (
     <PageTemplate
       title="Add product"
@@ -75,7 +68,7 @@ export function AddProductPage() {
     >
       <Flex direction="row" gap="xl">
         <Box miw={200}>
-          <ProductForm onSubmit={onSubmit} onChange={onChange} />
+          <ProductForm onSubmit={onSubmit} onChange={setNutrition} />
         </Box>
         <Flex direction="column" align="center">
           <Text mb={-5} c="gray">

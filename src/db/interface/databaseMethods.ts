@@ -35,7 +35,12 @@ export function createDatabaseMethods<SchemaT extends ZodSchema>({
 
     async many(sqlQuery: Sql): Promise<Array<z.infer<SchemaT>>> {
       const rows = await connection.execO(sqlQuery.sql, sqlQuery.values)
-      return rows.map((row) => schema.parse(transformRow(row)))
+      console.log('rows', rows)
+      return rows.map((row) => {
+        const t = transformRow(row)
+        console.log(t)
+        return schema.parse(t)
+      })
     },
   }
 }

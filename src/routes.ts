@@ -37,6 +37,10 @@ export const routes = {
       path: '/products/add',
       title: 'Add product',
     },
+    import: {
+      path: '/products/import',
+      title: 'Import products',
+    },
     edit: {
       path: '/products/edit/:id',
       title: 'Edit product',

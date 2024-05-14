@@ -364,6 +364,26 @@ export function useUpsertProduct() {
   }
 }
 
+export function useInsertProducts() {
+  const ctx = useSqlite()
+  const queryClient = useQueryClient()
+
+  return {
+    insertProducts: async (products: ProductResolvedBeforeSaving[]) => {
+      await Product.insertMany({
+        connection: ctx.db,
+        objects: products,
+      })
+      queryClient.invalidateQueries({
+        queryKey: getCacheKeyToInvalidate(queryNames.getAllCustomProducts),
+      })
+      queryClient.invalidateQueries({
+        queryKey: getCacheKeyToInvalidate(queryNames.getAllExternalProducts),
+      })
+    },
+  }
+}
+
 export function useDeleteProduct() {
   const ctx = useSqlite()
   const queryClient = useQueryClient()

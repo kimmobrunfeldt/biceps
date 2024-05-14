@@ -84,7 +84,9 @@ async function main() {
       }
       return ProductBeforeDatabaseSchema.parse(product)
     })
-  console.log(JSON.stringify(processed, null, 2))
+  for (const product of processed) {
+    console.log(JSON.stringify(product))
+  }
 }
 
 main()
