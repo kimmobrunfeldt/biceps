@@ -185,7 +185,7 @@ function CopyScheduleButton({
           const results = await copySchedule(selectedWeekday, weekday)
           return results
         },
-        minLoadingNotificationMs: 800,
+        minLoadingNotificationMs: 500,
         loading: { message: 'Copying ...' },
         success: (results) => ({
           message: `Copied ${results.length} events`,

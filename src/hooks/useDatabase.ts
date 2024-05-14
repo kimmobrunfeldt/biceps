@@ -3,6 +3,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query'
+import _ from 'lodash'
 import { APP_STATE_KEY } from 'src/constants'
 import { createRecipe, upsertRecipe } from 'src/core/recipeCore'
 import {
@@ -29,6 +30,7 @@ import {
   useTableLastUpdatedAt,
 } from 'src/hooks/useSqlite'
 import { Weekday } from 'src/utils/time'
+import { assertUnreachable } from 'src/utils/utils'
 
 const queryNames = {
   getAppState: 'getAppState',
@@ -558,10 +560,25 @@ export function useCopyDaySchedule() {
 
         return await RecurringEvent.insertMany({
           connection: tx,
-          objects: fromEvents.map((event) => ({
-            ...event,
-            weekday: toWeekday,
-          })),
+          objects: fromEvents.map((event) => {
+            switch (event.eventType) {
+              case 'EatRecipe':
+                return {
+                  ..._.omit(event, [
+                    'id',
+                    'productToEatId',
+                    'weightGramsToEat',
+                  ]),
+                  weekday: toWeekday,
+                }
+
+              case 'EatProduct':
+                throw new Error('Copying EatProduct events is not supported')
+
+              default:
+                assertUnreachable(event)
+            }
+          }),
         })
       })
 

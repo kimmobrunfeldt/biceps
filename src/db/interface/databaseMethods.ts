@@ -1,6 +1,7 @@
 import { TXAsync } from '@vlcn.io/xplat-api'
 import _ from 'lodash'
 import { Sql } from 'sql-template-tag'
+import { parse } from 'src/db/schemas/common'
 import { SqlError } from 'src/db/utils/errors'
 import { ZodSchema, z } from 'zod'
 
@@ -22,7 +23,7 @@ export function createDatabaseMethods<SchemaT extends ZodSchema>({
       if (rows.length === 0) {
         throw new SqlError('No rows returned')
       }
-      return schema.parse(transformRow(rows[0]))
+      return parse(transformRow(rows[0]), schema)
     },
 
     async maybeOne(sqlQuery: Sql): Promise<z.infer<SchemaT> | null> {
@@ -30,7 +31,7 @@ export function createDatabaseMethods<SchemaT extends ZodSchema>({
       if (rows.length > 1) {
         throw new SqlError('Unexpected amount of rows returned')
       }
-      return rows[0] ? schema.parse(transformRow(rows[0])) : null
+      return rows[0] ? parse(transformRow(rows[0]), schema) : null
     },
 
     async many(sqlQuery: Sql): Promise<Array<z.infer<SchemaT>>> {
@@ -39,7 +40,7 @@ export function createDatabaseMethods<SchemaT extends ZodSchema>({
       return rows.map((row) => {
         const t = transformRow(row)
         console.log(t)
-        return schema.parse(t)
+        return parse(t, schema)
       })
     },
   }

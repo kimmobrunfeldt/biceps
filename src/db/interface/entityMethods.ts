@@ -2,6 +2,7 @@ import _ from 'lodash'
 import sql, { Sql, join, raw } from 'sql-template-tag'
 import { createDatabaseMethods } from 'src/db/interface/databaseMethods'
 import { Options } from 'src/db/interface/entityInterface'
+import { parse } from 'src/db/schemas/common'
 import { getLogger, withSqlLogging } from 'src/utils/logger'
 import { isNotUndefined } from 'src/utils/typeUtils'
 import { deepOmitBy } from 'src/utils/utils'
@@ -63,14 +64,14 @@ export function makeUtils<
 
   function baseInsertAsSql(objects: z.infer<BeforeDatabaseSchemaT>[]) {
     const first = objects[0]
-    const validObject = beforeDatabaseSchema.parse(first)
+    const validObject = parse(first, beforeDatabaseSchema)
     const keys = Object.keys(validObject)
     const filteredKeys = keys.filter(
       (key) => !_.isUndefined(validObject[key]) && key !== '__type'
     )
 
     const values = objects.map((object) => {
-      const valid = beforeDatabaseSchema.parse(object)
+      const valid = parse(object, beforeDatabaseSchema)
       return sql`
         (
           ${join(
@@ -338,7 +339,7 @@ export function makeUtils<
     if (!_.isArray(onConflict)) {
       throw new Error('clientUpsert requires onConflict to be an array')
     }
-    const validObject = beforeDatabaseSchema.parse(object)
+    const validObject = parse(object, beforeDatabaseSchema)
     const onConflictWhere = _.pick(validObject, onConflict) as WhereConditions<
       z.infer<SchemaT>
     >

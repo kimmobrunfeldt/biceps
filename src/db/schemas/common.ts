@@ -1,8 +1,9 @@
 import _ from 'lodash'
 import { DATABASE_ID_PREFIX } from 'src/constants'
+import { getLogger } from 'src/utils/logger'
 import { nanoId } from 'src/utils/nanoid'
 import { calculateMacros } from 'src/utils/nutrition'
-import { z } from 'zod'
+import { ZodSchema, z } from 'zod'
 
 export const preprocessors = {
   addNanoId: (val: unknown) => (!_.isNil(val) ? val : nanoId()),
@@ -89,4 +90,18 @@ export function isTotalCarbsGreaterOrEqualToSugars(
   nutrition: Pick<Nutrition, 'carbsTotal' | 'carbsSugar'>
 ) {
   return nutrition.carbsTotal >= nutrition.carbsSugar
+}
+
+const logger = getLogger('db:schema')
+
+export function parse<T extends ZodSchema>(
+  value: unknown,
+  schema: ZodSchema
+): z.TypeOf<T> {
+  try {
+    return schema.parse(value)
+  } catch (error) {
+    logger.error('Value was not valid according to schema', { error, value })
+    throw new Error(`Failed to parse value: ${error}`)
+  }
 }
