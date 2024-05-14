@@ -471,63 +471,18 @@ export function useGetAllRecurringEvents() {
   })
 }
 
-export function useGetAppState() {
-  const ctx = useSqlite()
-  const loaders = useDataLoaders()
-  const lastUpdatedAt = useTableLastUpdatedAt(['app_state'])
-
-  return useQuery({
-    placeholderData: keepPreviousData,
-    queryKey: [...getCacheKey(ctx, queryNames.getAppState), lastUpdatedAt],
-    queryFn: withQueryErrorHandling(queryNames.getAppState, async () => {
-      const appState = await AppState.find({
-        connection: ctx.db,
-        where: { key: APP_STATE_KEY },
-      })
-      const resolved = await resolver({
-        row: appState,
-        connection: ctx.db,
-        loaders,
-      })
-      return resolved
-    }),
-  })
-}
-
-export function useUpdateAppState() {
+export function useDeleteRecurringEvent() {
   const ctx = useSqlite()
   const queryClient = useQueryClient()
 
   return {
-    updateAppState: async (newValues: Partial<AppStateBeforeDatabase>) => {
-      await AppState.update({
+    deleteRecurringEvent: async (id: string) => {
+      await RecurringEvent.remove({
         connection: ctx.db,
-        where: { key: APP_STATE_KEY },
-        set: newValues,
+        where: { id: id },
       })
       queryClient.invalidateQueries({
-        queryKey: getCacheKeyToInvalidate(queryNames.getAppState),
-      })
-    },
-  }
-}
-
-export function useUpdatePerson() {
-  const ctx = useSqlite()
-  const queryClient = useQueryClient()
-
-  return {
-    updatePerson: async (
-      personId: string,
-      newValues: Partial<PersonBeforeDatabase>
-    ) => {
-      await Person.update({
-        connection: ctx.db,
-        where: { id: personId },
-        set: newValues,
-      })
-      queryClient.invalidateQueries({
-        queryKey: getCacheKeyToInvalidate(queryNames.getAppState),
+        queryKey: getCacheKeyToInvalidate(queryNames.getAllRecurringEvents),
       })
     },
   }
@@ -586,6 +541,68 @@ export function useCopyDaySchedule() {
         queryKey: getCacheKeyToInvalidate(queryNames.getAllRecurringEvents),
       })
       return result
+    },
+  }
+}
+
+export function useGetAppState() {
+  const ctx = useSqlite()
+  const loaders = useDataLoaders()
+  const lastUpdatedAt = useTableLastUpdatedAt(['app_state'])
+
+  return useQuery({
+    placeholderData: keepPreviousData,
+    queryKey: [...getCacheKey(ctx, queryNames.getAppState), lastUpdatedAt],
+    queryFn: withQueryErrorHandling(queryNames.getAppState, async () => {
+      const appState = await AppState.find({
+        connection: ctx.db,
+        where: { key: APP_STATE_KEY },
+      })
+      const resolved = await resolver({
+        row: appState,
+        connection: ctx.db,
+        loaders,
+      })
+      return resolved
+    }),
+  })
+}
+
+export function useUpdateAppState() {
+  const ctx = useSqlite()
+  const queryClient = useQueryClient()
+
+  return {
+    updateAppState: async (newValues: Partial<AppStateBeforeDatabase>) => {
+      await AppState.update({
+        connection: ctx.db,
+        where: { key: APP_STATE_KEY },
+        set: newValues,
+      })
+      queryClient.invalidateQueries({
+        queryKey: getCacheKeyToInvalidate(queryNames.getAppState),
+      })
+    },
+  }
+}
+
+export function useUpdatePerson() {
+  const ctx = useSqlite()
+  const queryClient = useQueryClient()
+
+  return {
+    updatePerson: async (
+      personId: string,
+      newValues: Partial<PersonBeforeDatabase>
+    ) => {
+      await Person.update({
+        connection: ctx.db,
+        where: { id: personId },
+        set: newValues,
+      })
+      queryClient.invalidateQueries({
+        queryKey: getCacheKeyToInvalidate(queryNames.getAppState),
+      })
     },
   }
 }

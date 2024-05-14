@@ -20,7 +20,10 @@ import {
   RecurringEventRow,
 } from 'src/db/schemas/RecurringEventSchema'
 import { Nutrition } from 'src/db/schemas/common'
-import { useCopyDaySchedule } from 'src/hooks/useDatabase'
+import {
+  useCopyDaySchedule,
+  useDeleteRecurringEvent,
+} from 'src/hooks/useDatabase'
 import { useNotifications } from 'src/hooks/useNotification'
 import { calculateValuesForEvent } from 'src/pages/IndexPage/IndexPage'
 import { formatRoute, routes } from 'src/routes'
@@ -131,10 +134,31 @@ export function DaySchedule({
 }
 
 function EventRow({ event }: { event: RecurringEventResolved }) {
+  const { deleteRecurringEvent } = useDeleteRecurringEvent()
+  const { withNotifications } = useNotifications()
+
+  const onRemove = useCallback(async () => {
+    await withNotifications({
+      fn: async () => {
+        await deleteRecurringEvent(event.id)
+      },
+      minLoadingNotificationMs: 500,
+      success: {
+        message: `Scheduled event deleted`,
+        color: 'green',
+      },
+      error: (err) => ({
+        message: `Failed delete: ${err.message}`,
+        color: 'red',
+        icon: <IconX />,
+      }),
+    })
+  }, [deleteRecurringEvent, withNotifications, event])
+
   switch (event.eventType) {
     case 'EatRecipe':
       return (
-        <>
+        <Flex align="center" gap="xs">
           <Text>
             {formatPortions(event.portionsToEat)}{' '}
             {pluralize('portion', event.portionsToEat)} of{' '}
@@ -146,7 +170,19 @@ function EventRow({ event }: { event: RecurringEventResolved }) {
               {event.recipeToEat.name}
             </Link>
           </Text>
-        </>
+          <Tooltip label="Remove scheduled event" position="right">
+            <ActionIcon
+              variant="light"
+              aria-label="Remove"
+              radius="lg"
+              size="xs"
+              onClick={onRemove}
+              color="red"
+            >
+              <IconX height="70%" />
+            </ActionIcon>
+          </Tooltip>
+        </Flex>
       )
     case 'EatProduct': {
       return (
@@ -209,6 +245,8 @@ function CopyScheduleButton({
             size="sm"
             radius="lg"
             aria-label="Copy schedule to another day"
+            pos="relative"
+            top={2}
           >
             <IconCopy size={14} />
           </ActionIcon>
