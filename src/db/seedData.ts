@@ -1,11 +1,11 @@
 import { TXAsync } from '@vlcn.io/xplat-api'
 import _ from 'lodash'
+import murmurhash from 'murmurhash'
 import { APP_STATE_KEY } from 'src/constants'
 import products from 'src/data/products.json'
 import { AppState, Person, Product } from 'src/db/entities'
 import { ProductBeforeDatabase } from 'src/db/schemas/ProductSchema'
 import { getLogger } from 'src/utils/logger'
-import { nanoId } from 'src/utils/nanoid'
 
 const logger = getLogger('db:seedData')
 
@@ -26,7 +26,7 @@ export async function upsertSeedData(connection: TXAsync) {
       id: 'biceps-default-user',
       name: '',
     },
-    onConflict: ['name'],
+    onConflict: ['id'],
   })
 
   for (const chunk of _.chunk(products, 1000)) {
@@ -34,7 +34,7 @@ export async function upsertSeedData(connection: TXAsync) {
       connection,
       objects: chunk.map((c) => ({
         ...c,
-        id: `seed-${nanoId()}`,
+        id: `seed-${murmurhash.v3(c.name)}`,
       })) as ProductBeforeDatabase[],
     })
   }
