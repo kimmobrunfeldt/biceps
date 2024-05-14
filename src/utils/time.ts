@@ -77,7 +77,7 @@ export function parseTime(value: string) {
 }
 
 export function isBeforeNow(time: RecurringEventResolved['time']) {
-  const now = Temporal.Now.plainDateTime(calendar).subtract({ hours: 10 })
+  const now = Temporal.Now.plainDateTime(calendar)
   return (
     time.hour < now.hour || (time.hour === now.hour && time.minute < now.minute)
   )
