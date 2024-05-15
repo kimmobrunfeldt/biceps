@@ -60,7 +60,7 @@ export function ImportExportData() {
       confirmProps: { color: 'red' },
       closeOnConfirm: true,
       onConfirm: async () => {
-        modals.close('import-data')
+        modals.close('import-user-data')
         await withNotifications({
           fn: async () => {
             const data = await file.text()
