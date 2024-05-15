@@ -649,6 +649,7 @@ type UserDataExport = Awaited<
 
 export function useImportUserData() {
   const ctx = useSqlite()
+  const queryClient = useQueryClient()
 
   return {
     importUserData: async (data: UserDataExport): Promise<number> => {
@@ -702,6 +703,7 @@ export function useImportUserData() {
         importedCount++
       }
 
+      queryClient.invalidateQueries()
       return importedCount
     },
   }
