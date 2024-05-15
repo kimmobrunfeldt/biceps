@@ -1,6 +1,5 @@
 import { DB } from '@vlcn.io/crsqlite-wasm'
 import { TblRx } from '@vlcn.io/rx-tbl'
-import { wdbRtc } from '@vlcn.io/sync-p2p'
 import {
   createContext,
   useCallback,
@@ -10,6 +9,7 @@ import {
   useState,
 } from 'react'
 import { getLogger } from 'src/utils/logger'
+import { wdbRtc } from 'src/utils/p2p'
 
 const logger = getLogger('hooks:useSqlite')
 

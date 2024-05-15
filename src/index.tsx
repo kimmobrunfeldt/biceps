@@ -11,7 +11,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import initWasm, { DB, SQLite3 } from '@vlcn.io/crsqlite-wasm'
 import wasmUrl from '@vlcn.io/crsqlite-wasm/crsqlite.wasm?url'
 import tblrx from '@vlcn.io/rx-tbl'
-import { wdbRtc } from '@vlcn.io/sync-p2p'
 import _ from 'lodash'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
@@ -31,6 +30,7 @@ import { DeleteAllDataRequestedPage } from 'src/pages/errors/DataAllDataRequeste
 import { EmergencyFallbackPage } from 'src/pages/errors/EmergencyFallbackPage'
 import { theme } from 'src/theme'
 import { getLogger } from 'src/utils/logger'
+import { wdbRtc } from 'src/utils/p2p'
 import { stringify as uuidStringify } from 'uuid'
 
 const queryClient = new QueryClient({
