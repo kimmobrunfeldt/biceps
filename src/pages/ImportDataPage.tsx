@@ -3,6 +3,7 @@ import { modals } from '@mantine/modals'
 import { IconChevronLeft, IconX } from '@tabler/icons-react'
 import { useRef } from 'react'
 import { PageTemplate } from 'src/components/PageTemplate'
+import { DATABASE_EXPORT_FILE_NAME } from 'src/constants'
 import { useNotifications } from 'src/hooks/useNotification'
 import { routes } from 'src/routes'
 import { importBicepsData } from 'src/utils/indexedDbBackup'
@@ -27,8 +28,8 @@ export function ImportDataPage() {
 
   function importJson(file: File) {
     modals.openConfirmModal({
-      id: 'import-data',
-      title: 'Import data',
+      id: 'import-database',
+      title: 'Import database',
       children: (
         <Text size="sm">
           Importing overwrites all existing data. Do you really want to
@@ -63,7 +64,7 @@ export function ImportDataPage() {
 
   return (
     <PageTemplate
-      title="Data import"
+      title="Database import"
       titleRightSection={
         <a href={routes.index.path}>
           <Flex direction="row" align="center">
@@ -73,7 +74,7 @@ export function ImportDataPage() {
       }
     >
       <Blockquote color="yellow">
-        Importing will overwrite all existing data.
+        Importing a database will overwrite all existing data.
       </Blockquote>
 
       <Box mt="xl">
@@ -86,9 +87,10 @@ export function ImportDataPage() {
           onChange={onImportFileSelected}
         />
         <Text maw={700}>
-          To import data, click the button below and select{' '}
-          <Code>biceps.json</Code> export file. If importing fails, visit the{' '}
-          <a href={routes.index.path}>Home page</a> and come back to retry.
+          To import, click the button below and select{' '}
+          <Code>{DATABASE_EXPORT_FILE_NAME}</Code> export file. If the process
+          fails, visit the <a href={routes.index.path}>Home page</a> and come
+          back to retry.
         </Text>
         <Button mt="lg" id="file" type="button" onClick={onButtonClick}>
           Import file

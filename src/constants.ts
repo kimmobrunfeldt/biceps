@@ -10,3 +10,6 @@ export const APP_BASE_URL =
 
 export const SYNC_QUERY_PARAM = 'syncWithPeerId'
 export const IMPORT_DATA_QUERY_PARAM = 'importData'
+
+export const DATABASE_EXPORT_FILE_NAME = 'biceps-database.json'
+export const DATA_EXPORT_FILE_NAME = 'biceps-user-data.json'

@@ -9,6 +9,10 @@ import { z } from 'zod'
 
 const logger = getLogger('db:migrations')
 
+export type MigrationRow = {
+  version: string
+}
+
 export async function runMigrations(db: DB) {
   logger.info('Running migrations ...')
 

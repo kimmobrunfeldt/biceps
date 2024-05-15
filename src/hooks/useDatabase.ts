@@ -29,6 +29,7 @@ import {
   useSqlite,
   useTableLastUpdatedAt,
 } from 'src/hooks/useSqlite'
+import { MigrationRow } from 'src/migrations'
 import { Weekday } from 'src/utils/time'
 import { assertUnreachable } from 'src/utils/utils'
 
@@ -603,6 +604,105 @@ export function useUpdatePerson() {
       queryClient.invalidateQueries({
         queryKey: getCacheKeyToInvalidate(queryNames.getAppState),
       })
+    },
+  }
+}
+
+export function useLazyGetAllUserData() {
+  const ctx = useSqlite()
+
+  return {
+    getAllUserData: async () => {
+      const appState = await AppState.find({
+        connection: ctx.db,
+        where: { key: APP_STATE_KEY },
+      })
+      const persons = await Person.findMany({ connection: ctx.db })
+      const recipes = await Recipe.findMany({ connection: ctx.db })
+      const recipeItems = await RecipeItem.findMany({ connection: ctx.db })
+      const customProducts = await Product.findManyCustom({
+        connection: ctx.db,
+      })
+      const recurringEvents = await RecurringEvent.findMany({
+        connection: ctx.db,
+      })
+      const migrations = (await ctx.db.execO(
+        'SELECT * FROM migrations'
+      )) as MigrationRow[]
+
+      return {
+        migrations,
+        appState,
+        persons,
+        recipes,
+        recipeItems,
+        products: customProducts,
+        recurringEvents,
+      }
+    },
+  }
+}
+
+type UserDataExport = Awaited<
+  ReturnType<ReturnType<typeof useLazyGetAllUserData>['getAllUserData']>
+>
+
+export function useImportUserData() {
+  const ctx = useSqlite()
+
+  return {
+    importUserData: async (data: UserDataExport): Promise<number> => {
+      const migrations = await ctx.db.execO('SELECT * FROM migrations')
+      if (!_.isEqual(data.migrations, migrations)) {
+        throw new Error('Exported data is from a different database version')
+      }
+
+      function prepareForUpsert<T extends { __type: string }>(
+        data: T
+      ): Omit<T, '__type'> {
+        return _.omit(data, ['__type'])
+      }
+
+      let importedCount = 0
+
+      await AppState.clientUpsert({
+        connection: ctx.db,
+        object: prepareForUpsert(data.appState),
+        onConflict: ['key'],
+      })
+      importedCount++
+
+      const mapping = {
+        persons: Person,
+        recipes: Recipe,
+        products: Product,
+        recurringEvents: RecurringEvent,
+      } as const
+
+      const keys = Object.keys(mapping) as (keyof typeof mapping)[]
+      for (const key of keys) {
+        const items = data[key]
+        for (const item of items) {
+          const Entity = mapping[key] as (typeof mapping)[typeof key]
+          await Entity.clientUpsert({
+            connection: ctx.db,
+            object: prepareForUpsert(item), // Will be validated before upsert
+            onConflict: ['id'],
+          } as any)
+          importedCount++
+        }
+      }
+
+      for (const item of data.recipeItems) {
+        await RecipeItem.clientUpsert({
+          connection: ctx.db,
+          object: prepareForUpsert(item),
+          onConflict: ['recipeId', 'productId'],
+        })
+        importedCount++
+      }
+
+      return importedCount
     },
   }
 }
