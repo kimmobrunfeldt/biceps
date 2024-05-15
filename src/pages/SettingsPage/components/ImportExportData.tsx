@@ -37,17 +37,9 @@ export function ImportExportData() {
     inputRef.current?.click()
   }
 
-  function onImportFileSelected() {
-    if (!inputRef.current?.files) return
-
-    const [file] = inputRef.current.files
-    if (!file) return
-
-    importJson(file)
-  }
-
   function importJson(file: File) {
     modals.openConfirmModal({
+      id: 'import-user-data',
       title: 'Import user data',
       children: (
         <Text size="sm">
@@ -59,6 +51,7 @@ export function ImportExportData() {
       confirmProps: { color: 'red' },
       closeOnConfirm: true,
       onConfirm: async () => {
+        modals.close('import-user-data')
         await withNotifications({
           fn: async () => {
             const data = await file.text()
@@ -79,6 +72,16 @@ export function ImportExportData() {
         })
       },
     })
+  }
+
+  function onImportFileSelected() {
+    if (!inputRef.current?.files) return
+
+    const [file] = inputRef.current.files
+    if (!file) return
+
+    console.log('file selected!', file)
+    importJson(file)
   }
 
   return (

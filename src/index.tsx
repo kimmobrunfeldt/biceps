@@ -109,7 +109,8 @@ async function main() {
       ;(window as any)[key] = (entitiesWithConnection as any)[key]
     }
 
-    ReactDOM.createRoot(ROOT_ELEMENT).render(
+    const root = ReactDOM.createRoot(ROOT_ELEMENT)
+    root.render(
       <UiProviders>
         <PageTemplate title="Initializing app">
           <Box mt="lg">
@@ -142,8 +143,7 @@ async function main() {
     )
 
     const dataLoaders = createLoaders(db)
-
-    ReactDOM.createRoot(ROOT_ELEMENT).render(
+    root.render(
       <ErrorBoundary
         fallback={
           <UiProviders>
