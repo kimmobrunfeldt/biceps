@@ -85,6 +85,9 @@ async function main() {
   // data deletion is needed, the IndexedDB connection is not locked.
   await withConnectionCloseOnError(crsqlite, async (db) => {
     logger.info('Connected to database:', db)
+    logger.info(
+      `Use the SQLite database with: await sql('SELECT * FROM products')`
+    )
     ;(window as any).sql = (sql: string) => db.execO(sql)
 
     ReactDOM.createRoot(ROOT_ELEMENT).render(
