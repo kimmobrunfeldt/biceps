@@ -30,7 +30,8 @@ export function SyncData() {
       <Text maw={650}>
         Open the following link in another device to sync data between devices
         (peer-to-peer). Anyone with the link can start syncing. Remember to keep
-        this browser open.
+        this browser open. If the sync is not working, delete all data from the
+        other device, import user content there, and retry syncing.
       </Text>
 
       <GrayText py={6}>{syncUrl}</GrayText>
