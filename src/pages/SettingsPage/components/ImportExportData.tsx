@@ -48,7 +48,6 @@ export function ImportExportData() {
 
   function importJson(file: File) {
     modals.openConfirmModal({
-      id: 'import-user-data',
       title: 'Import user data',
       children: (
         <Text size="sm">
@@ -60,7 +59,6 @@ export function ImportExportData() {
       confirmProps: { color: 'red' },
       closeOnConfirm: true,
       onConfirm: async () => {
-        modals.close('import-user-data')
         await withNotifications({
           fn: async () => {
             const data = await file.text()
