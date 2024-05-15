@@ -55,6 +55,8 @@ export function NutritionCircle({
       sections={sections}
     />
   )
-  const icon = <RingProgress size={36} thickness={8} sections={sections} />
+  const icon = (
+    <RingProgress size={36} thickness={8} sections={sections} m={-4} />
+  )
   return variant === 'icon' ? icon : large
 }

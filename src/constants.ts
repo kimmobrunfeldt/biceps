@@ -13,3 +13,5 @@ export const IMPORT_DATA_QUERY_PARAM = 'importData'
 
 export const DATABASE_EXPORT_FILE_NAME = 'biceps-database.json'
 export const DATA_EXPORT_FILE_NAME = 'biceps-user-data.json'
+
+export const PAGE_DESCRIPTION_MAX_WIDTH = 700

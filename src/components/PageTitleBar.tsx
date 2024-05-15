@@ -1,5 +1,6 @@
 import { BoxProps, Flex, Stack, Title } from '@mantine/core'
 import { GrayText } from 'src/components/GrayText'
+import { PAGE_DESCRIPTION_MAX_WIDTH } from 'src/constants'
 
 type Props = {
   title: string
@@ -29,7 +30,7 @@ export function PageTitleBar({
           {title}
         </Title>
         {description ? (
-          <GrayText mb="xl" maw={700} strong>
+          <GrayText mb="xl" maw={PAGE_DESCRIPTION_MAX_WIDTH} strong>
             {description}
           </GrayText>
         ) : null}

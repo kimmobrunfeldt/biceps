@@ -15,6 +15,7 @@ import { useCallback } from 'react'
 import { GrayText } from 'src/components/GrayText'
 import { Link } from 'src/components/Link'
 import { NutritionCircle } from 'src/components/NutritionCircle'
+import { PAGE_DESCRIPTION_MAX_WIDTH } from 'src/constants'
 import {
   RecurringEventResolved,
   RecurringEventRow,
@@ -89,31 +90,49 @@ export function DaySchedule({
   )
 
   return (
-    <Box>
-      <Flex align="center" gap="md" mb="xs">
-        <NutritionCircle
-          nutrition={nutritionsPerDay}
-          weightGrams={nutritionsPerDay.weightGrams}
-          variant="icon"
-        />
+    <Box pl={4}>
+      <Flex
+        align="center"
+        justify="space-between"
+        gap={{ base: 'xs', lg: 'sm' }}
+        mb={8}
+        maw={PAGE_DESCRIPTION_MAX_WIDTH}
+      >
+        <Flex align="center" gap={{ base: 'xs', lg: 'sm' }}>
+          <Title order={2} size="h3">
+            {weekdayNumberToLongName(weekday)}
+          </Title>
+          <Box pos="relative" top={2}>
+            <NutritionCircle
+              nutrition={nutritionsPerDay}
+              weightGrams={nutritionsPerDay.weightGrams}
+              variant="icon"
+            />
+          </Box>
+          {editable ? (
+            <Flex align="flex-end" pos="relative" top={-1}>
+              <CopyScheduleButton weekday={weekday} />
+            </Flex>
+          ) : null}
+        </Flex>
+      </Flex>
 
-        <Title order={2} size="h3">
-          {weekdayNumberToLongName(weekday)}
-        </Title>
+      <Flex
+        align="center"
+        justify="space-between"
+        gap={{ base: 'xs', lg: 'sm' }}
+        mb="md"
+        maw={PAGE_DESCRIPTION_MAX_WIDTH}
+      >
         {!hideNutritionHeader ? (
           <GrayText style={{ position: 'relative', top: '2px' }}>
             {formatKcal(nutritionsPerDay.kcal)} kcal,{' '}
             {formatGrams(nutritionsPerDay.protein)}g protein
           </GrayText>
         ) : null}
-        {editable ? (
-          <Flex align="flex-end">
-            <CopyScheduleButton weekday={weekday} />
-          </Flex>
-        ) : null}
       </Flex>
 
-      <Stack pb="xl" pl={54} gap="xs">
+      <Stack pb="xl" gap="xs">
         {recurringEvents.length === 0 && <GrayText>No events</GrayText>}
         {sortedTimes.map((timeKey, i) => {
           const recurringEvents = eventsGroupedByTime[timeKey]
