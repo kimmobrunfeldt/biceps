@@ -12,6 +12,7 @@ import initWasm, { DB, SQLite3 } from '@vlcn.io/crsqlite-wasm'
 import wasmUrl from '@vlcn.io/crsqlite-wasm/crsqlite.wasm?url'
 import tblrx from '@vlcn.io/rx-tbl'
 import { wdbRtc } from '@vlcn.io/sync-p2p'
+import _ from 'lodash'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { ErrorBoundary } from 'react-error-boundary'
@@ -20,6 +21,7 @@ import { DELETE_ALL_DATA_QUERY_PARAM } from 'src/components/DeleteAllDataLink'
 import { PageTemplate } from 'src/components/PageTemplate'
 import { DATABASE_NAME, IMPORT_DATA_QUERY_PARAM } from 'src/constants'
 import { createLoaders } from 'src/db/dataLoaders'
+import { allEntities } from 'src/db/entities'
 import { upsertSeedData } from 'src/db/seedData'
 import { DataLoaderContext } from 'src/hooks/useDataLoaders'
 import { DatabaseContext } from 'src/hooks/useSqlite'
@@ -88,7 +90,24 @@ async function main() {
     logger.info(
       `Use the SQLite database with: await sql('SELECT * FROM products')`
     )
+    logger.info(`or: await Recipe.findMany()`)
     ;(window as any).sql = (sql: string) => db.execO(sql)
+
+    const entitiesWithConnection = _.mapValues(allEntities, (Entity) => {
+      return _.mapValues(Entity, (val) => {
+        if (!_.isFunction(val)) {
+          return val
+        }
+        return async (params: Record<string, any> = {}) => {
+          return await val({ connection: db, ...params } as any)
+        }
+      })
+    })
+
+    for (const key of Object.keys(entitiesWithConnection)) {
+      // eslint-disable-next-line no-extra-semi
+      ;(window as any)[key] = (entitiesWithConnection as any)[key]
+    }
 
     ReactDOM.createRoot(ROOT_ELEMENT).render(
       <UiProviders>
