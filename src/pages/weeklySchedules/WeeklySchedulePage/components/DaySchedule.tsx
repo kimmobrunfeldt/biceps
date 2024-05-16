@@ -1,3 +1,4 @@
+import { Temporal } from '@js-temporal/polyfill'
 import {
   ActionIcon,
   Box,
@@ -8,10 +9,11 @@ import {
   Title,
   Tooltip,
 } from '@mantine/core'
+import { useInterval } from '@mantine/hooks'
 import { IconCopy, IconPlus, IconX } from '@tabler/icons-react'
 import _ from 'lodash'
 import pluralize from 'pluralize'
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { GrayText } from 'src/components/GrayText'
 import { Link } from 'src/components/Link'
 import { NutritionCircle } from 'src/components/NutritionCircle'
@@ -31,6 +33,7 @@ import { formatRoute, routes } from 'src/routes'
 import { formatGrams, formatKcal, formatPortions } from 'src/utils/format'
 import {
   Weekday,
+  calendar,
   formatTime,
   getWeekdays,
   isBeforeNow,
@@ -45,6 +48,7 @@ type Props = {
   hideNutritionHeader?: boolean
   editable?: boolean
   onAddRecurringEventClick?: () => void
+  showCurrentTime?: boolean
 }
 
 export function DaySchedule({
@@ -54,7 +58,14 @@ export function DaySchedule({
   editable = false,
   fadeEventsBeforeNow = false,
   hideNutritionHeader = false,
+  showCurrentTime = false,
 }: Props) {
+  const [now, setNow] = useState(Temporal.Now.plainDateTime(calendar))
+
+  useInterval(() => {
+    setNow(Temporal.Now.plainDateTime(calendar))
+  }, 1000 * 60)
+
   const eventsGroupedByTime = _.groupBy(
     recurringEvents,
     (event) => `${event.time.hour}-${event.time.minute}`
@@ -151,22 +162,63 @@ export function DaySchedule({
           const first = recurringEvents[0] // This should always exist
           const shouldFade = fadeEventsBeforeNow && isBeforeNow(first.time)
           const formattedTime = formatTime(first.time)
+          const prevTimeKey = i > 0 ? sortedTimes[i - 1] : null
+          const prevEvents = prevTimeKey
+            ? eventsGroupedByTime[prevTimeKey]
+            : null
+          const prevTime = prevEvents ? prevEvents[0].time : null
+          const isNowGap =
+            // If first event is in the future, show now gap
+            (i === 0 && !isBeforeNow(first.time)) ||
+            // Otherwise check if the prev event is in past end next event in future
+            (i > 0 &&
+              prevTime &&
+              isBeforeNow(prevTime) &&
+              !isBeforeNow(first.time))
+          const shouldShowNow = showCurrentTime && isNowGap
+
           return (
-            <Flex
-              key={i}
-              align="flex-start"
-              gap={6}
-              opacity={shouldFade ? 0.4 : 1}
-            >
-              <Text c="gray" fw="bold" miw={60}>
-                {formattedTime}
-              </Text>
-              <Stack gap={4}>
-                {recurringEvents.map((event, i) => {
-                  return <EventRow key={i} event={event} editable={editable} />
-                })}
-              </Stack>
-            </Flex>
+            <Box key={i}>
+              {shouldShowNow ? (
+                <Flex align="center" gap={6} maw={200}>
+                  <Text c="gray" fw="bold" miw={60}>
+                    {formatTime(now)}
+                  </Text>
+                  <Box
+                    my="lg"
+                    style={{
+                      height: '1px',
+                      background: '#ddd',
+                      flex: 1,
+                    }}
+                  />
+                  <GrayText fw="bold" fz="xs" style={{ letterSpacing: '1px' }}>
+                    NOW
+                  </GrayText>
+                  <Box
+                    my="lg"
+                    style={{
+                      height: '1px',
+                      background: '#ddd',
+                      flex: 1,
+                    }}
+                  />
+                </Flex>
+              ) : null}
+
+              <Flex align="flex-start" gap={6} opacity={shouldFade ? 0.4 : 1}>
+                <Text c="gray" fw="bold" miw={60}>
+                  {formattedTime}
+                </Text>
+                <Stack gap={4}>
+                  {recurringEvents.map((event, i) => {
+                    return (
+                      <EventRow key={i} event={event} editable={editable} />
+                    )
+                  })}
+                </Stack>
+              </Flex>
+            </Box>
           )
         })}
       </Stack>

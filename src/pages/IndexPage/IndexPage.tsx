@@ -59,6 +59,7 @@ export function IndexPage() {
                       recurringEvents={eventsToday}
                       hideNutritionHeader
                       fadeEventsBeforeNow
+                      showCurrentTime
                     />
                   </Stack>
                 )
