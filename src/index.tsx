@@ -46,7 +46,7 @@ const queryClient = new QueryClient({
 const UiProviders = ({ children }: { children: React.ReactNode }) => {
   return (
     <MantineProvider theme={theme} defaultColorScheme="auto">
-      <Notifications position="top-center" />
+      <Notifications position="top-center" limit={2} />
       <ModalsProvider>
         <QueryClientProvider client={queryClient}>
           {children}
