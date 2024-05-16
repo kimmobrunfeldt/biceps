@@ -42,7 +42,6 @@ export function ProductSearch({ onSelect }: Props) {
   const apiProducts = apiSearchResult.data?.products ?? []
   const dbCustomProducts = dbCustomSearchResult.data ?? []
   const dbExternalProducts = dbExternalSearchResult.data ?? []
-  const externalProducts = [...dbExternalProducts, ...apiProducts]
 
   const errorMessage = getErrorMessage([
     apiSearchResult.error
