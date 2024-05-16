@@ -69,7 +69,14 @@ export function SyncData() {
         )}
       </CopyButton>
 
-      <Box bg="white" p={4} mt="md">
+      <Box
+        bg="white"
+        p={4}
+        mt="md"
+        w={128}
+        h={128}
+        style={{ overflow: 'hidden', borderRadius: '4px' }}
+      >
         <QRCode value={syncUrl} size={120} />
       </Box>
 
