@@ -46,6 +46,7 @@
     "react-dom": "^18.2.0",
     "react-error-boundary": "^4.0.13",
     "react-hook-form": "^7.51.3",
+    "react-qr-code": "^2.0.13",
     "spin-delay": "^2.0.0",
     "sql-template-tag": "^5.2.0",
     "uuid": "^9.0.1",

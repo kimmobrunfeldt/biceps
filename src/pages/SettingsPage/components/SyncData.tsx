@@ -10,6 +10,7 @@ import {
   rem,
 } from '@mantine/core'
 import { IconCheck, IconCopy } from '@tabler/icons-react'
+import QRCode from 'react-qr-code'
 import { GrayText } from 'src/components/GrayText'
 import { APP_BASE_URL, SYNC_QUERY_PARAM } from 'src/constants'
 import { useSqlite } from 'src/hooks/useSqlite'
@@ -34,7 +35,10 @@ export function SyncData() {
         initiating the connection.
       </Text>
 
-      <GrayText py={6}>{syncUrl}</GrayText>
+      <Box pt="xs">
+        <GrayText>{syncUrl}</GrayText>
+      </Box>
+
       <CopyButton value={syncUrl} timeout={2000}>
         {({ copied, copy }) => (
           <Flex
@@ -64,6 +68,10 @@ export function SyncData() {
           </Flex>
         )}
       </CopyButton>
+
+      <Box bg="white" p={4} mt="md">
+        <QRCode value={syncUrl} size={120} />
+      </Box>
 
       <Box pt="lg">
         <Title order={3} fz="md" mb="xs">
