@@ -1,4 +1,5 @@
 import { Box, Flex } from '@mantine/core'
+import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useRef, useState } from 'react'
 import 'src/App.css'
 import { NavBar } from 'src/components/NavBar'
@@ -11,6 +12,8 @@ const logger = getLogger('rtc')
 
 export function App({ children }: { children?: React.ReactNode }) {
   useSyncDataModalOpener()
+
+  const queryClient = useQueryClient()
   const ref = useRef<HTMLDivElement>(null)
   const ctx = useSqlite()
   const [connections, setConnections] = useState<RtcContext>({
@@ -23,12 +26,13 @@ export function App({ children }: { children?: React.ReactNode }) {
     const dispose = ctx.rtc.onConnectionsChanged((pending, established) => {
       logger.info('Connections changed', { pending, established })
       setConnections({ pending, established })
+      queryClient.invalidateQueries()
     })
     return () => {
       logger.info('Disposing RTC connections listener')
       dispose()
     }
-  }, [ctx.rtc])
+  }, [queryClient, ctx.rtc])
 
   useEffect(() => {
     ref.current?.scrollTo(0, 0)
