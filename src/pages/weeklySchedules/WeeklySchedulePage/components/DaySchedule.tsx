@@ -17,7 +17,6 @@ import { useCallback, useState } from 'react'
 import { GrayText } from 'src/components/GrayText'
 import { Link } from 'src/components/Link'
 import { NutritionCircle } from 'src/components/NutritionCircle'
-import { PAGE_DESCRIPTION_MAX_WIDTH } from 'src/constants'
 import {
   RecurringEventResolved,
   RecurringEventRow,
@@ -109,7 +108,6 @@ export function DaySchedule({
         justify="space-between"
         gap={{ base: 'xs', lg: 'sm' }}
         mb={8}
-        maw={PAGE_DESCRIPTION_MAX_WIDTH}
       >
         <Flex align="center" gap={{ base: 'xs', lg: 'sm' }}>
           <Title order={2} size="h3">
@@ -140,20 +138,19 @@ export function DaySchedule({
         </Flex>
       </Flex>
 
-      <Flex
-        align="center"
-        justify="space-between"
-        gap={{ base: 'xs', lg: 'sm' }}
-        mb="md"
-        maw={PAGE_DESCRIPTION_MAX_WIDTH}
-      >
-        {!hideNutritionHeader ? (
+      {recurringEvents.length > 0 && !hideNutritionHeader ? (
+        <Flex
+          align="center"
+          justify="space-between"
+          gap={{ base: 'xs', lg: 'sm' }}
+          mb="md"
+        >
           <GrayText style={{ position: 'relative', top: '2px' }}>
             {formatKcal(nutritionsPerDay.kcal)} kcal,{' '}
             {formatGrams(nutritionsPerDay.protein)}g protein
           </GrayText>
-        ) : null}
-      </Flex>
+        </Flex>
+      ) : null}
 
       <Stack gap="xs">
         {recurringEvents.length === 0 && <GrayText>No events</GrayText>}
