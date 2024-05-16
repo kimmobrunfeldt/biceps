@@ -1,5 +1,6 @@
 import { Temporal } from '@js-temporal/polyfill'
 import { Stack } from '@mantine/core'
+import _ from 'lodash'
 import { GrayText } from 'src/components/GrayText'
 import { PageTemplate } from 'src/components/PageTemplate'
 import { Query } from 'src/components/Query'
@@ -102,11 +103,13 @@ function calculateEventTotals(recurringEvents: RecurringEventResolved[]) {
 
 export function calculateValuesForEvent(event: RecurringEventResolved) {
   switch (event.eventType) {
-    case 'EatRecipe':
-      return calculateTotals(event.recipeToEat.recipeItems, {
-        amountsPerPortion: false,
-        portions: event.portionsToEat,
+    case 'EatRecipe': {
+      const singlePortion = calculateTotals(event.recipeToEat.recipeItems, {
+        amountsPerPortion: true,
+        portions: event.recipeToEat.portions,
       })
+      return _.mapValues(singlePortion, (val) => val * event.portionsToEat)
+    }
     case 'EatProduct': {
       return {
         weightGrams: event.weightGramsToEat,

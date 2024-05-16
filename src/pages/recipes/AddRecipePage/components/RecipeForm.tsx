@@ -8,7 +8,6 @@ import {
   Text,
   TextInput,
 } from '@mantine/core'
-import _ from 'lodash'
 import { useCallback, useState } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import { NutritionCircle } from 'src/components/NutritionCircle'
@@ -58,14 +57,18 @@ export function RecipeForm({ initialData, onSubmit: inputOnSubmit }: Props) {
   const portions = useWatch({
     control,
     name: 'portions',
-    defaultValue: 1,
+    defaultValue: initialData?.portions ?? 1,
   })
   const recipeItems = useWatch({
     control,
     name: 'recipeItems',
     defaultValue: initialData?.recipeItems ?? [],
   })
-  const totals = calculateTotals(recipeItems)
+  const totals = calculateTotals(recipeItems, {
+    amountsPerPortion: true,
+    portions,
+  })
+  console.log('totals', totals, 'portions', portions)
 
   const onSubmit = useCallback(
     async (data: RecipeFormFields) => {
@@ -134,9 +137,9 @@ export function RecipeForm({ initialData, onSubmit: inputOnSubmit }: Props) {
             per portion
           </Text>
           <NutritionCircle
-            nutrition={_.mapValues(totals, (val) => val / portions)}
+            nutrition={totals}
             variant="large"
-            weightGrams={totals.weightGrams / portions}
+            weightGrams={totals.weightGrams}
           />
           <Button
             mt="sm"

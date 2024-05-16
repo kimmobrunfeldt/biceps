@@ -28,7 +28,7 @@ export function NutritionCircle({
         return {
           value: percentage,
           color: getColor(key),
-          tooltip: `${formatGrams(value)}g ${getLabel(key).toLocaleLowerCase()} / ${weightGrams}g (${Math.round(percentage)}%)`,
+          tooltip: `${formatGrams(value)}g ${getLabel(key).toLocaleLowerCase()} / ${formatGrams(weightGrams)}g (${Math.round(percentage)}%)`,
         }
       })
 
