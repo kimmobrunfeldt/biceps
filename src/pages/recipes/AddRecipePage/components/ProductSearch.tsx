@@ -13,8 +13,12 @@ import { useDebounce } from '@uidotdev/usehooks'
 import convert, { Unit } from 'convert'
 import { useCallback, useState } from 'react'
 import { ProductImage } from 'src/components/ProductImage'
+import { ProductResolved } from 'src/db/schemas/ProductSchema'
 import { RecipeItemResolvedBeforeSaving } from 'src/db/schemas/RecipeItemSchema'
-import { useCustomProductSearch } from 'src/hooks/useDatabase'
+import {
+  useCustomProductSearch,
+  useExternalProductSearch,
+} from 'src/hooks/useDatabase'
 import { useSearch } from 'src/hooks/useFoodApi'
 import { Product } from 'src/utils/foodApi'
 
@@ -28,19 +32,27 @@ export function ProductSearch({ onSelect }: Props) {
   })
   const [value, setValue] = useState('')
   const debouncedValue = useDebounce(value, 300)
-  const dbSearchResult = useCustomProductSearch({
+  const apiSearchResult = useSearch({ searchTerms: debouncedValue })
+  const dbCustomSearchResult = useCustomProductSearch({
     searchTerms: debouncedValue,
   })
-  const apiSearchResult = useSearch({ searchTerms: debouncedValue })
-  const dbProducts = dbSearchResult.data ?? []
+  const dbExternalSearchResult = useExternalProductSearch({
+    searchTerms: debouncedValue,
+  })
   const apiProducts = apiSearchResult.data?.products ?? []
+  const dbCustomProducts = dbCustomSearchResult.data ?? []
+  const dbExternalProducts = dbExternalSearchResult.data ?? []
+  const externalProducts = [...dbExternalProducts, ...apiProducts]
 
   const errorMessage = getErrorMessage([
     apiSearchResult.error
       ? `Search failed: ${apiSearchResult.error?.message ?? 'unknown error'}`
       : undefined,
-    dbSearchResult.error
-      ? `Search failed: ${dbSearchResult.error?.message ?? 'unknown error'}`
+    dbCustomSearchResult.error
+      ? `Search failed: ${dbCustomSearchResult.error?.message ?? 'unknown error'}`
+      : undefined,
+    dbExternalSearchResult.error
+      ? `Search failed: ${dbExternalSearchResult.error?.message ?? 'unknown error'}`
       : undefined,
   ])
 
@@ -58,30 +70,33 @@ export function ProductSearch({ onSelect }: Props) {
     [onSelect, setValue]
   )
 
-  const customOptions = dbProducts.map((product) => (
-    <Combobox.Option
-      value={product.id}
-      key={product.id}
-      onClick={onOptionClick.bind(null, {
-        __type: 'RecipeItem',
-        weightGrams: 100,
-        product,
-      })}
-    >
-      <Flex align="center" gap="sm">
-        <ProductImage
-          product={{
-            imageUrl: product.imageUrl,
-            imageThumbUrl: product.imageThumbUrl,
-          }}
-          alt={product.name}
-        />
+  function toOption(product: ProductResolved) {
+    return (
+      <Combobox.Option
+        value={product.id}
+        key={product.id}
+        onClick={onOptionClick.bind(null, {
+          __type: 'RecipeItem',
+          weightGrams: 100,
+          product,
+        })}
+      >
+        <Flex align="center" gap="sm">
+          <ProductImage
+            product={{
+              imageUrl: product.imageUrl,
+              imageThumbUrl: product.imageThumbUrl,
+            }}
+            alt={product.name}
+          />
 
-        <Text>{product.name}</Text>
-      </Flex>
-    </Combobox.Option>
-  ))
-
+          <Text>{product.name}</Text>
+        </Flex>
+      </Combobox.Option>
+    )
+  }
+  const customOptions = dbCustomProducts.map(toOption)
+  const externalOptions = dbExternalProducts.map(toOption)
   const apiOptions = apiProducts.map((product) => (
     <Combobox.Option
       value={product.id}
@@ -108,8 +123,10 @@ export function ProductSearch({ onSelect }: Props) {
     value.length > 0 &&
     (apiSearchResult.isLoading ||
       apiSearchResult.isPending ||
-      dbSearchResult.isLoading ||
-      dbSearchResult.isPending)
+      dbCustomSearchResult.isLoading ||
+      dbCustomSearchResult.isPending ||
+      dbExternalSearchResult.isLoading ||
+      dbExternalSearchResult.isPending)
   return (
     <Stack gap="sm">
       <Combobox
@@ -149,10 +166,11 @@ export function ProductSearch({ onSelect }: Props) {
             </Combobox.Options>
           </Combobox.Group>
 
-          <Combobox.Group label="Open Food Facts">
+          <Combobox.Group label="External products">
             <Combobox.Options mah={280} style={{ overflowY: 'auto' }}>
+              {externalOptions}
               {apiOptions}
-              {apiProducts.length === 0 ? (
+              {apiProducts.length === 0 && externalOptions.length === 0 ? (
                 <Combobox.Empty>
                   {value.length > 0 ? 'No products found' : 'Type to search'}
                 </Combobox.Empty>

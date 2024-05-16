@@ -38,7 +38,8 @@ const queryNames = {
   getAllRecipes: 'getAllRecipes',
   getRecipe: (id: string) => `getRecipe-${id}`,
   getAllCustomProducts: 'getAllCustomProducts',
-  useCustomProductSearch: 'useCustomProductSearch',
+  customProductSearch: 'customProductSearch',
+  externalProductSearch: 'externalProductSearch',
   getAllExternalProducts: 'getAllExternalProducts',
   getProduct: (id: string) => `getProduct-${id}`,
   getRecurringEvent: (id: string) => `getRecurringEvent-${id}`,
@@ -262,6 +263,40 @@ export function useCustomProductSearch({
         const rows = await Product.findManyCustom({
           connection: ctx.db,
           where: { name: is('LIKE', `%${searchTerms}%`) },
+          limit: 10,
+        })
+        const products = await Promise.all(
+          rows.map((row) => resolver({ row, connection: ctx.db, loaders }))
+        )
+        return products
+      }
+    ),
+  })
+}
+
+export function useExternalProductSearch({
+  searchTerms,
+}: {
+  searchTerms: string
+}) {
+  const ctx = useSqlite()
+  const loaders = useDataLoaders()
+  // Don't use table reactivity here as it could potentially make searching UX confusing
+
+  return useQuery({
+    queryKey: [
+      ...getCacheKey(ctx, queryNames.externalProductSearch),
+      searchTerms,
+    ],
+    queryFn: withQueryErrorHandling(
+      queryNames.externalProductSearch,
+      async () => {
+        const rows = await Product.findManyExternal({
+          connection: ctx.db,
+          where: {
+            name: is('LIKE', `%${searchTerms}%`),
+            id: is('LIKE', 'seed-%'),
+          },
           limit: 10,
         })
         const products = await Promise.all(

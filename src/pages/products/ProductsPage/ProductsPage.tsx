@@ -53,7 +53,7 @@ export function ProductsPage() {
         <ProductsTable useData={useGetAllCustomProducts} showRemove />
 
         <Title order={2} size="h3" mt={80}>
-          Imported products
+          External products
         </Title>
         <GrayText py="sm" maw={650}>
           Products added from Open Food Facts via product search or
