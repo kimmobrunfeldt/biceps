@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Button, Select, Stack } from '@mantine/core'
+import { Button, Flex, Select, Stack } from '@mantine/core'
 import { useCallback, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { InputSkeleton } from 'src/components/InputSkeleton'
@@ -26,7 +26,7 @@ export type RecurringEventFormFields = Extract<
 
 type Props = {
   selectedPersonId: string
-  initialData?: RecurringEventFormFields
+  initialData?: Partial<RecurringEventFormFields>
   onSubmit: (data: RecurringEventFormFields) => void
   onChange?: (data: Nutrition) => void
 }
@@ -178,14 +178,16 @@ export function RecurringEventForm({
         />
       </Stack>
 
-      <Button
-        type="submit"
-        mt="lg"
-        disabled={!isDirty || isSubmitting}
-        loading={isSubmitting}
-      >
-        {initialData ? 'Save schedule' : 'Add schedule'}
-      </Button>
+      <Flex justify="flex-end">
+        <Button
+          type="submit"
+          mt="lg"
+          disabled={!isDirty || isSubmitting}
+          loading={isSubmitting}
+        >
+          {initialData ? 'Save meal' : 'Add meal'}
+        </Button>
+      </Flex>
     </form>
   )
 }

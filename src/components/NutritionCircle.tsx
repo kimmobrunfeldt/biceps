@@ -38,7 +38,7 @@ export function NutritionCircle({
     ...macroSections,
     {
       value: rest,
-      color: 'gray',
+      color: '#c7c7c7',
       tooltip: 'Nutrition macros distribution',
     },
   ]

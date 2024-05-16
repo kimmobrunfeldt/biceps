@@ -8,7 +8,7 @@ import {
   Title,
   Tooltip,
 } from '@mantine/core'
-import { IconCopy, IconX } from '@tabler/icons-react'
+import { IconCopy, IconPlus, IconX } from '@tabler/icons-react'
 import _ from 'lodash'
 import pluralize from 'pluralize'
 import { useCallback } from 'react'
@@ -44,11 +44,13 @@ type Props = {
   fadeEventsBeforeNow?: boolean
   hideNutritionHeader?: boolean
   editable?: boolean
+  onAddRecurringEventClick?: () => void
 }
 
 export function DaySchedule({
   weekday,
   recurringEvents,
+  onAddRecurringEventClick,
   editable = false,
   fadeEventsBeforeNow = false,
   hideNutritionHeader = false,
@@ -102,16 +104,26 @@ export function DaySchedule({
           <Title order={2} size="h3">
             {weekdayNumberToLongName(weekday)}
           </Title>
-          <Box pos="relative" top={2}>
-            <NutritionCircle
-              nutrition={nutritionsPerDay}
-              weightGrams={nutritionsPerDay.weightGrams}
-              variant="icon"
-            />
-          </Box>
+          {editable ? null : (
+            <Box pos="relative" top={2}>
+              <NutritionCircle
+                nutrition={nutritionsPerDay}
+                weightGrams={nutritionsPerDay.weightGrams}
+                variant="icon"
+              />
+            </Box>
+          )}
+
           {editable ? (
-            <Flex align="flex-end" pos="relative" top={-1}>
+            <Flex align="flex-end" pos="relative" top={-1} gap="xs">
               <CopyScheduleButton weekday={weekday} />
+              <ActionIcon
+                radius="lg"
+                aria-label="Add meal"
+                onClick={onAddRecurringEventClick}
+              >
+                <IconPlus size={14} />
+              </ActionIcon>
             </Flex>
           ) : null}
         </Flex>
@@ -132,7 +144,7 @@ export function DaySchedule({
         ) : null}
       </Flex>
 
-      <Stack pb="xl" gap="xs">
+      <Stack gap="xs">
         {recurringEvents.length === 0 && <GrayText>No events</GrayText>}
         {sortedTimes.map((timeKey, i) => {
           const recurringEvents = eventsGroupedByTime[timeKey]
@@ -197,13 +209,19 @@ function EventRow({
           <Text>
             {formatPortions(event.portionsToEat)}{' '}
             {pluralize('portion', event.portionsToEat)} of{' '}
-            <Link
-              to={formatRoute(routes.recipes.edit.path, {
-                id: event.recipeToEatId,
-              })}
-            >
-              {event.recipeToEat.name}
-            </Link>
+            {editable ? (
+              <Box component="span" c="blue">
+                {event.recipeToEat.name}{' '}
+              </Box>
+            ) : (
+              <Link
+                to={formatRoute(routes.recipes.edit.path, {
+                  id: event.recipeToEatId,
+                })}
+              >
+                {event.recipeToEat.name}
+              </Link>
+            )}
           </Text>
           {editable ? (
             <Tooltip label="Remove meal" position="right">
@@ -278,13 +296,7 @@ function CopyScheduleButton({
     <Menu shadow="md" width={200}>
       <Menu.Target>
         <Tooltip label="Copy meals to another day">
-          <ActionIcon
-            size="sm"
-            radius="lg"
-            aria-label="Copy meals to another day"
-            pos="relative"
-            top={2}
-          >
+          <ActionIcon radius="lg" aria-label="Copy meals to another day">
             <IconCopy size={14} />
           </ActionIcon>
         </Tooltip>

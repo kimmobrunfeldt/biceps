@@ -4,6 +4,7 @@ import { useSearch, Link as WouterLink } from 'wouter'
 type Props = {
   className?: string
   children?: React.ReactNode
+  onClick?: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void
 } & ({ to: string } | { href: string })
 
 export const Link = React.forwardRef<HTMLAnchorElement, Props>((props, ref) => {

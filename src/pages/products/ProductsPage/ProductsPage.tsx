@@ -15,7 +15,7 @@ export function ProductsPage() {
     <PageTemplate
       title="Products"
       titleRightSection={
-        <Flex direction="column" align="center" gap={4}>
+        <Flex direction="column" align="center" gap={6}>
           <Link to={routes.products.add.path}>
             <Button leftSection={<IconPlus size={14} />}>Add product</Button>
           </Link>
