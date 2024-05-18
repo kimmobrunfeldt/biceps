@@ -6,20 +6,31 @@ import { GrayText } from 'src/components/GrayText'
 import { useNotifications } from 'src/hooks/useNotification'
 import { useSyncWithPeerId } from 'src/hooks/usePeerIdToConnect'
 import { useSqlite } from 'src/hooks/useSqlite'
+import { getLogger } from 'src/utils/logger'
 
-export function useSyncDataModalOpener() {
+const logger = getLogger('syncModal')
+
+export function useSyncDataModalOpener(
+  getConnectedPeerId: () => string | undefined
+) {
   const ctx = useSqlite()
   const { notification, withNotifications } = useNotifications()
   const modals = useModals()
-  const peerId = useSyncWithPeerId()
+  const queryPeerId = useSyncWithPeerId()
   const [modalOpened, setModalOpened] = useState(false)
 
   const modalId = 'data-sync'
   useLayoutEffect(() => {
-    if (peerId && !modalOpened) {
+    if (queryPeerId && !modalOpened) {
       setModalOpened(true)
 
-      if (peerId === ctx.siteid) {
+      const connectedPeerId = getConnectedPeerId()
+      if (connectedPeerId && queryPeerId === connectedPeerId) {
+        logger.info('Already connected to a peer, not opening sync modal')
+        return
+      }
+
+      if (queryPeerId === ctx.siteid) {
         notification({
           message: 'Cannot sync data with the same device ID!',
           color: 'red',
@@ -45,7 +56,7 @@ export function useSyncDataModalOpener() {
             <Text size="sm" py="sm"></Text>
             <Text size="sm">Their device ID:</Text>
             <GrayText pb="sm" size="sm">
-              {peerId}
+              {queryPeerId}
             </GrayText>
             <Text size="sm">Your device ID:</Text>
             <GrayText pb="sm" size="sm">
@@ -61,7 +72,7 @@ export function useSyncDataModalOpener() {
           modals.closeModal(modalId)
           await withNotifications({
             fn: async () => {
-              ctx.rtc.connectTo(peerId)
+              ctx.rtc.connectTo(queryPeerId)
             },
             success: { message: 'Data sync enabled', color: 'blue' },
             error: (error) => {
@@ -78,7 +89,8 @@ export function useSyncDataModalOpener() {
       })
     }
   }, [
-    peerId,
+    queryPeerId,
+    getConnectedPeerId,
     modalOpened,
     modals,
     withNotifications,
