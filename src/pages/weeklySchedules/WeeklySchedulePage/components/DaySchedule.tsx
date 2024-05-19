@@ -10,7 +10,7 @@ import {
   Tooltip,
 } from '@mantine/core'
 import { useInterval } from '@mantine/hooks'
-import { IconCopy, IconPlus, IconX } from '@tabler/icons-react'
+import { IconClock, IconCopy, IconPlus, IconX } from '@tabler/icons-react'
 import _ from 'lodash'
 import pluralize from 'pluralize'
 import { useCallback, useEffect, useState } from 'react'
@@ -29,6 +29,7 @@ import {
 import { useNotifications } from 'src/hooks/useNotification'
 import { calculateValuesForEvent } from 'src/pages/IndexPage/IndexPage'
 import { formatRoute, routes } from 'src/routes'
+import { theme } from 'src/theme'
 import { formatGrams, formatKcal, formatPortions } from 'src/utils/format'
 import {
   Weekday,
@@ -156,7 +157,7 @@ export function DaySchedule({
         </Flex>
       ) : null}
 
-      <Stack gap="xs">
+      <Stack gap={12}>
         {recurringEvents.length === 0 && <GrayText>No events</GrayText>}
         {sortedTimes.map((timeKey, i) => {
           const recurringEvents = eventsGroupedByTime[timeKey]
@@ -181,34 +182,38 @@ export function DaySchedule({
           return (
             <Box key={i}>
               {shouldShowNow ? (
-                <Flex align="center" gap={6} maw={200}>
-                  <Text c="gray" fw="bold" miw={60}>
+                <Flex align="center" gap={4} maw={200} my="sm">
+                  <Text
+                    c="gray"
+                    fw="bold"
+                    miw={60}
+                    ff="monospace"
+                    fz="sm"
+                    pl={1}
+                  >
                     {formatTime(now)}
                   </Text>
-                  <Box
-                    my="lg"
-                    style={{
-                      height: '1px',
-                      background: '#ddd',
-                      flex: 1,
-                    }}
-                  />
+
                   <GrayText fw="bold" fz="xs" style={{ letterSpacing: '1px' }}>
-                    NOW
+                    NEXT MEALS
                   </GrayText>
-                  <Box
-                    my="lg"
-                    style={{
-                      height: '1px',
-                      background: '#ddd',
-                      flex: 1,
-                    }}
-                  />
+                  <GrayText pos="relative" top={1}>
+                    <IconClock size={14} />
+                  </GrayText>
                 </Flex>
               ) : null}
 
-              <Flex align="flex-start" gap={6} opacity={shouldFade ? 0.4 : 1}>
-                <Text c="gray" fw="bold" miw={60}>
+              <Flex align="flex-start" gap={4} opacity={shouldFade ? 0.4 : 1}>
+                <Text
+                  c="gray"
+                  fw="bold"
+                  miw={60}
+                  ff="monospace"
+                  fz="sm"
+                  pos="relative"
+                  top={2}
+                  pl={1}
+                >
                   {formattedTime}
                 </Text>
                 <Stack gap={4}>
