@@ -13,7 +13,7 @@ import { useInterval } from '@mantine/hooks'
 import { IconCopy, IconPlus, IconX } from '@tabler/icons-react'
 import _ from 'lodash'
 import pluralize from 'pluralize'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { GrayText } from 'src/components/GrayText'
 import { Link } from 'src/components/Link'
 import { NutritionCircle } from 'src/components/NutritionCircle'
@@ -61,9 +61,13 @@ export function DaySchedule({
 }: Props) {
   const [now, setNow] = useState(Temporal.Now.plainDateTime(calendar))
 
-  useInterval(() => {
+  const interval = useInterval(() => {
     setNow(Temporal.Now.plainDateTime(calendar))
-  }, 1000 * 60)
+  }, 1000 * 5)
+  useEffect(() => {
+    interval.start()
+    return interval.stop
+  }, [interval])
 
   const eventsGroupedByTime = _.groupBy(
     recurringEvents,
