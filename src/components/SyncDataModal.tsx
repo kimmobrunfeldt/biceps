@@ -79,7 +79,8 @@ export function useSyncDataModalOpener(
               console.error(error)
               setModalOpened(false)
               return {
-                message: 'Failed to start data sync!',
+                message:
+                  'Failed to start data sync! Close other biceps tabs, refresh browser in both devices, and try again.',
                 color: 'red',
                 icon: <IconX />,
               }
