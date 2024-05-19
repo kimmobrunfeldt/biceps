@@ -24,7 +24,7 @@
 }
 
 .stat {
-  min-width: rem(98px);
+  min-width: rem(130px);
   padding-top: var(--mantine-spacing-xl);
   min-height: rem(140px);
   display: flex;
