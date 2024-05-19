@@ -658,6 +658,20 @@ export function useLazyGetAllUserData() {
       const customProducts = await Product.findManyCustom({
         connection: ctx.db,
       })
+      // Also include products that are used in recipes
+      const productsInUse = await Product.findMany({
+        where: {
+          id: is(
+            'IN',
+            recipeItems.map((r) => r.productId)
+          ),
+        },
+        connection: ctx.db,
+      })
+      const allProducts = _.uniqWith(
+        [...customProducts, ...productsInUse],
+        (p1, p2) => p1.id === p2.id
+      )
       const recurringEvents = await RecurringEvent.findMany({
         connection: ctx.db,
       })
@@ -671,7 +685,7 @@ export function useLazyGetAllUserData() {
         persons,
         recipes,
         recipeItems,
-        products: customProducts,
+        products: allProducts,
         recurringEvents,
       }
     },
