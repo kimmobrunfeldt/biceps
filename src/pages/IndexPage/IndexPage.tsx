@@ -1,6 +1,8 @@
 import { Temporal } from '@js-temporal/polyfill'
 import { Stack } from '@mantine/core'
+import { useInterval } from '@mantine/hooks'
 import _ from 'lodash'
+import { useEffect, useState } from 'react'
 import { GrayText } from 'src/components/GrayText'
 import { PageTemplate } from 'src/components/PageTemplate'
 import { Query } from 'src/components/Query'
@@ -16,7 +18,14 @@ import { Weekday, calendar, isBeforeNow } from 'src/utils/time'
 export function IndexPage() {
   const appStateResult = useGetAppState()
   const recurringEventsResult = useGetAllRecurringEvents()
-  const today = Temporal.Now.plainDate(calendar)
+  const [today, setToday] = useState(Temporal.Now.plainDate(calendar))
+  const interval = useInterval(() => {
+    setToday(Temporal.Now.plainDate(calendar))
+  }, 1000 * 60)
+  useEffect(() => {
+    interval.start()
+    return interval.stop
+  }, [interval])
   const dayOfWeek = today.dayOfWeek as Weekday
 
   function getTitle() {
